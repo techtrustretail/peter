@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Maths Quest – Factors &amp; Division</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#dff3ff; --dot:#c4e6fb; --card:#ffffff; --ink:#1f2a44; --muted:#5b6785; --line:#1f2a44;
+  --sun:#ffd23f; --grape:#7b5cff; --mint:#2ec4b6; --coral:#ff5d73; --sky:#3a9bff; --tang:#ff9f1c;
+  --grapeT:rgba(123,92,255,.20); --skyT:rgba(58,155,255,.20);
+  --goodBg:#d9f7ef; --badBg:#ffe1e6; --sunBg:#fff4c7; --skyBg:#e3f1ff;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#141a2e; --dot:#1c2440; --card:#222b48; --ink:#eef2ff; --muted:#a9b3d6; --line:#7d89c2;
+    --grapeT:rgba(123,92,255,.30); --skyT:rgba(58,155,255,.28);
+    --goodBg:#16443d; --badBg:#4a1f2a; --sunBg:#40391a; --skyBg:#1b3256;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#141a2e; --dot:#1c2440; --card:#222b48; --ink:#eef2ff; --muted:#a9b3d6; --line:#7d89c2;
+  --grapeT:rgba(123,92,255,.30); --skyT:rgba(58,155,255,.28);
+  --goodBg:#16443d; --badBg:#4a1f2a; --sunBg:#40391a; --skyBg:#1b3256;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{
+  margin:0; min-height:100%; color:var(--ink); background:var(--bg);
+  background-image:radial-gradient(var(--dot) 2.5px,transparent 2.5px); background-size:26px 26px;
+  font-family:'Fredoka','Baloo 2','Trebuchet MS','Segoe UI',system-ui,sans-serif; font-size:17px; line-height:1.4;
+  -webkit-tap-highlight-color:transparent;
+}
+.wrap{max-width:760px;margin:0 auto;padding:14px 14px 48px}
+button{font:inherit;color:inherit}
+:focus-visible{outline:4px solid var(--sky);outline-offset:3px}
+
+.btn{font-weight:600;font-size:1.1rem;border:3px solid var(--line);border-radius:16px;padding:10px 20px;
+  background:var(--sun);color:#1f2a44;box-shadow:0 4px 0 var(--line);cursor:pointer;transition:transform .08s,box-shadow .08s}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+.btn.ghost{background:var(--card);color:var(--ink)}
+.btn.sm{padding:4px 10px;font-size:1.1rem;border-radius:12px}
+.btn.go{background:var(--mint);color:#fff}
+.btn[disabled]{opacity:.5;pointer-events:none}
+.card{background:var(--card);border:3px solid var(--line);border-radius:24px;box-shadow:0 5px 0 var(--line);padding:16px}
+.row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+
+/* Home */
+.hero{text-align:center;padding:10px 0 18px}
+.hero .owl{font-size:72px;line-height:1;display:inline-block;animation:bob 2.4s ease-in-out infinite}
+.hero h1{font-size:clamp(2.4rem,9vw,3.6rem);margin:4px 0 0;line-height:1;font-weight:700;letter-spacing:-.5px;
+  color:var(--sun);-webkit-text-stroke:2px var(--line);paint-order:stroke fill;text-shadow:0 4px 0 var(--line)}
+.hero p{margin:8px 0 12px;font-size:1.15rem;color:var(--muted);font-weight:500}
+.pill{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:3px solid var(--line);border-radius:999px;padding:3px 14px;font-weight:600;white-space:nowrap}
+.levels{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px}
+.level{display:flex;gap:14px;align-items:center;cursor:pointer;text-align:left;width:100%;transition:transform .1s}
+.level:hover{transform:translateY(-2px) rotate(-.4deg)}
+.level:active{transform:translateY(3px);box-shadow:0 2px 0 var(--line)}
+.ico{width:68px;height:68px;font-size:36px;border-radius:20px;display:grid;place-items:center;border:3px solid var(--line);flex:none}
+.lname{font-weight:700;font-size:1.25rem}
+.ldesc{color:var(--muted);font-size:.98rem}
+.stars{color:var(--sun);font-size:1.3rem;letter-spacing:2px;-webkit-text-stroke:1px var(--line)}
+.foot{text-align:center;color:var(--muted);margin-top:22px}
+
+/* Game frame */
+.topbar{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.progress{flex:1;height:18px;border:3px solid var(--line);border-radius:999px;background:var(--card);overflow:hidden}
+.progress>div{height:100%;background:var(--mint);transition:width .5s}
+.mascot{display:flex;align-items:center;gap:12px;margin:8px 0 14px}
+.mascot .owl{font-size:50px;line-height:1;flex:none;animation:bob 2.4s ease-in-out infinite}
+.bubble{background:var(--card);border:3px solid var(--line);border-radius:18px;padding:8px 14px;font-weight:500;position:relative;flex:1;min-height:48px;display:flex;align-items:center}
+.bubble::before{content:'';position:absolute;left:-13px;top:50%;margin-top:-9px;border:9px solid transparent;border-right-color:var(--line);border-left:0}
+.bubble.pop{animation:pop .35s}
+.lvltitle{font-weight:700;font-size:1.3rem;margin:0 0 6px;text-align:center}
+.center{text-align:center}
+.muted{color:var(--muted)}
+
+/* Venn */
+.vwrap{padding:34px 2px 2px}
+.venn{position:relative;width:100%;aspect-ratio:1.7/1;cursor:pointer;user-select:none;-webkit-user-select:none}
+.circle{position:absolute;width:58%;aspect-ratio:1/1;top:50%;transform:translateY(-50%);border:3px solid var(--line);border-radius:50%}
+.c1{left:3%;background:var(--grapeT)}
+.c2{left:39%;background:var(--skyT)}
+.vlabel{position:absolute;top:-32px;transform:translateX(-50%);background:var(--card);border:3px solid var(--line);border-radius:12px;padding:0 10px;font-weight:600;font-size:.95rem;white-space:nowrap}
+.vlabel.a{left:22%}.vlabel.b{left:78%}
+.zone{position:absolute;top:14%;height:72%;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:5px;pointer-events:none}
+.zL{left:6%;width:31%}.zM{left:40.5%;width:19%}.zR{left:63%;width:31%}
+.zone .chip,.outside .chip{pointer-events:auto}
+.chip{font-weight:600;font-size:1.2rem;min-width:46px;height:42px;padding:0 8px;border:3px solid var(--line);border-radius:13px;
+  background:var(--sun);color:#1f2a44;box-shadow:0 3px 0 var(--line);cursor:pointer;transition:transform .12s}
+.zone .chip{font-size:1rem;min-width:36px;height:32px;padding:0 5px;border-radius:10px;box-shadow:0 2px 0 var(--line)}
+.chip.sel{background:var(--tang);transform:translateY(-5px) scale(1.1)}
+.chip.ok{background:var(--mint);color:#fff}
+.chip.bad{background:var(--coral);color:#fff;animation:shake .45s}
+.outside{margin-top:12px;border:3px dashed var(--line);border-radius:16px;min-height:58px;padding:6px 10px 10px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;cursor:pointer}
+.outside .lbl{font-weight:500;color:var(--muted);font-size:.92rem;width:100%}
+.tray{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center;padding:14px;border-radius:18px;background:var(--sunBg);border:3px solid var(--line);min-height:74px;margin-top:14px}
+
+/* Questions */
+.q-big{font-size:clamp(2.2rem,10vw,3.4rem);font-weight:700;text-align:center;margin:8px 0 14px;line-height:1.1}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.opt{font-size:1.35rem;padding:14px 8px;background:var(--card);color:var(--ink)}
+.opt.right{background:var(--mint);color:#fff}
+.opt.wrong{background:var(--coral);color:#fff;animation:shake .45s}
+.timer{height:12px;border-radius:999px;background:var(--skyBg);overflow:hidden;border:2px solid var(--line)}
+.timer>div{height:100%;width:100%;background:var(--sky)}
+.timer>div.low{background:var(--coral)}
+.streak{display:inline-block;font-weight:600;color:var(--tang)}
+.fb{margin-top:14px;border-radius:16px;padding:12px 14px;border:3px solid var(--line);font-weight:500}
+.fb.good{background:var(--goodBg)}.fb.bad{background:var(--badBg)}.fb.info{background:var(--skyBg)}
+.fb b{font-weight:700}
+.story{display:flex;gap:14px;align-items:center}
+.story .pic{font-size:64px;line-height:1;flex:none}
+.story p{margin:0;font-size:1.15rem}
+.ask{font-weight:700;font-size:1.2rem;margin:14px 0 12px;text-align:center}
+.think{display:flex;gap:8px;justify-content:center;margin-bottom:12px;flex-wrap:wrap}
+.think span{border:2px dashed var(--line);border-radius:999px;padding:0 10px;font-size:.95rem;color:var(--muted)}
+
+/* Missing number */
+.eq{font-size:clamp(1.6rem,7vw,2.4rem);font-weight:700;text-align:center;margin:10px 0;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+.ansbox{display:inline-grid;place-items:center;min-width:92px;height:62px;padding:0 10px;border:3px solid var(--line);border-radius:16px;background:var(--sunBg)}
+.ansbox.empty{color:var(--muted)}
+.ansbox.bad{animation:shake .45s;background:var(--badBg)}
+.ansbox.ok{background:var(--mint);color:#fff}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:330px;margin:14px auto 0}
+.pad .btn{height:58px;font-size:1.6rem;padding:0;background:var(--card);color:var(--ink)}
+.pad .btn.go{background:var(--mint);color:#fff}
+.steps{text-align:left;line-height:1.7}
+
+/* Times tables */
+.ttgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:10px;margin:8px 0 16px}
+.ttgrid .btn{padding:8px 4px;display:flex;flex-direction:column;align-items:center;line-height:1.15;font-size:1.3rem}
+.ttgrid .btn.on{background:var(--grape);color:#fff}
+.mini{font-size:.75rem;color:var(--sun);-webkit-text-stroke:.5px var(--line);letter-spacing:1px}
+.ttlist{display:grid;grid-auto-flow:column;grid-template-rows:repeat(6,auto);gap:4px 18px;font-size:1.25rem;background:var(--sunBg);border:3px solid var(--line);border-radius:16px;padding:12px 16px}
+.sq{overflow-x:auto;border:3px solid var(--line);border-radius:16px}
+.sq table{border-collapse:collapse;width:100%;min-width:420px;font-weight:500;text-align:center}
+.sq th,.sq td{padding:4px 2px;border:1px solid var(--dot)}
+.sq th{background:var(--grapeT);font-weight:700}
+.sq tr:nth-child(even) td{background:var(--sunBg)}
+
+/* End */
+.big-stars{font-size:clamp(3rem,15vw,4.6rem);text-align:center;letter-spacing:6px;margin:6px 0}
+.big-stars span{display:inline-block;color:var(--sun);-webkit-text-stroke:2px var(--line);animation:starIn .5s both}
+.big-stars span.off{color:var(--card)}
+
+/* FX */
+.popnum{position:fixed;z-index:60;font-weight:700;font-size:1.5rem;color:var(--mint);-webkit-text-stroke:1px var(--line);pointer-events:none;animation:floatUp 1s forwards}
+.confetti{position:fixed;top:-20px;width:10px;height:16px;z-index:50;pointer-events:none;border-radius:2px;animation:fall linear forwards}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes pop{0%{transform:scale(.9)}60%{transform:scale(1.04)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+@keyframes floatUp{to{transform:translateY(-60px);opacity:0}}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+@keyframes starIn{0%{transform:scale(0) rotate(-90deg)}70%{transform:scale(1.3)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:420px){.zone .chip{font-size:.9rem;min-width:30px;height:28px}.vlabel{font-size:.85rem}.opt{font-size:1.15rem}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+(function(){
+const app=document.getElementById('app');
+const rand=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const uniq=a=>[...new Set(a)];
+const factors=n=>{const f=[];for(let i=1;i<=n;i++)if(n%i===0)f.push(i);return f};
+const PRAISE=['Brilliant!','Super star! ⭐','Nailed it!','Fantastic!','You’re a maths wizard! 🧙','Hoot hoot, correct! 🦉','Awesome work!','Spot on!'];
+const OOPS=['Nearly! Let’s look at why…','Good try! Here’s the trick…','Not quite – you’ll get the next one!','Oops! Check the working below.'];
+
+const S={muted:false,prog:{}};
+try{S.prog=JSON.parse(localStorage.getItem('mq-prog')||'{}')||{}}catch(e){S.prog={}}
+try{S.muted=localStorage.getItem('mq-muted')==='1'}catch(e){}
+function saveProg(){try{localStorage.setItem('mq-prog',JSON.stringify(S.prog))}catch(e){}}
+
+/* ---------- sound ---------- */
+let actx=null;
+function tone(notes){
+  if(S.muted)return;
+  try{
+    actx=actx||new (window.AudioContext||window.webkitAudioContext)();
+    const t0=actx.currentTime;
+    notes.forEach(([f,t,d])=>{
+      const o=actx.createOscillator(),g=actx.createGain();
+      o.type='triangle';o.frequency.value=f;
+      g.gain.setValueAtTime(0.0001,t0+t);
+      g.gain.exponentialRampToValueAtTime(0.18,t0+t+0.015);
+      g.gain.exponentialRampToValueAtTime(0.0001,t0+t+d);
+      o.connect(g);g.connect(actx.destination);o.start(t0+t);o.stop(t0+t+d+0.05);
+    });
+  }catch(e){}
+}
+const SND={
+  good:()=>tone([[523,0,.12],[659,.09,.12],[784,.18,.22]]),
+  bad:()=>tone([[247,0,.2],[196,.14,.3]]),
+  tap:()=>tone([[880,0,.06]]),
+  win:()=>tone([[523,0,.15],[659,.12,.15],[784,.24,.15],[1047,.36,.4]])
+};
+
+/* ---------- fx ---------- */
+function confetti(n){
+  if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const cols=['#ffd23f','#7b5cff','#2ec4b6','#ff5d73','#3a9bff','#ff9f1c'];
+  for(let i=0;i<(n||60);i++){
+    const d=document.createElement('div');d.className='confetti';
+    d.style.left=Math.random()*100+'vw';d.style.background=pick(cols);
+    d.style.animationDuration=(1.6+Math.random()*1.8)+'s';d.style.animationDelay=(Math.random()*.4)+'s';
+    document.body.appendChild(d);setTimeout(()=>d.remove(),4000);
+  }
+}
+function popScore(n){
+  const s=document.getElementById('score');if(!s)return;
+  const r=s.getBoundingClientRect();const p=document.createElement('div');
+  p.className='popnum';p.textContent='+'+n;p.style.left=(r.left)+'px';p.style.top=(r.bottom+4)+'px';
+  document.body.appendChild(p);setTimeout(()=>p.remove(),1000);
+}
+
+/* ---------- levels ---------- */
+const LEVELS=[
+  {id:'venn',name:'Venn Sorter',emoji:'🟣',bg:'var(--grapeT)',desc:'Sort numbers into factor Venn diagrams.',total:3},
+  {id:'dash',name:'Division Dash',emoji:'⚡',bg:'var(--sunBg)',desc:'Divide with and without remainders. Take your time!',total:10},
+  {id:'story',name:'Story Problems',emoji:'🚌',bg:'var(--skyBg)',desc:'Buses, boxes and sharing. Round up or down?',total:8},
+  {id:'missing',name:'Mystery Number',emoji:'🔍',bg:'var(--goodBg)',desc:'Use the remainder to find the hidden number.',total:8},
+  {id:'tt',name:'Times Tables',emoji:'✖️',bg:'var(--badBg)',desc:'Learn and practise the 2 to 12 times tables.',total:10}
+];
+const starStr=n=>'★'.repeat(n)+'☆'.repeat(3-n);
+let G=null;
+function clearTimers(){if(G&&G.timers){G.timers.forEach(t=>{clearTimeout(t);clearInterval(t)});G.timers=[]}}
+function later(fn,ms){const t=setTimeout(fn,ms);G.timers.push(t);return t}
+
+function home(){
+  clearTimers();G=null;
+  const total=LEVELS.reduce((s,l)=>s+(S.prog[l.id]||0),0);
+  app.innerHTML=`
+  <div class="hero">
+    <div class="owl">🦉</div>
+    <h1>Maths Quest</h1>
+    <p>Factors and division practice with Professor Hoot</p>
+    <span class="pill">⭐ ${total} / ${LEVELS.length*3} stars collected</span>
+  </div>
+  <div class="levels">${LEVELS.map(l=>`
+    <button class="card level" data-l="${l.id}">
+      <div class="ico" style="background:${l.bg}">${l.emoji}</div>
+      <div><div class="lname">${l.name}</div><div class="ldesc">${l.desc}</div>
+      <div class="stars" aria-label="${S.prog[l.id]||0} of 3 stars">${starStr(S.prog[l.id]||0)}</div></div>
+    </button>`).join('')}
+  </div>
+  <p class="foot">Get 3 stars on every level to become a Maths Master! 🏆</p>`;
+  app.querySelectorAll('.level').forEach(b=>b.onclick=()=>{SND.tap();b.dataset.l==='tt'?ttPicker():start(b.dataset.l)});
+}
+
+function start(id,tt){
+  clearTimers();
+  const L=LEVELS.find(l=>l.id===id);
+  G={id,L,round:0,total:L.total,score:0,correct:0,asked:0,streak:0,timers:[],used:[],tt,bs:shuffle([1,2,3,4,5,6,7,8,9,10,11,12])};
+  next();
+}
+function next(){
+  clearTimers();
+  if(G.round>=G.total)return finish();
+  ({venn:vennRound,dash:dashRound,story:storyRound,missing:missingRound,tt:ttRound})[G.id]();
+}
+function frame(inner,msg){
+  app.innerHTML=`
+  <div class="topbar">
+    <button class="btn sm ghost" id="homeBtn" aria-label="Back to level map">🏠</button>
+    <div class="progress" aria-label="Progress"><div style="width:${G.round/G.total*100}%"></div></div>
+    <span class="pill">⭐ <span id="score">${G.score}</span></span>
+    <button class="btn sm ghost" id="muteBtn" aria-label="Sound on or off">${S.muted?'🔇':'🔊'}</button>
+  </div>
+  <div class="mascot"><div class="owl" aria-hidden="true">🦉</div><div class="bubble" id="say" aria-live="polite">${msg}</div></div>
+  <div class="lvltitle">${G.L.emoji} ${G.L.name}${G.tt?(G.tt==='mix'?' (mixed)':` (${G.tt}×)`):''} <span class="muted">· ${G.round+1} of ${G.total}</span></div>
+  <div id="stage">${inner}</div>`;
+  document.getElementById('homeBtn').onclick=home;
+  document.getElementById('muteBtn').onclick=e=>{S.muted=!S.muted;try{localStorage.setItem('mq-muted',S.muted?'1':'0')}catch(_){}e.currentTarget.textContent=S.muted?'🔇':'🔊'};
+}
+function say(t){const b=document.getElementById('say');if(!b)return;b.innerHTML=t;b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop')}
+function addScore(n){G.score+=n;const s=document.getElementById('score');if(s)s.textContent=G.score;popScore(n)}
+function finishRound(){G.round++;next()}
+
+function mcq(el,opts,ans,fmt,cb){
+  el.innerHTML=`<div class="opts">${opts.map((o,i)=>`<button class="btn opt" data-i="${i}">${fmt?fmt(o):o}</button>`).join('')}</div>`;
+  let done=false;
+  el.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+    if(done)return;done=true;
+    const o=opts[+b.dataset.i];const ok=o===ans;
+    b.classList.add(ok?'right':'wrong');
+    if(!ok){const i=opts.indexOf(ans);const rb=el.querySelector(`.opt[data-i="${i}"]`);if(rb)rb.classList.add('right')}
+    cb(ok);
+  });
+  return ()=>{done=true};
+}
+function nextBtn(label){return `<div class="row"><button class="btn go" id="nextBtn">${label||'Next ➜'}</button></div>`}
+function bindNext(){const b=document.getElementById('nextBtn');if(b){b.onclick=()=>{SND.tap();finishRound()};b.focus({preventScroll:true})}}
+
+/* =========================================================
+   LEVEL 1: VENN SORTER
+   ========================================================= */
+const PAIRS=[[16,24],[18,30],[24,36],[12,20],[20,30],[12,18],[15,25],[28,42],[24,40],[30,45],[36,48],[18,24],[20,32],[16,40]];
+function vennRound(){
+  let pair,guard=0;
+  do{pair=pick(PAIRS);guard++}while(G.used.includes(pair.join('-'))&&guard<50);
+  G.used.push(pair.join('-'));
+  const [A,B]=pair;
+  const fa=factors(A).filter(x=>x>1),fb=factors(B).filter(x=>x>1);
+  const both=fa.filter(x=>fb.includes(x)),aO=fa.filter(x=>!fb.includes(x)),bO=fb.filter(x=>!fa.includes(x));
+  const neither=[];for(let x=2;x<=20;x++)if(A%x&&B%x)neither.push(x);
+  const take=(arr,n,must)=>{const base=(must!=null&&arr.includes(must))?[must]:[];return base.concat(shuffle(arr.filter(x=>x!==must)).slice(0,n-base.length))};
+  const nums=shuffle(uniq([...take(both,3),...take(aO,3,A),...take(bO,3,B),...shuffle(neither).slice(0,2)]));
+  G.v={A,B,nums,items:nums.map(n=>({n,zone:null,locked:false,bad:false})),sel:-1,checks:0,done:false};
+  G.asked+=nums.length;
+  frame(`<div class="card" id="vcard"></div>`,
+    G.round===0?'Tap a number, then tap where it belongs in the Venn diagram! Numbers that fit nowhere go <b>outside</b>.'
+               :`New diagram! Factors of <b>${A}</b> and <b>${B}</b>. You can do it!`);
+  renderVenn();
+}
+function zoneFor(n){const {A,B}=G.v;const a=A%n===0,b=B%n===0;return a&&b?'M':a?'L':b?'R':'O'}
+function renderVenn(){
+  const v=G.v;
+  const chip=(it,i)=>`<button class="chip ${it.locked?'ok':''} ${it.bad?'bad':''} ${v.sel===i?'sel':''}" data-i="${i}" aria-label="${it.n}">${it.n}</button>`;
+  const inZone=z=>v.items.map((it,i)=>it.zone===z?chip(it,i):'').join('');
+  const tray=v.items.map((it,i)=>it.zone===null?chip(it,i):'').join('');
+  const card=document.getElementById('vcard');
+  card.innerHTML=`
+    <div class="vwrap"><div class="venn" id="venn">
+      <div class="circle c1"></div><div class="circle c2"></div>
+      <div class="vlabel a">Factors of ${v.A}</div><div class="vlabel b">Factors of ${v.B}</div>
+      <div class="zone zL">${inZone('L')}</div><div class="zone zM">${inZone('M')}</div><div class="zone zR">${inZone('R')}</div>
+    </div></div>
+    <div class="outside" id="outside"><div class="lbl">Outside: not a factor of ${v.A} or ${v.B}</div>${inZone('O')}</div>
+    <div class="tray" id="tray">${tray||'<span class="muted">All placed! Press <b>Check</b> ✔</span>'}</div>
+    <div id="vbottom">${v.done?'':'<div class="row"><button class="btn go" id="checkBtn">Check ✔</button></div>'}</div>`;
+  card.onclick=vennClick;
+  const cb=document.getElementById('checkBtn');if(cb)cb.onclick=e=>{e.stopPropagation();vennCheck()};
+}
+function place(z){const v=G.v;if(v.sel<0)return false;v.items[v.sel].zone=z;v.items[v.sel].bad=false;v.sel=-1;SND.tap();renderVenn();return true}
+function vennClick(e){
+  const v=G.v;if(v.done)return;
+  const ch=e.target.closest('.chip');
+  if(ch){
+    const i=+ch.dataset.i,it=v.items[i];
+    if(it.locked){const {A,B}=v;const z=it.zone;
+      say(z==='M'?`${it.n} is a factor of <b>both</b> ${A} and ${B}. That’s a <b>common factor</b>!`:z==='L'?`${it.n} goes into ${A} but not ${B}.`:z==='R'?`${it.n} goes into ${B} but not ${A}.`:`${it.n} doesn’t divide ${A} or ${B} exactly.`);return}
+    if(it.zone===null){v.sel=(v.sel===i)?-1:i;SND.tap();renderVenn();return}
+    if(v.sel>=0&&v.sel!==i){place(it.zone);return}
+    it.zone=null;v.sel=-1;SND.tap();renderVenn();return;
+  }
+  if(v.sel<0)return;
+  const venn=e.target.closest('#venn');
+  if(venn){
+    const r=venn.getBoundingClientRect();const x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.width;
+    const cy=r.height/r.width/2,R=.29;
+    const in1=Math.hypot(x-.32,y-cy)<=R,in2=Math.hypot(x-.68,y-cy)<=R;
+    place(in1&&in2?'M':in1?'L':in2?'R':'O');return;
+  }
+  if(e.target.closest('#outside'))place('O');
+}
+function explainNum(n){
+  const {A,B}=G.v;
+  const t=X=>X%n===0?`${X} ÷ ${n} = ${X/n} ✔`:`${X} ÷ ${n} has a remainder ✘`;
+  return `<b>${n}</b>: ${t(A)} and ${t(B)}.`;
+}
+function vennCheck(){
+  const v=G.v;
+  if(v.items.some(it=>it.zone===null)){say('Place every number first! 😊');return}
+  v.checks++;const wrong=[];
+  v.items.forEach(it=>{
+    if(it.locked)return;
+    if(it.zone===zoneFor(it.n)){it.locked=true;if(v.checks===1)G.correct++;G.score+=v.checks===1?10:5}
+    else{it.bad=true;wrong.push(it)}
+  });
+  document.getElementById('score').textContent=G.score;
+  if(wrong.length){
+    SND.bad();renderVenn();
+    say(`${wrong.length} to fix! Hint: ${explainNum(wrong[0].n)}`);
+    later(()=>{wrong.forEach(it=>{it.zone=null;it.bad=false});renderVenn()},900);
+  }else{
+    SND.good();confetti(40);v.done=true;renderVenn();popScore(v.checks===1?v.items.length*10:5);
+    say(v.checks===1?`Perfect sort first time! ${pick(PRAISE)}`:`All sorted! ${pick(PRAISE)}`);
+    later(vennBonus,700);
+  }
+}
+function vennBonus(){
+  const {A,B,nums}=G.v;
+  const common=factors(A).filter(x=>B%x===0);
+  const hcf=Math.max(...common);
+  const bottom=document.getElementById('vbottom');
+  G.asked++;
+  let q,ans,opts,expl;
+  if(G.round===1){
+    const missing=common.filter(x=>!nums.includes(x));
+    ans=pick(missing);
+    const pool=shuffle(Array.from({length:Math.max(A,B)},(_,i)=>i+1).filter(x=>!common.includes(x)&&!nums.includes(x)&&x<=20));
+    opts=shuffle(uniq([ans,...pool]).slice(0,4));
+    q=`Bonus ⭐ Which number is <b>another common factor</b> of ${A} and ${B} that is NOT in the list?`;
+    expl=`All the common factors of ${A} and ${B} are: <b>${common.join(', ')}</b>. ${ans===1?'Don’t forget <b>1</b> – it is a factor of every number!':''}`;
+  }else{
+    ans=hcf;
+    const others=common.filter(x=>x!==hcf);
+    const fakes=shuffle([hcf*2,hcf+1,hcf+2,A,B].filter(x=>!common.includes(x)));
+    opts=shuffle(uniq([hcf,...shuffle(others).slice(0,2),...fakes]).slice(0,4));
+    q=`Bonus ⭐ What is the <b>highest common factor</b> of ${A} and ${B}?`;
+    expl=`The common factors of ${A} and ${B} are <b>${common.join(', ')}</b>. The biggest one is <b>${hcf}</b>. It goes into ${A} (${hcf} × ${A/hcf}) and into ${B} (${hcf} × ${B/hcf}).`;
+  }
+  bottom.innerHTML=`<div class="ask">${q}</div><div id="bopts"></div><div id="bfb"></div>`;
+  say('Bonus question for extra stars!');
+  mcq(document.getElementById('bopts'),opts,ans,null,ok=>{
+    if(ok){G.correct++;addScore(20);SND.good();say(pick(PRAISE))}else{SND.bad();say(pick(OOPS))}
+    document.getElementById('bfb').innerHTML=`<div class="fb ${ok?'good':'bad'}">${expl}</div>${nextBtn(G.round+1>=G.total?'See my stars ⭐':'Next diagram ➜')}`;
+    bindNext();
+  });
+  bottom.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+/* =========================================================
+   LEVEL 2: DIVISION DASH
+   ========================================================= */
+const DASH_TIME=15;
+function dashRound(){
+  let text,ans,opts,expl;
+  if(Math.random()<.5){
+    const d=rand(2,9),k=rand(11,d<=5?25:18),n=d*k;
+    text=`${n} ÷ ${d}`;ans=String(k);
+    opts=uniq([ans,String(k+1),String(k-1),String(k+(Math.random()<.5?10:-2)),String(k+2)]).slice(0,4);
+    expl=`${d} × ${k} = ${n}, so ${n} ÷ ${d} = <b>${k}</b> with no remainder.`;
+  }else{
+    const d=rand(3,9),k=rand(6,19),r=rand(1,d-1),n=d*k+r;
+    text=`${n} ÷ ${d}`;ans=`${k} r ${r}`;
+    const cand=shuffle([`${k+1} r ${r}`,`${k-1} r ${r}`,`${k} r ${r===d-1?r-1:r+1}`,`${k}`,`${k} r ${d-r}`]).filter(c=>c!==ans);
+    opts=uniq([ans,...cand]).slice(0,4);
+    expl=`${d} × ${k} = ${d*k}. Then ${n} − ${d*k} = ${r} left over. So ${n} ÷ ${d} = <b>${k} r ${r}</b>.`;
+  }
+  opts=shuffle(opts);
+  G.asked++;
+  frame(`<div class="card">
+      <div class="q-big">${text} = ?</div>
+      <div id="opts"></div><div id="fb"></div>
+    </div>`,
+    G.round===0?'Take your time and think! Some answers have a <b>remainder</b> (r). 🧠':
+    G.streak>=3?`<span class="streak">🔥 ${G.streak} in a row!</span> Keep going!`:'Pick the right answer!');
+  mcq(document.getElementById('opts'),opts,ans,null,ok=>resolve(ok));
+  function resolve(ok){
+    if(ok){
+      G.correct++;G.streak++;const pts=15+(G.streak>=3?5:0);addScore(pts);SND.good();
+      say(G.streak>=3?`🔥 ${G.streak} in a row! ${pick(PRAISE)}`:pick(PRAISE));
+      later(finishRound,1000);
+    }else{
+      G.streak=0;SND.bad();say(pick(OOPS));
+      document.getElementById('fb').innerHTML=`<div class="fb bad">${expl}</div>${nextBtn(G.round+1>=G.total?'See my stars ⭐':null)}`;
+      bindNext();
+    }
+  }
+}
+
+/* =========================================================
+   LEVEL 3: STORY PROBLEMS
+   ========================================================= */
+const both=(a,b)=>`${a}|${b}`;
+function twoOpts(k,r,c){
+  return uniq([both(k,r),both(k+1,0),both(k,r===c-1?r-1:r+1),both(k-1,r+c),both(k+1,r)]).filter(x=>!x.startsWith('0|')&&!x.includes('|-'));
+}
+const STORIES=[
+  ()=>{const c=pick([20,25,30,40]),k=rand(2,5),r=rand(1,c-1),n=c*k+r;
+    return{pic:'🚌',kind:'up',text:`A bus holds <b>${c}</b> children. There are <b>${n}</b> children going on a school trip.`,
+      ask:'How many buses are needed?',ans:String(k+1),opts:[k,k+1,k+2,k-1].filter(x=>x>0).map(String),fmt:x=>x+' buses',
+      expl:`${n} ÷ ${c} = ${k} r ${r}. The <b>${r}</b> extra children still need a seat, so we round <b>UP</b> to <b>${k+1} buses</b>.`}},
+  ()=>{const c=pick([6,8,9,10,12]),k=rand(4,10),r=rand(1,c-1),n=c*k+r;
+    return{pic:'🍎',kind:'down',text:`A box can hold <b>${c}</b> apples. There are <b>${n}</b> apples.`,
+      ask:'How many full boxes, and how many apples left over?',ans:both(k,r),opts:twoOpts(k,r,c),fmt:x=>{const[a,b]=x.split('|');return`${a} boxes, ${b} left`},
+      expl:`${n} ÷ ${c} = ${k} r ${r}. Only <b>${k}</b> boxes are completely full, so we round <b>DOWN</b>. <b>${r}</b> apples are left over.`}},
+  ()=>{const c=rand(3,8),k=rand(5,12),r=rand(1,c-1),n=c*k+r,item=pick(['stickers','pencils','sweets','marbles']);
+    return{pic:pick(['⭐','✏️','🍬','🔮']),kind:'share',text:`<b>${n}</b> ${item} are shared equally between <b>${c}</b> children.`,
+      ask:`How many ${item} each, and how many left over?`,ans:both(k,r),opts:twoOpts(k,r,c),fmt:x=>{const[a,b]=x.split('|');return`${a} each, ${b} left`},
+      expl:`${n} ÷ ${c} = ${k} r ${r}. Each child gets <b>${k}</b>. There are not enough to give everyone another one, so <b>${r}</b> are left over.`}},
+  ()=>{const c=pick([10,12,15]),k=rand(5,10),r=rand(1,c-1),n=c*k+r;
+    return{pic:'📚',kind:'up',text:`There are <b>${n}</b> books. Each box can hold <b>${c}</b> books.`,
+      ask:'How many boxes are needed to pack ALL the books?',ans:String(k+1),opts:[k,k+1,k+2,k-1].map(String),fmt:x=>x+' boxes',
+      expl:`${n} ÷ ${c} = ${k} r ${r}. The last <b>${r}</b> books still need a box, so we round <b>UP</b> to <b>${k+1} boxes</b>.`}},
+  ()=>{const c=pick([4,6,8]),k=rand(5,12),r=rand(1,c-1),n=c*k+r;
+    return{pic:'🍽️',kind:'up',text:`Each table seats <b>${c}</b> people. <b>${n}</b> people are coming to a party.`,
+      ask:'How many tables are needed so everyone can sit?',ans:String(k+1),opts:[k,k+1,k+2,k-1].map(String),fmt:x=>x+' tables',
+      expl:`${n} ÷ ${c} = ${k} r ${r}. The <b>${r}</b> extra people need a table too, so round <b>UP</b> to <b>${k+1} tables</b>.`}},
+  ()=>{const c=rand(3,9),k=rand(3,9),r=rand(1,c-1),n=c*k+r;
+    return{pic:'🪙',kind:'down',text:`Toy cars cost <b>£${c}</b> each. You have <b>£${n}</b>.`,
+      ask:'How many toy cars can you buy?',ans:String(k),opts:[k,k+1,k-1,k+2].filter(x=>x>0).map(String),fmt:x=>x+' cars',
+      expl:`${n} ÷ ${c} = ${k} r ${r}. The £${r} left is not enough for another car, so we round <b>DOWN</b> to <b>${k} cars</b>.`}},
+  ()=>{const c=6,k=rand(9,15),r=rand(0,5),n=c*k+r;
+    return{pic:'🥪',kind:'down',text:`A school has <b>${n}</b> sandwiches. They put <b>6</b> sandwiches in each box.`,
+      ask:'How many full boxes, and how many left over?',ans:both(k,r),opts:uniq([both(k,r),both(k+1,r),both(k,r+1),both(k-1,r+6),both(k+1,0)]),fmt:x=>{const[a,b]=x.split('|');return`${a} boxes, ${b} left`},
+      expl:`${n} ÷ 6 = ${k}${r?` r ${r}`:''}. That makes <b>${k}</b> full boxes with <b>${r}</b> left over.${r===0?' It divides exactly!':''}`}},
+  ()=>{const c=pick([4,5]),k=rand(6,12),r=rand(1,c-1),n=c*k+r;
+    return{pic:'🚗',kind:'up',text:`Each car can take <b>${c}</b> children to football practice. <b>${n}</b> children need a lift.`,
+      ask:'How many cars are needed?',ans:String(k+1),opts:[k,k+1,k+2,k-1].map(String),fmt:x=>x+' cars',
+      expl:`${n} ÷ ${c} = ${k} r ${r}. Nobody can be left behind, so round <b>UP</b> to <b>${k+1} cars</b>.`}}
+];
+function storyRound(){
+  if(!G.order)G.order=shuffle(STORIES.map((_,i)=>i));
+  const s=STORIES[G.order[G.round%G.order.length]]();
+  const opts=shuffle(s.opts.slice(0,4).includes(s.ans)?s.opts.slice(0,4):[s.ans,...s.opts.filter(o=>o!==s.ans).slice(0,3)]);
+  G.asked++;
+  frame(`<div class="card">
+      <div class="story"><div class="pic" aria-hidden="true">${s.pic}</div><p>${s.text}</p></div>
+      <div class="ask">${s.ask}</div>
+      <div class="think"><span>⬆️ Round up?</span><span>⬇️ Round down?</span><span>🍰 Left over?</span></div>
+      <div id="opts"></div><div id="fb"></div>
+    </div>`,
+    G.round===0?'Read carefully! Sometimes we need to round <b>UP</b> (so nobody is left out), sometimes <b>DOWN</b>.':'Think: does the remainder need its own bus, box or table?');
+  mcq(document.getElementById('opts'),opts,s.ans,s.fmt,ok=>{
+    if(ok){G.correct++;addScore(15);SND.good();say(pick(PRAISE))}else{SND.bad();say(pick(OOPS))}
+    document.getElementById('fb').innerHTML=`<div class="fb ${ok?'good':'bad'}">${s.expl}</div>${nextBtn(G.round+1>=G.total?'See my stars ⭐':null)}`;
+    bindNext();
+  });
+}
+
+/* =========================================================
+   LEVEL 4: MYSTERY NUMBER
+   ========================================================= */
+function missingRound(){
+  const d=G.round<3?5:rand(3,9),k=rand(5,16),r=Math.random()<.85?rand(1,d-1):0,n=d*k+r;
+  G.m={d,k,r,n,input:'',tries:0,hint:false,done:false};
+  G.asked++;
+  frame(`<div class="card">
+      <div class="eq"><span class="ansbox empty" id="ab">?</span><span>÷ ${d} = ${k}${r?` <span class="muted">remainder</span> ${r}`:''}</span></div>
+      <div class="row" style="margin-top:4px"><button class="btn ghost sm" id="hintBtn">💡 Show me how</button></div>
+      <div id="hintBox"></div>
+      <div class="pad" id="pad">
+        ${[1,2,3,4,5,6,7,8,9].map(x=>`<button class="btn" data-k="${x}">${x}</button>`).join('')}
+        <button class="btn" data-k="del" aria-label="Delete">⌫</button><button class="btn" data-k="0">0</button><button class="btn go" data-k="ok" aria-label="Check">✔</button>
+      </div>
+      <div id="fb"></div>
+    </div>`,
+    G.round===0?'A number is hiding! Multiply, then add the remainder to find it. 🔍':'Find the mystery number!');
+  document.getElementById('pad').onclick=e=>{const b=e.target.closest('[data-k]');if(b)key(b.dataset.k)};
+  document.getElementById('hintBtn').onclick=()=>{G.m.hint=true;showHint(false)};
+}
+function showHint(full){
+  const {d,k,r,n}=G.m;
+  document.getElementById('hintBox').innerHTML=`<div class="fb info steps">
+    <b>Step 1:</b> multiply ${d} × ${k} = ${full?`<b>${d*k}</b>`:'?'}<br>
+    <b>Step 2:</b> add the remainder: ${full?`${d*k} + ${r} = <b>${n}</b>`:`? + ${r} = ?`}</div>`;
+}
+function key(k){
+  const m=G&&G.m;if(!m||m.done||(G.id!=='missing'&&G.id!=='tt'))return;
+  const ab=document.getElementById('ab');
+  if(k==='del')m.input=m.input.slice(0,-1);
+  else if(k==='ok'){G.id==='tt'?checkTT():checkMissing();return}
+  else if(m.input.length<4)m.input+=k;
+  SND.tap();ab.textContent=m.input||'?';ab.classList.toggle('empty',!m.input);ab.classList.remove('bad');
+}
+function checkMissing(){
+  const m=G.m;if(!m.input)return;
+  const ab=document.getElementById('ab');const v=+m.input;
+  if(v===m.n){
+    m.done=true;ab.classList.add('ok');SND.good();
+    if(m.tries===0)G.correct++;
+    addScore(m.tries===0?(m.hint?10:15):5);say(pick(PRAISE));showHint(true);
+    finishBox(true);
+  }else{
+    m.tries++;SND.bad();ab.classList.remove('bad');void ab.offsetWidth;ab.classList.add('bad');
+    if(m.tries===1){
+      m.input='';
+      say(v===m.d*m.k&&m.r?`So close! You found ${m.d} × ${m.k}. Now <b>add the remainder ${m.r}</b>!`:`Not quite. First work out <b>${m.d} × ${m.k}</b>, then add ${m.r}. Try again!`);
+      showHint(false);
+      later(()=>{if(!m.done){ab.textContent='?';ab.classList.add('empty')}},500);
+    }else{
+      m.done=true;say(pick(OOPS));ab.textContent=m.n;ab.classList.remove('empty');showHint(true);finishBox(false);
+    }
+  }
+}
+function finishBox(ok){
+  const {d,k,r,n}=G.m;
+  document.getElementById('fb').innerHTML=`<div class="fb ${ok?'good':'bad'}">Check: ${n} ÷ ${d} = ${k}${r?` r ${r}`:''} ✔</div>${nextBtn(G.round+1>=G.total?'See my stars ⭐':null)}`;
+  bindNext();
+}
+document.addEventListener('keydown',e=>{
+  if(!G||(G.id!=='missing'&&G.id!=='tt')||!G.m||G.m.done)return;
+  if(/^[0-9]$/.test(e.key))key(e.key);
+  else if(e.key==='Backspace')key('del');
+  else if(e.key==='Enter'){e.preventDefault();key('ok')}
+});
+
+/* =========================================================
+   LEVEL 5: TIMES TABLES
+   ========================================================= */
+function ttSquare(){
+  const n=[1,2,3,4,5,6,7,8,9,10,11,12];
+  return `<div class="sq"><table><tr><th>×</th>${n.map(x=>`<th>${x}</th>`).join('')}</tr>${n.map(a=>`<tr><th>${a}</th>${n.map(b=>`<td>${a*b}</td>`).join('')}</tr>`).join('')}</table></div>`;
+}
+function ttPicker(sel){
+  clearTimers();G=null;
+  sel=sel||2;
+  const tabs=[2,3,4,5,6,7,8,9,10,11,12];
+  const chart=sel==='mix'?ttSquare():`<div class="ttlist">${[1,2,3,4,5,6,7,8,9,10,11,12].map(b=>`<div>${sel} × ${b} = <b>${sel*b}</b></div>`).join('')}</div>`;
+  app.innerHTML=`
+  <div class="topbar"><button class="btn sm ghost" id="homeBtn" aria-label="Back to level map">🏠</button></div>
+  <div class="mascot"><div class="owl" aria-hidden="true">🦉</div><div class="bubble">Pick a times table. Read it out loud a few times, then press <b>Start</b>!</div></div>
+  <div class="card">
+    <div class="lvltitle">✖️ Choose a times table</div>
+    <div class="ttgrid">${tabs.map(t=>`<button class="btn ${sel===t?'on':'ghost'}" data-t="${t}">${t}×<span class="mini">${starStr(S.prog['tt-'+t]||0)}</span></button>`).join('')}
+      <button class="btn ${sel==='mix'?'on':'ghost'}" data-t="mix">Mixed<span class="mini">${starStr(S.prog['tt-mix']||0)}</span></button></div>
+    ${chart}
+    <div class="row"><button class="btn go" id="ttStart">Start ${sel==='mix'?'mixed tables':'the '+sel+' times table'}</button></div>
+  </div>`;
+  document.getElementById('homeBtn').onclick=home;
+  app.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{SND.tap();ttPicker(b.dataset.t==='mix'?'mix':+b.dataset.t)});
+  document.getElementById('ttStart').onclick=()=>{SND.tap();start('tt',sel)};
+}
+function ttRound(){
+  const mix=G.tt==='mix';
+  const t=mix?rand(2,12):G.tt,b=mix?rand(2,12):G.bs[G.round];
+  const miss=G.round>=5&&Math.random()<.4;
+  G.m={t,b,miss,n:miss?b:t*b,input:'',tries:0,done:false};
+  G.asked++;
+  const eq=miss?`<span>${t} ×</span><span class="ansbox empty" id="ab">?</span><span>= ${t*b}</span>`:`<span>${t} × ${b} =</span><span class="ansbox empty" id="ab">?</span>`;
+  frame(`<div class="card">
+      <div class="eq">${eq}</div>
+      <div class="pad" id="pad">
+        ${[1,2,3,4,5,6,7,8,9].map(x=>`<button class="btn" data-k="${x}">${x}</button>`).join('')}
+        <button class="btn" data-k="del" aria-label="Delete">⌫</button><button class="btn" data-k="0">0</button><button class="btn go" data-k="ok" aria-label="Check">✔</button>
+      </div>
+      <div id="fb"></div>
+    </div>`,
+    G.round===0?'Type the answer on the keypad. No rush, take your time! 🧠':
+    miss?`Tricky one! What number times <b>${t}</b> makes <b>${t*b}</b>?`:
+    G.streak>=3?`<span class="streak">🔥 ${G.streak} in a row!</span> Keep going!`:'What’s the answer?');
+  document.getElementById('pad').onclick=e=>{const k=e.target.closest('[data-k]');if(k)key(k.dataset.k)};
+}
+function checkTT(){
+  const m=G.m;if(!m.input)return;
+  const ab=document.getElementById('ab');const {t,b}=m;
+  if(+m.input===m.n){
+    m.done=true;ab.classList.add('ok');SND.good();
+    if(m.tries===0){G.correct++;G.streak++}
+    addScore(m.tries===0?10+(G.streak>=3?5:0):5);
+    say(G.streak>=3?`🔥 ${G.streak} in a row! ${pick(PRAISE)}`:pick(PRAISE));
+    ttFb(true);
+  }else{
+    m.tries++;G.streak=0;SND.bad();ab.classList.remove('bad');void ab.offsetWidth;ab.classList.add('bad');
+    if(m.tries===1){
+      m.input='';
+      say(m.miss?`Count up in ${t}s until you reach ${t*b}: ${t}, ${2*t}, ${3*t}… How many jumps?`:
+        b===10?`Hint: times 10 – just add a zero to ${t}!`:`Hint: count up in ${t}s, ${b} jumps: ${t}, ${2*t}, ${3*t}… Try again!`);
+      later(()=>{if(!m.done){ab.textContent='?';ab.classList.add('empty')}},500);
+    }else{
+      m.done=true;ab.textContent=m.n;ab.classList.remove('empty');say(pick(OOPS));ttFb(false);
+    }
+  }
+}
+function ttFb(ok){
+  const {t,b,tries}=G.m;
+  const last=G.round+1>=G.total;
+  document.getElementById('fb').innerHTML=`<div class="fb ${ok?'good':'bad'}">${t} × ${b} = <b>${t*b}</b>${ok?'':`<br>Say it 3 times: “${t} times ${b} is ${t*b}”!`}</div>${ok&&tries===0&&!last?'':nextBtn(last?'See my stars ⭐':null)}`;
+  if(ok&&tries===0&&!last)later(finishRound,1000);else bindNext();
+}
+
+/* ---------- finish ---------- */
+function finish(){
+  clearTimers();
+  const pct=G.asked?G.correct/G.asked:0;
+  const stars=pct>=.9?3:pct>=.7?2:pct>=.4?1:0;
+  const prev=S.prog[G.id]||0;S.prog[G.id]=Math.max(prev,stars);
+  if(G.tt){const tk='tt-'+G.tt;S.prog[tk]=Math.max(S.prog[tk]||0,stars)}
+  saveProg();
+  const msg=['Keep practising – every try makes your brain stronger! 💪','Good effort! Play again to win more stars.','Great job! One more try for 3 stars?','WOW! A perfect Maths Master! 🏆'][stars];
+  if(stars>0){SND.win();confetti(stars*40)}
+  const idx=LEVELS.findIndex(l=>l.id===G.id),nextL=LEVELS[idx+1];
+  app.innerHTML=`
+    <div class="mascot"><div class="owl" aria-hidden="true">🦉</div><div class="bubble">${msg}</div></div>
+    <div class="card center">
+      <div class="lvltitle">${G.L.emoji} ${G.L.name} complete!</div>
+      <div class="big-stars" aria-label="${stars} of 3 stars">${[0,1,2].map(i=>`<span class="${i<stars?'':'off'}" style="animation-delay:${.2+i*.25}s">★</span>`).join('')}</div>
+      <p style="font-size:1.2rem;margin:4px 0"><b>${G.score}</b> points</p>
+      <p class="muted" style="margin:0">${G.correct} out of ${G.asked} right first time</p>
+      ${stars>prev?'<p><b>New best! 🎉</b></p>':''}
+      <div class="row">
+        <button class="btn" id="again">Play again 🔁</button>
+        ${G.id==='tt'?'<button class="btn go" id="pickT">✖️ Choose another table</button>':''}
+        ${nextL?`<button class="btn go" id="nextLvl">${nextL.emoji} ${nextL.name}</button>`:''}
+        <button class="btn ghost" id="map">🏠 Level map</button>
+      </div>
+    </div>`;
+  const id=G.id,tt=G.tt;
+  document.getElementById('again').onclick=()=>start(id,tt);
+  document.getElementById('map').onclick=home;
+  const pt=document.getElementById('pickT');if(pt)pt.onclick=()=>ttPicker(tt);
+  if(nextL)document.getElementById('nextLvl').onclick=()=>nextL.id==='tt'?ttPicker():start(nextL.id);
+}
+
+home();
+})();
+</script>
+<a href="../" aria-label="Back to Peter's World" style="position:fixed;left:calc(10px + env(safe-area-inset-left,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:2147483000;width:48px;height:48px;border-radius:50%;background:#fff;border:3px solid #5fd3b0;display:grid;place-items:center;font-size:22px;text-decoration:none;box-shadow:0 3px 0 rgba(0,0,0,.18)">🏠</a>
+</body>
+</html>

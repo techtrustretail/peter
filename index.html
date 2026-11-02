@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Peter's Mint Chocolate World</title>
+<meta name="theme-color" content="#c9f5e7">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Peter's World">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍦</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;800&display=swap">
+<style>
+/* Layout: one column "flight route". The home igloo at the top, then a ticket card per destination, joined by a dotted flight path. Single light theme by choice (a sunny Arctic). */
+:root{
+  --mint:#5fd3b0; --mint-l:#c9f5e7; --mint-d:#16876a;
+  --choc:#6b3e26; --choc-l:#a8724f; --cream:#fffaf2;
+  --pink:#ff7eb6; --berry:#e2457e; --gold:#ffcf5a; --sky:#e3f8ff;
+  --ink:#3a2418; --muted:#7a5a48; --line:#ead8c6;
+  --display:"Fredoka","Chalkboard SE","Comic Sans MS",system-ui,sans-serif;
+  --body:"Nunito","Avenir Next","Segoe UI",system-ui,sans-serif;
+  color-scheme:light;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box}
+html{background:var(--sky)}
+body{margin:0;font-family:var(--body);color:var(--ink);font-size:17px;line-height:1.5;
+  background:linear-gradient(180deg,#dff7ff 0%,#c9f5e7 40%,#fbeee0 100%);min-height:100vh;overflow-x:hidden}
+img{max-width:100%}
+[hidden]{display:none!important}
+h1,h2,h3{font-family:var(--display);line-height:1.12;margin:0;text-wrap:balance}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--berry);outline-offset:3px;border-radius:8px}
+.wrap{max-width:880px;margin:0 auto;padding-block:16px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));position:relative;z-index:1}
+.snow{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.snow i{position:absolute;top:-30px;font-style:normal;color:#fff;text-shadow:0 0 4px rgba(31,158,124,.35);animation:fall linear infinite}
+@keyframes fall{to{transform:translateY(110vh) rotate(360deg)}}
+
+/* hero */
+.hero{position:relative;border-radius:28px;overflow:hidden;background:linear-gradient(180deg,#bfeaff,#e9fbff 60%);border:3px solid #fff;box-shadow:0 10px 0 rgba(107,62,38,.12)}
+.hero svg.scene{display:block;width:100%;height:auto}
+.hero .title{position:absolute;left:0;right:0;top:0;padding:18px 20px 0;text-align:center}
+.hero .eyebrow{display:inline-block;background:rgba(255,255,255,.85);color:var(--mint-d);font-weight:800;font-size:13px;letter-spacing:.12em;text-transform:uppercase;border-radius:999px;padding:4px 12px}
+.hero h1{font-size:clamp(30px,6.4vw,56px);color:var(--choc);margin-top:8px;text-shadow:0 3px 0 #fff}
+.hero h1 b{color:var(--mint-d)}
+@media (max-width:600px){.hero .title{position:static;padding:14px 14px 0}.hero h1{font-size:30px}}
+.skier{animation:ski 5s ease-in-out infinite;transform-origin:center}
+@keyframes ski{0%,100%{transform:translate(0,0) rotate(-6deg)}50%{transform:translate(-14px,6px) rotate(-3deg)}}
+.aur{animation:aur 7s ease-in-out infinite alternate}
+@keyframes aur{to{transform:translateX(-30px)}}
+.intro{display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap;margin:14px 0 0;text-align:center;color:var(--muted);font-weight:600}
+
+/* passport */
+.passport{margin-top:22px;background:#2f6f5e;color:#fff;border-radius:22px;padding:16px 18px;box-shadow:0 8px 0 #1f4e42;display:grid;gap:10px}
+.passport h2{font-size:22px;display:flex;align-items:center;gap:8px}
+.passport p{margin:0;font-size:14.5px;color:#cfeee4}
+.stamps{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+@media (max-width:560px){.stamps{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.stamp div{min-width:0;overflow-wrap:anywhere}
+.stamp{aspect-ratio:1;max-width:100%;border-radius:50%;border:3px dashed rgba(255,255,255,.4);display:grid;place-items:center;text-align:center;font-family:var(--display);font-size:11.5px;line-height:1.1;color:rgba(255,255,255,.6);padding:6px}
+.stamp span{font-size:26px;display:block;filter:grayscale(1);opacity:.5}
+.stamp.on{border:3px solid var(--gold);background:rgba(255,207,90,.18);color:#fff;transform:rotate(-8deg)}
+.stamp.on span{filter:none;opacity:1}
+
+/* featured */
+.feature{margin-top:22px;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;background:#fff;border:3px solid var(--pink);border-radius:22px;padding:14px 16px;text-decoration:none;box-shadow:0 6px 0 rgba(226,69,126,.25)}
+.feature .big{font-size:44px}
+.feature small{display:block;font-weight:800;color:var(--berry);letter-spacing:.08em;text-transform:uppercase;font-size:12px}
+.feature h3{font-size:22px;color:var(--choc)}
+.feature p{margin:2px 0 0;color:var(--muted);font-size:15px}
+.go{background:var(--berry);color:#fff;border-radius:14px;padding:10px 16px;font-family:var(--display);font-size:17px;white-space:nowrap}
+@media (max-width:520px){.feature{grid-template-columns:auto 1fr}.feature .go{grid-column:1/-1;text-align:center}}
+
+/* route */
+.route-h{font-size:28px;color:var(--choc);margin:34px 0 4px}
+.route-sub{margin:0 0 16px;color:var(--muted)}
+.route{display:grid;gap:0}
+.hop{display:flex;justify-content:center;align-items:center;gap:6px;height:46px;color:var(--mint-d);font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.hop::before,.hop::after{content:"";flex:0 1 80px;border-top:3px dotted var(--mint-d);opacity:.6}
+.ticket{display:grid;grid-template-columns:150px 1fr;background:#fff;border-radius:22px;overflow:hidden;box-shadow:0 6px 0 rgba(107,62,38,.12);border:2px solid var(--line)}
+.stub{background:var(--c);color:#fff;padding:16px 14px;display:grid;align-content:start;gap:4px;border-right:3px dashed rgba(255,255,255,.7);position:relative}
+.stub .flag{font-size:40px;line-height:1}
+.stub .land{font-size:44px;line-height:1;position:absolute;right:10px;bottom:8px;opacity:.9}
+.stub h3{font-size:22px}
+.stub small{font-size:12.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;opacity:.9}
+.stub .subj{display:inline-block;margin-top:6px;background:rgba(255,255,255,.25);border-radius:999px;padding:2px 10px;font-weight:800;font-size:14px;justify-self:start}
+.body{padding:14px 16px;display:grid;gap:10px;min-width:0}
+.body .about{margin:0;color:var(--muted);font-size:15px}
+.lessons{display:grid;gap:8px}
+.lesson{display:grid;grid-template-columns:40px 1fr auto;gap:10px;align-items:center;text-decoration:none;background:var(--cream);border:2px solid var(--line);border-radius:16px;padding:9px 12px;transition:transform .12s,border-color .12s}
+a.lesson:hover{transform:translateY(-2px);border-color:var(--c)}
+.lesson .ic{font-size:26px;text-align:center}
+.lesson b{font-family:var(--display);font-weight:600;font-size:18px;color:var(--choc);display:block}
+.lesson span.d{font-size:14px;color:var(--muted)}
+.chip{font-size:12px;font-weight:800;border-radius:999px;padding:3px 9px;white-space:nowrap}
+.chip.new{background:var(--gold);color:#5a3b00}
+.chip.done{background:var(--mint-l);color:var(--mint-d)}
+.chip.soon{background:#eee6dc;color:var(--muted)}
+.lesson.soon{opacity:.7;border-style:dashed}
+.group{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:4px}
+@media (max-width:600px){.ticket{grid-template-columns:1fr}.stub{border-right:0;border-bottom:3px dashed rgba(255,255,255,.7);grid-template-columns:auto 1fr;align-items:center;column-gap:12px}.stub .flag{grid-row:span 3}.stub .land{font-size:34px}}
+@media (max-width:420px){.lesson{grid-template-columns:32px 1fr}.lesson .chip{grid-column:2;justify-self:start}}
+
+/* parents */
+.parents{margin-top:40px;background:#fff;border-radius:22px;border:2px solid var(--line);padding:4px 18px}
+.parents>summary{cursor:pointer;list-style:none;padding:14px 0;font-family:var(--display);font-size:22px;color:var(--choc);display:flex;justify-content:space-between;gap:10px}
+.parents>summary::after{content:"Mở ▾";font-family:var(--body);font-size:14px;color:var(--muted);font-weight:800}
+.parents[open]>summary::after{content:"Đóng ▴"}
+.pbox{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;padding-bottom:18px;font-size:15.5px}
+.pbox>*{min-width:0}
+.pbox h3{font-size:19px;color:var(--mint-d);margin-bottom:6px}
+.pbox ul{margin:0;padding-left:20px}.pbox li{margin:4px 0}
+.tbl{overflow-x:auto}
+.pbox table{border-collapse:collapse;width:100%;min-width:560px;font-size:14.5px}
+.pbox th,.pbox td{text-align:left;vertical-align:top;border-bottom:1px solid var(--line);padding:7px 8px}
+.pbox th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.ai{background:var(--mint-l);border-radius:16px;padding:12px 16px}
+.ai h3{color:var(--choc)}
+.small{font-size:13px;color:var(--muted)}
+footer{text-align:center;color:var(--muted);font-size:13px;margin-top:26px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="snow" id="snow" aria-hidden="true"></div>
+<div class="wrap">
+ <header class="hero">
+  <div class="title"><span class="eyebrow">Stormy’s World Tour</span><h1>Peter’s <b>Mint Chocolate</b> World</h1></div>
+  <svg class="scene" viewBox="0 0 800 380" role="img" aria-label="Stormy the cloud cat skiing down a mint chocolate hill at the North Pole">
+   <defs>
+    <linearGradient id="aurA" x1="0" x2="1"><stop offset="0" stop-color="#7ee8c8" stop-opacity="0"/><stop offset=".5" stop-color="#7ee8c8" stop-opacity=".55"/><stop offset="1" stop-color="#ffafcc" stop-opacity="0"/></linearGradient>
+    <linearGradient id="hill" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#9ff0d6"/><stop offset="1" stop-color="#5fd3b0"/></linearGradient>
+    <linearGradient id="hill2" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#c9f5e7"/><stop offset="1" stop-color="#8fe3c8"/></linearGradient>
+    <radialGradient id="sf" cx="45%" cy="35%" r="72%"><stop offset="0" stop-color="#fff"/><stop offset=".65" stop-color="#eef1f8"/><stop offset="1" stop-color="#cdd4e4"/></radialGradient>
+    <linearGradient id="sc" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#ffafcc"/><stop offset="1" stop-color="#a2d2ff"/></linearGradient>
+   </defs>
+   <g class="aur"><path d="M-40 150 C120 90 240 170 400 120 S680 80 860 130" fill="none" stroke="url(#aurA)" stroke-width="34" stroke-linecap="round"/><path d="M-40 185 C140 140 260 200 420 160 S700 130 860 170" fill="none" stroke="url(#aurA)" stroke-width="18" stroke-linecap="round" opacity=".7"/></g>
+   <g fill="#fff"><circle cx="90" cy="70" r="2"/><circle cx="700" cy="60" r="2.5"/><circle cx="620" cy="110" r="1.6"/><circle cx="160" cy="120" r="1.6"/><circle cx="520" cy="40" r="2"/></g>
+   <!-- far hills -->
+   <path d="M0 250 C120 190 220 210 330 240 C430 200 560 180 800 230 L800 380 L0 380Z" fill="url(#hill2)"/>
+   <!-- igloo made of a mint choc chip scoop on a cone -->
+   <g transform="translate(110 168)">
+    <path d="M30 80 L70 170 L110 80Z" fill="#e6b36f" stroke="#a8724f" stroke-width="3"/>
+    <path d="M42 92 L98 92 M48 108 L92 108 M55 124 L85 124 M38 84 L90 140 M102 84 L50 140" stroke="#a8724f" stroke-width="2" opacity=".6"/>
+    <path d="M10 88 C0 40 40 0 70 2 C100 0 140 40 130 88 Z" fill="#9ff0d6" stroke="#4fbf9c" stroke-width="3"/>
+    <path d="M10 88 C30 70 40 96 60 82 C80 96 100 70 130 88" fill="#6b3e26"/>
+    <g fill="#6b3e26"><rect x="40" y="30" width="7" height="5" rx="2" transform="rotate(20 43 32)"/><rect x="80" y="20" width="7" height="5" rx="2" transform="rotate(-15 83 22)"/><rect x="95" y="52" width="7" height="5" rx="2"/><rect x="30" y="58" width="7" height="5" rx="2" transform="rotate(35 33 60)"/><rect x="62" y="48" width="7" height="5" rx="2"/></g>
+    <path d="M52 88 L52 64 C52 50 88 50 88 64 L88 88" fill="#3a2418" opacity=".85"/>
+    <circle cx="70" cy="-6" r="9" fill="#e2457e"/><path d="M70 -14 C72 -24 80 -26 84 -22" stroke="#4fbf9c" stroke-width="3" fill="none"/>
+   </g>
+   <!-- big front slope with chocolate drip -->
+   <path d="M0 300 C160 270 320 250 480 285 C600 310 700 290 800 280 L800 380 L0 380Z" fill="url(#hill)"/>
+   <path d="M0 300 C160 270 320 250 480 285 C600 310 700 290 800 280 L800 296 C760 300 750 318 735 300 C700 306 690 330 670 304 C620 312 600 300 560 300 C540 330 520 330 505 296 C440 270 400 262 360 266 C350 290 330 292 322 266 C250 268 200 276 160 282 C150 305 130 306 125 286 C80 292 40 298 0 312Z" fill="#6b3e26"/>
+   <g fill="#6b3e26"><rect x="230" y="330" width="10" height="6" rx="2"/><rect x="420" y="320" width="10" height="6" rx="2" transform="rotate(30 425 323)"/><rect x="620" y="340" width="10" height="6" rx="2"/><rect x="90" y="345" width="10" height="6" rx="2" transform="rotate(-20 95 348)"/><rect x="720" y="320" width="10" height="6" rx="2"/></g>
+   <path d="M330 300 C420 290 520 300 640 318" stroke="#fff" stroke-width="5" stroke-dasharray="2 14" stroke-linecap="round" opacity=".8" fill="none"/>
+   <!-- Stormy on skis -->
+   <g class="skier"><g transform="translate(520 150) scale(.82)">
+    <path d="M-10 196 L230 214" stroke="#e2457e" stroke-width="9" stroke-linecap="round"/><path d="M220 213 C236 214 242 206 238 198" stroke="#e2457e" stroke-width="9" stroke-linecap="round" fill="none"/>
+    <path d="M10 180 L245 200" stroke="#ffcf5a" stroke-width="8" stroke-linecap="round"/>
+    <path d="M44 120 L10 196" stroke="#6b3e26" stroke-width="5" stroke-linecap="round"/><circle cx="12" cy="190" r="7" fill="none" stroke="#6b3e26" stroke-width="3"/>
+    <path d="M160 120 L200 190" stroke="#6b3e26" stroke-width="5" stroke-linecap="round"/><circle cx="198" cy="186" r="7" fill="none" stroke="#6b3e26" stroke-width="3"/>
+    <path d="M150 132 C186 128 192 92 172 82 C160 76 150 88 160 96" fill="none" stroke="url(#sc)" stroke-width="14" stroke-linecap="round"/>
+    <path d="M58 62 L64 20 L92 48 Z" fill="#e8ecf5" stroke="#b9c1d6" stroke-width="3" stroke-linejoin="round"/><path d="M67 52 L69 32 L82 47Z" fill="#ffc8dd"/>
+    <path d="M142 62 L136 20 L108 48 Z" fill="#e8ecf5" stroke="#b9c1d6" stroke-width="3" stroke-linejoin="round"/><path d="M133 52 L131 32 L118 47Z" fill="#ffc8dd"/>
+    <path d="M50 122 C28 122 26 90 48 86 C40 58 72 40 100 45 C128 40 160 58 152 86 C174 90 172 122 150 122 C160 148 130 162 112 152 C104 164 96 164 88 152 C70 162 40 148 50 122 Z" fill="url(#sf)" stroke="#b9c1d6" stroke-width="3"/>
+    <ellipse cx="80" cy="94" rx="6.5" ry="8.5" fill="#3d3553"/><circle cx="82.5" cy="90.5" r="2.4" fill="#fff"/><ellipse cx="120" cy="94" rx="6.5" ry="8.5" fill="#3d3553"/><circle cx="122.5" cy="90.5" r="2.4" fill="#fff"/>
+    <ellipse cx="66" cy="108" rx="9" ry="5" fill="#ffafcc" opacity=".75"/><ellipse cx="134" cy="108" rx="9" ry="5" fill="#ffafcc" opacity=".75"/>
+    <path d="M97 101 L103 101 L100 104.5Z" fill="#ff7aa2"/><path d="M91 106 Q95.5 111 100 106 Q104.5 111 109 106" fill="none" stroke="#3d3553" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M60 128 Q100 144 140 128 L140 139 Q100 155 60 139Z" fill="#5fd3b0"/><path d="M60 134 L30 150 L36 138 L22 130Z" fill="#5fd3b0"/><g fill="#6b3e26"><circle cx="80" cy="137" r="2.5"/><circle cx="104" cy="141" r="2.5"/><circle cx="126" cy="135" r="2.5"/></g>
+    <path d="M62 54 C70 18 130 18 138 54 Z" fill="#e2457e"/><path d="M58 56 L142 56" stroke="#fff" stroke-width="8" stroke-linecap="round"/><circle cx="100" cy="16" r="10" fill="#fff"/>
+   </g></g>
+  </svg>
+ </header>
+ <p class="intro"><span>Hi Peter! Stormy is ready to fly. Learn, play and collect a passport stamp in every country. 🍦✈️</span></p>
+
+ <section class="passport" aria-label="Passport">
+  <h2>🛂 Peter’s passport</h2>
+  <p>Open a lesson in a country to get its stamp.</p>
+  <div class="stamps" id="stamps"></div>
+ </section>
+
+ <a class="feature" id="feature" href="#"></a>
+
+ <h2 class="route-h">Flight route</h2>
+ <p class="route-sub">From Stormy’s igloo at the North Pole, all the way around the world.</p>
+ <div class="route" id="route"></div>
+
+ <details class="parents" id="parents">
+  <summary>Góc bố mẹ</summary>
+  <div class="pbox" id="pbox"></div>
+ </details>
+ <footer>Made with love for Peter · Lessons save progress on this iPad</footer>
+</div>
+
+<script>
+const DATA={"places": [{"id": "london", "flag": "🇬🇧", "country": "United Kingdom", "city": "London", "landmark": "💂", "color": "#3d7be0", "subject": "English (EFL)", "hop": "Take off!", "about": "Reading, writing and grammar from the Collins Student Book.", "lessons": [{"icon": "🧞", "t": "Unit 4: Other People, Other Places", "d": "Magic Carpet Story Quest · 5-day review", "href": "efl/unit-4.html", "tag": "This week", "ext": null}, {"icon": "🧁", "t": "Peter’s Story Writing", "d": "Lila’s Secret Bakery · make your story shine", "href": "efl/story-writing.html", "tag": null, "ext": null}, {"icon": "🌊", "t": "Unit 3: The Power of the Sea", "d": "Sea Power Mission · poems and explanation texts", "href": "efl/unit-3.html", "tag": null, "ext": null}, {"icon": "📘", "t": "Next unit", "d": "Coming after Unit 4", "href": null, "tag": null, "ext": null}]}, {"id": "paris", "flag": "🇫🇷", "country": "France", "city": "Paris", "landmark": "🗼", "color": "#e2457e", "subject": "Debate Writing", "hop": "Next stop: Paris", "about": "Persuasive writing: say what you think, give reasons, win the debate.", "lessons": [{"icon": "🍫", "t": "Mint Chocolate City", "d": "Persuasive writing in 7 days", "href": "debate/mint-chocolate-city.html", "tag": null, "ext": null}, {"icon": "🍔", "t": "Reason 1, 2, 3 Builder", "d": "How to plan three strong reasons", "href": null, "tag": null, "ext": null}]}, {"id": "alps", "flag": "🇨🇭", "country": "Switzerland", "city": "Swiss Alps", "landmark": "🏔️", "color": "#ef8a2b", "subject": "Maths", "hop": "Skiing to the Alps", "about": "Chocolate, snow and numbers. Practise, then battle the monsters!", "lessons": [{"group": "Grade 3 practice"}, {"icon": "🔢", "t": "Number Quest: Unit 9", "d": "Big numbers, rounding and comparing", "href": "maths/number-quest.html", "tag": null, "ext": null}, {"icon": "➗", "t": "Maths Quest", "d": "Factors and division", "href": "maths/maths-quest.html", "tag": null, "ext": null}, {"icon": "🛡️", "t": "Times Table Tanks", "d": "Blast the tank with the right answer", "href": "maths/times-table-tanks.html", "tag": null, "ext": null}, {"icon": "👾", "t": "Monster Siege", "d": "Times tables battle, win a new gun every level", "href": "maths/monster-siege.html", "tag": null, "ext": null}, {"icon": "🏴‍☠️", "t": "Math Treasure Quest", "d": "Open chests, beat the pirate bots", "href": "maths/math-treasure.html", "tag": null, "ext": null}, {"group": "Easy warm-ups"}, {"icon": "🍳", "t": "Little Kitchen Math", "d": "Adding small numbers (English)", "href": "maths/little-kitchen.html", "tag": null, "ext": null}, {"icon": "🥘", "t": "Bếp nhỏ của em", "d": "Phép cộng nhỏ (Tiếng Việt)", "href": "maths/bep-nho.html", "tag": null, "ext": null}, {"icon": "🚀", "t": "Phi hành gia Toán học", "d": "Cộng trong phạm vi 20", "href": "maths/phi-hanh-gia.html", "tag": null, "ext": null}]}, {"id": "usa", "flag": "🇺🇸", "country": "United States", "city": "New York & NASA", "landmark": "🚀", "color": "#6c5ce7", "subject": "Science", "hop": "Across the ocean to the USA", "about": "Be a scientist: bodies, animals, energy and space.", "lessons": [{"icon": "🦴", "t": "Golden Bone Hunt", "d": "Unit 1: bones, muscles, animals, medicines", "href": "science/golden-bone-hunt.html", "tag": null, "ext": null}, {"icon": "⚡", "t": "Unit 2: Energy", "d": "Coming soon", "href": null, "tag": null, "ext": null}]}, {"id": "china", "flag": "🇨🇳", "country": "China", "city": "Beijing", "landmark": "🐼", "color": "#d83a3a", "subject": "Chinese", "hop": "Flying to China", "about": "Pinyin, tones and Panda Fun with Stormy. Opens in its own app.", "lessons": [{"icon": "🐱", "t": "Stormy’s Chinese Island", "d": "Pinyin and Panda Fun with Stormy", "href": "https://techtrustretail.github.io/stormy-chinese/", "tag": "Open app", "ext": true}]}, {"id": "home", "flag": "🍦", "country": "Home sweet home", "city": "Mint Chocolate North Pole", "landmark": "🌌", "color": "#16876a", "subject": "Bedtime Stories", "hop": "Back home to the igloo", "about": "Cosy stories under the northern lights before bed.", "lessons": [{"icon": "🌙", "t": "Peter’s Story Nights", "d": "Lila meets Stormy · 4 nights", "href": "stories/peter-story-nights.html", "tag": null, "ext": null}, {"icon": "🚪", "t": "Stormy’s Story Door", "d": "Open the door, build a story", "href": "stories/story-door.html", "tag": null, "ext": null}, {"icon": "🧁", "t": "Lila & Stormy Bedtime Stories", "d": "Read-along bedtime tales", "href": "stories/bedtime-stories.html", "tag": null, "ext": null}]}], "feature": {"icon": "🧞", "t": "Magic Carpet Story Quest", "d": "English Unit 4 · fly to a new land each day", "href": "efl/unit-4.html"}, "parents": "\n<section><h3>Cách dùng trên iPad</h3><ul>\n<li>Mở link <b>peter.haibabyro.com</b> bằng Safari → bấm nút Chia sẻ (ô vuông có mũi tên) → <b>Thêm vào MH chính</b>. Từ đó con bấm biểu tượng 🍦 như một app.</li>\n<li>Mỗi bài tự lưu tiến độ <b>trên chính iPad đó</b>. Tiến độ cũ ở các link claude.ai không chuyển sang đây, con làm lại từ đầu.</li>\n<li>Trong mỗi bài, nút 🏠 ở góc dưới bên trái đưa con về trang này.</li>\n<li>Bài nào có <b>Mã kết quả</b> (Góc phụ huynh trong bài): Sếp sao chép, dán vào <i>ket-qua/ma-ipad.txt</i> rồi nhắn Claude “cập nhật kết quả”. Claude sẽ cập nhật bảng dưới đây và gợi ý mới.</li>\n</ul></section>\n<section class=\"ai\"><h3>🤖 Gợi ý của AI tuần này (02/11/2026)</h3><ul><li><b>Ưu tiên số 1 – Dấu ’ sở hữu (EFL):</b> mỗi tối hỏi con 3 câu &quot;Ai là chủ?&quot; với đồ trong nhà (Mum’s phone, the cat’s bowl, the children’s shoes). Nhắc quy tắc: chỉ người/vật làm chủ mới có ’s; thứ được sở hữu ở số nhiều thì <b>không</b> có dấu ’ (the city’s streets).</li><li><b>know / no / now:</b> con chọn đúng khi khoanh nhưng tự viết lại sai. Sau mỗi bài viết, con đọc to từng câu có &quot;now/no&quot; và tự hỏi &quot;nghĩa là <i>biết</i> hay <i>bây giờ</i>?&quot;.</li><li><b>Writing lên Level 4:</b> mỗi lý do hoặc mỗi sự việc thêm 1 câu giải thích bắt đầu bằng &quot;…so…&quot; hoặc &quot;…which means…&quot;.</li><li><b>Debate:</b> con có ý rất sáng tạo nhưng lặp &quot;because&quot; và câu nào cũng mở bằng cùng một cụm từ. Khi viết, cho con chọn 1 từ nối mới (also, as a result, for example) và 1 cách mở câu mới cho mỗi đoạn.</li><li><b>Lịch gợi ý:</b> Thứ 2–6 làm Magic Carpet ngày 1–5 (15–20 phút). Thứ 7 làm Boss Battle và 1 ngày Mint Chocolate City. Chủ nhật học tiếng Trung với Stormy.</li><li><b>Cách khen:</b> khen cụ thể (&quot;con đặt dấu ’ đúng chỗ rồi!&quot;) thay vì &quot;giỏi quá&quot;, và luôn theo kiểu &quot;2 sao 1 điều ước&quot;.</li></ul>\n<p class=\"small\">Gợi ý do Claude viết dựa trên bài làm và kết quả của con, cập nhật mỗi khi Sếp nhắn “cập nhật kết quả”.</p></section>\n<section><h3>Peter đang ở đâu</h3>\n<p class=\"small\">🔴 cần luyện ngay · 🟡 đang tiến bộ · 🟢 đã vững</p>\n<div class=\"tbl\"><table><tr><th>Môn</th><th>Kỹ năng</th><th>Mức</th><th>Lỗi cụ thể</th><th>Cách luyện</th></tr><tr><td>Debate</td><td>Đa dạng từ nối (bớt lặp &quot;because&quot;)</td><td>🔴</td><td>21/10 &quot;Mint Chocolate City&quot;: because ×7, chỉ 2 loại từ nối</td><td>Mint Chocolate City ngày 1 (Connective scoops)</td></tr><tr><td>Debate</td><td>Đổi cách mở câu, không lặp chủ ngữ</td><td>🔴</td><td>6 câu mở bằng &quot;Mint chocolate city…&quot;</td><td>Ngày 2 (Opener Wheel + biệt danh thành phố)</td></tr><tr><td>Debate</td><td>Mở bài hook + kết bài kêu gọi</td><td>🔴</td><td>Chưa có</td><td>Ngày 6 (Hamburger)</td></tr><tr><td>Debate</td><td>Giải thích + ví dụ cho mỗi lý do</td><td>🟡</td><td>Lý do có, ít &quot;this means / for example&quot;</td><td>Ngày 5 (Zoom Machine)</td></tr><tr><td>Debate</td><td>Modal verbs + to + verb</td><td>🟡</td><td>should, would; to play, to explore</td><td>Ngày 4 (Power-up Machine)</td></tr><tr><td>Debate</td><td>Ý tưởng sáng tạo, WOW adjectives</td><td>🟢</td><td>&quot;snowflakes made out of mint chocolate ice cream&quot;, edible, numerous, affordable</td><td>Giữ, khen</td></tr><tr><td>EFL</td><td>Viết hoa đầu câu, không viết hoa giữa câu</td><td>🔴</td><td>14/10 &quot;the sparkling…&quot;; 17/10 &quot;Like a drone&quot;</td><td>Game &quot;Capital Detective&quot; + bảng tự kiểm sau mỗi bài</td></tr><tr><td>EFL</td><td>Mạo từ a / an</td><td>🔴</td><td>&quot;a enjoyable&quot;, &quot;enjoy incredible moment&quot;</td><td>Game a/an với tính từ bắt đầu bằng nguyên âm</td></tr><tr><td>EFL</td><td>Dấu ’ sở hữu (không thêm ’ cho số nhiều)</td><td>🔴</td><td>BTVN 30/10: “The citys’s street’s”, “fruit seller’s apple’s”</td><td>Magic Carpet ngày 3 + thẻ “Mum’s phone” dán đồ trong nhà</td></tr><tr><td>EFL</td><td>Homophone khi tự viết (know/no/now)</td><td>🔴</td><td>Khoanh đúng 6/6 nhưng tự viết “I don’t now where…”</td><td>Magic Carpet ngày 2 (gõ lại cả câu)</td></tr><tr><td>EFL</td><td>Dùng &quot;however&quot; đúng nghĩa (chỉ khi đối lập)</td><td>🟡</td><td>Dùng đúng ở bài điền, sai khi tự viết</td><td>So sánh &quot;and / also&quot; (thêm ý) với &quot;however&quot; (ý ngược)</td></tr><tr><td>EFL</td><td>Cấu trúc simile as + tính từ + as</td><td>🟡</td><td>&quot;as gentle brush of silk&quot;</td><td>Công thức &quot;as ___ as a ___&quot; bằng thẻ ghép</td></tr><tr><td>EFL</td><td>Chính tả từ dài (mattress, exciting, silk)</td><td>🟡</td><td>17/10, bài thư thuyết phục</td><td>Danh sách 5 từ/tuần, đọc–che–viết–kiểm</td></tr><tr><td>EFL</td><td>Khoảng cách chữ (finger space), chữ viết</td><td>🟡</td><td>Chữ dính nhau ở cả 3 bài</td><td>Đặt ngón tay giữa các từ khi viết</td></tr><tr><td>EFL</td><td>Alliteration</td><td>🟢</td><td>5/5, cô khen</td><td>Giữ, dùng làm &quot;WOW&quot; trong bài viết</td></tr><tr><td>EFL</td><td>Connectives firstly/also/because/however/finally</td><td>🟢</td><td>Điền đúng 4/4</td><td>Đưa vào bài viết dài</td></tr><tr><td>EFL</td><td>Quantifiers some/all/both/either</td><td>🟢</td><td>BTVN 6/6</td><td>Dùng trong bài viết truyện</td></tr><tr><td>EFL</td><td>Đọc hiểu, suy luận có dẫn chứng</td><td>🟢</td><td>The Lost Purse đúng gần hết</td><td>Giữ; ngày 1 Magic Carpet</td></tr></table></div>\n<p><b>Mục tiêu Writing EFL:</b> từ Level 3 (Secure) lên Level 4 (Strong): mỗi lý do thêm 1 câu giải thích (&quot;…so / which means…&quot;).</p></section>\n<p class=\"small\">Cập nhật lần cuối: 02/11/2026</p>"};
+const KEY="peterWorld.v1";
+let ST={visited:{}};
+try{const r=localStorage.getItem(KEY);if(r)ST=Object.assign(ST,JSON.parse(r))}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(ST))}catch(e){}}
+const $=s=>document.querySelector(s);
+function esc(t){return String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function visitedPlace(p){return p.lessons.some(l=>l.href&&ST.visited[l.href])}
+
+function render(){
+ $("#stamps").innerHTML=DATA.places.map(p=>`<div class="stamp ${visitedPlace(p)?"on":""}" title="${esc(p.city)}"><div><span>${p.flag}</span>${esc(p.city)}</div></div>`).join("");
+ const f=DATA.feature;
+ const fe=$("#feature");fe.href=f.href;fe.dataset.href=f.href;
+ fe.innerHTML=`<span class="big">${f.icon}</span><span><small>This week’s mission</small><h3>${esc(f.t)}</h3><p>${esc(f.d)}</p></span><span class="go">Let’s go →</span>`;
+ $("#route").innerHTML=DATA.places.map((p,i)=>`${i?`<div class="hop" aria-hidden="true">✈️ ${esc(p.hop)}</div>`:""}
+  <article class="ticket" style="--c:${p.color}" id="${p.id}">
+   <div class="stub"><span class="flag">${p.flag}</span><small>${esc(p.country)}</small><h3>${esc(p.city)}</h3><span class="subj">${esc(p.subject)}</span><span class="land" aria-hidden="true">${p.landmark}</span></div>
+   <div class="body"><p class="about">${esc(p.about)}</p><div class="lessons">${p.lessons.map(lessonHTML).join("")}</div></div>
+  </article>`).join("");
+ document.querySelectorAll("a[data-href]").forEach(a=>a.addEventListener("click",()=>{ST.visited[a.dataset.href]=true;save()}));
+ $("#pbox").innerHTML=DATA.parents;
+}
+function lessonHTML(l){
+ if(l.group)return `<div class="group">${esc(l.group)}</div>`;
+ if(!l.href)return `<div class="lesson soon"><span class="ic">${l.icon}</span><span><b>${esc(l.t)}</b><span class="d">${esc(l.d)}</span></span><span class="chip soon">Coming soon</span></div>`;
+ const v=ST.visited[l.href];
+ return `<a class="lesson" href="${esc(l.href)}" data-href="${esc(l.href)}" ${l.ext?'target="_blank" rel="noopener"':""}><span class="ic">${l.icon}</span><span><b>${esc(l.t)}</b><span class="d">${esc(l.d)}</span></span><span class="chip ${v?"done":"new"}">${v?"Visited ✓":(l.tag||"Play")}</span></a>`;
+}
+(function snow(){if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;const s=$("#snow");for(let i=0;i<18;i++){const e=document.createElement("i");e.textContent=["❄","❅","·"][i%3];e.style.left=Math.random()*100+"%";e.style.fontSize=10+Math.random()*16+"px";e.style.animationDuration=9+Math.random()*12+"s";e.style.animationDelay=-Math.random()*20+"s";s.appendChild(e)}})();
+render();
+addEventListener("pageshow",render);
+</script>
+</body>
+</html>

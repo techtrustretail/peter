@@ -1,0 +1,835 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,-apple-system,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
+<meta charset="utf-8">
+<title>Mint Chocolate City</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:light;
+  --mint:#5fd3b0; --mint-l:#c9f5e7; --mint-d:#1f9e7c;
+  --choc:#6b3e26; --choc-l:#a8724f; --cream:#fff8ef;
+  --pink:#ff7eb6; --sky:#e9fbff; --ink:#3a2418; --muted:#7a5a48;
+  --adj:#bff0b8; --modal:#bfe1ff; --inf:#ffc8e3; --conn:#ffd59e;
+  --r:22px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Fredoka","Comic Sans MS","Chalkboard SE",system-ui,sans-serif;color:var(--ink);
+  background:linear-gradient(180deg,#dff7ff 0%,#c9f5e7 55%,#f3e2d3 100%);min-height:100vh;overflow-x:hidden}
+.snow{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.snow span{position:absolute;top:-40px;font-size:22px;animation:fall linear infinite;opacity:.75}
+@keyframes fall{to{transform:translateY(110vh) rotate(360deg)}}
+.wrap{position:relative;z-index:1;max-width:1240px;margin:0 auto;padding-block:18px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:14px;justify-content:space-between;margin-bottom:14px}
+h1{margin:0;font-size:clamp(28px,4vw,44px);color:var(--choc);letter-spacing:.5px;text-shadow:3px 3px 0 #fff}
+h1 small{display:block;font-size:.42em;color:var(--mint-d);font-weight:600;text-shadow:none}
+.motto{background:#fff;border-radius:999px;padding:10px 18px;font-weight:600;box-shadow:0 4px 0 #0001;font-size:17px}
+.layout{display:grid;grid-template-columns:300px 1fr;gap:18px;align-items:start}
+@media (max-width:860px){.layout{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){.snow{display:none}*{animation-duration:.01s!important;transition-duration:.01s!important}}
+main{min-width:0}
+.card{background:#fff;border-radius:var(--r);box-shadow:0 6px 0 #0000000f,0 10px 30px #0000000d;padding:18px}
+/* tower */
+.towerBox{position:sticky;top:12px;text-align:center}
+.towerBox h3{margin:0 0 6px;color:var(--choc)}
+.sky{background:linear-gradient(180deg,#2b2350,#5a4a9a 60%,#9fd9ff);border-radius:18px;padding:14px 10px 0;position:relative;min-height:520px;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden}
+.moon{width:92px;height:92px;border-radius:50%;margin:0 auto 10px;background:radial-gradient(circle at 35% 35%,#8a5a3a,#5a321d 70%);
+  box-shadow:0 0 0 6px #ffffff22,0 0 30px #ffe3b0aa;position:relative;transform:scale(0);transition:transform .8s cubic-bezier(.3,1.6,.5,1)}
+.moon::after{content:"";position:absolute;inset:6px;border-radius:50%;background:radial-gradient(#fff6 1.5px,transparent 2px) 0 0/10px 10px}
+.moon.show{transform:scale(1)}
+.moonLabel{color:#fff;font-size:13px;min-height:18px;margin-bottom:6px}
+.floors{display:flex;flex-direction:column-reverse;gap:4px;align-items:center}
+.floor{width:78%;height:56px;border-radius:12px 12px 6px 6px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;
+  border:3px dashed #ffffff66;color:#ffffffaa;font-weight:600;font-size:14px;transition:all .4s}
+.floor .win{display:flex;gap:6px}
+.floor .win i{width:12px;height:16px;border-radius:3px;background:#ffffff33;display:block}
+.floor.built{border:3px solid var(--choc);color:var(--choc);box-shadow:inset 0 -8px 0 #0000001a}
+.floor.built .win i{background:#fff59d;box-shadow:0 0 6px #fff59d}
+.floor.pop{animation:pop .7s cubic-bezier(.3,1.7,.5,1)}
+@keyframes pop{0%{transform:scale(.2) translateY(-80px)}100%{transform:scale(1)}}
+.ground{height:26px;background:repeating-linear-gradient(90deg,#fff 0 18px,#e8fff7 18px 36px);margin:4px -10px 0;border-top:4px solid var(--mint-d)}
+.progress{margin-top:10px;font-weight:600;color:var(--muted)}
+.reset{background:none;border:none;color:#b9a395;text-decoration:underline;cursor:pointer;font:inherit;font-size:12px;margin-top:6px}
+/* day tabs */
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:14px}
+@media (max-width:700px){.days{grid-template-columns:repeat(4,1fr)}}
+.day{border:none;border-radius:18px;padding:10px 4px;font:inherit;cursor:pointer;background:#fff;box-shadow:0 4px 0 #00000014;transition:transform .15s}
+.day:hover{transform:translateY(-3px)}
+.day b{display:block;font-size:26px}
+.day span{font-size:13px;font-weight:600;color:var(--muted)}
+.day.active{background:var(--choc);color:#fff;box-shadow:0 4px 0 #3a1f10}
+.day.active span{color:#ffe7d1}
+.day.done::after{content:"✅";display:block;font-size:14px}
+/* main */
+.mission h2{margin:0;font-size:30px;color:var(--choc)}
+.mission .sub{color:var(--mint-d);font-weight:600;font-size:18px;margin:2px 0 10px}
+details.guide{background:#fff4d6;border-radius:16px;padding:10px 14px;margin:10px 0 14px;border:2px dashed #f0c96b}
+details.guide summary{cursor:pointer;font-weight:700;color:#8a5a00;font-size:16px}
+details.guide ul{margin:8px 0 2px;padding-left:20px;font-family:system-ui,-apple-system,sans-serif;font-size:15px;line-height:1.55}
+.step{border-radius:20px;padding:16px;margin-top:14px}
+.step h3{margin:0 0 10px;font-size:21px;display:flex;align-items:center;gap:8px}
+.step h3 .n{background:var(--choc);color:#fff;border-radius:50%;width:32px;height:32px;display:inline-grid;place-items:center;font-size:17px}
+.s1{background:#effcf7;border:3px solid var(--mint-l)}
+.s2{background:#fff6fb;border:3px solid #ffd6ea}
+.s3{background:#f6f3ff;border:3px solid #e2dbff}
+.coach{background:#fff;border-radius:16px;padding:12px 14px;border-left:8px solid var(--mint);margin-bottom:12px;font-size:17px;line-height:1.5}
+.btn{border:none;border-radius:999px;padding:12px 22px;font:inherit;font-weight:700;font-size:18px;cursor:pointer;
+  background:var(--mint);color:#063d2f;box-shadow:0 5px 0 var(--mint-d);transition:transform .1s}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 0 var(--mint-d)}
+.btn.choc{background:var(--choc-l);color:#fff;box-shadow:0 5px 0 var(--choc)}
+.btn.pink{background:var(--pink);color:#fff;box-shadow:0 5px 0 #d94f8f}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.chip{display:inline-block;border:none;border-radius:14px;padding:9px 14px;margin:4px;font:inherit;font-size:17px;font-weight:600;cursor:pointer;
+  box-shadow:0 3px 0 #00000022;transition:transform .12s}
+.chip:hover{transform:translateY(-2px) scale(1.04)}
+.chip.shake{animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.say{background:none;border:none;cursor:pointer;font-size:20px;padding:0 4px;vertical-align:middle}
+.sentence{font-size:22px;line-height:1.6;background:#fff;border-radius:16px;padding:14px 16px;margin:8px 0}
+.blank{display:inline-block;min-width:110px;border-bottom:4px dotted var(--choc-l);text-align:center;color:var(--choc-l)}
+.feedback{min-height:28px;font-size:18px;font-weight:600;margin:8px 0}
+.good{color:var(--mint-d)} .hint{color:#c0632a}
+.adj{background:var(--adj);border-radius:6px;padding:0 4px}
+.modal{background:var(--modal);border-radius:6px;padding:0 4px}
+.inf{background:var(--inf);border-radius:6px;padding:0 4px}
+.conn{background:var(--conn);border-radius:6px;padding:0 4px}
+.legend span{display:inline-block;margin:3px 6px 3px 0;padding:3px 10px;border-radius:8px;font-size:15px;font-weight:600}
+/* tubs */
+.tubs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:8px 0}
+@media (max-width:600px){.tubs{grid-template-columns:repeat(2,1fr)}}
+.tub{border-radius:16px 16px 26px 26px;padding:8px;text-align:center;font-size:14px;font-weight:600}
+.tub b{display:block;font-size:16px}
+.cone{display:flex;flex-direction:column-reverse;align-items:center;min-height:60px;margin-top:6px}
+.cone .scoop{width:64px;height:40px;border-radius:30px 30px 14px 14px;margin-bottom:-10px;box-shadow:inset 0 -6px 0 #0000001a;animation:pop .5s}
+.cone .base{width:0;height:0;border-left:30px solid transparent;border-right:30px solid transparent;border-top:60px solid #e2a35e}
+/* wheel */
+.wheelArea{display:flex;flex-wrap:wrap;gap:20px;align-items:center}
+.wheelWrap{position:relative;width:300px;height:300px;margin:0 auto}
+.pointer{position:absolute;left:50%;top:-6px;transform:translateX(-50%);font-size:38px;z-index:2;filter:drop-shadow(0 2px 0 #0003)}
+.wheel{width:300px;height:300px;border-radius:50%;border:8px solid var(--choc);position:relative;transition:transform 3.2s cubic-bezier(.15,.9,.2,1);box-shadow:0 6px 0 #0002}
+.wheel .lab{position:absolute;left:50%;top:50%;width:0;height:0}
+.wheel .lab span{position:absolute;transform:translate(-50%,-50%);font-size:15px;font-weight:700;text-align:center;width:80px;line-height:1.1}
+.result{flex:1;min-width:240px}
+.bigOpener{font-size:30px;font-weight:700;color:var(--choc)}
+/* wow */
+.plain{background:#eee;border-radius:8px;padding:0 6px;cursor:pointer;border-bottom:3px solid #bbb}
+.plain:hover{background:#ffe9a8}
+.plain.sel{outline:3px solid var(--pink)}
+/* slot */
+.slots{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+@media (max-width:700px){.slots{grid-template-columns:repeat(2,1fr)}}
+.reel{background:#fff;border-radius:16px;padding:10px;text-align:center;cursor:pointer;border:3px solid #ddd;min-height:92px;transition:transform .15s}
+.reel small{display:block;color:var(--muted);font-weight:600;font-size:13px}
+.reel div{font-size:18px;font-weight:700;margin-top:6px}
+.reel.spin{animation:spinr .35s}
+@keyframes spinr{0%{transform:rotateX(0)}100%{transform:rotateX(360deg)}}
+/* zoom cone */
+.zoomStack{display:flex;flex-direction:column;gap:6px;margin:8px 0}
+.zs{border-radius:20px;padding:10px 14px;font-size:19px;animation:pop .5s}
+.z1{background:#c08a62;color:#fff}.z2{background:var(--mint);color:#063d2f}.z3{background:#ffb5d4}
+/* burger */
+.burger{max-width:560px;margin:10px auto}
+.bl{padding:12px 16px;font-size:18px;text-align:center;margin:3px 0}
+.bun-t{background:#e9a54e;border-radius:80px 80px 14px 14px;color:#4a2a00;font-weight:600;min-height:62px}
+.lettuce{background:#9be37a;border-radius:20px}
+.cheese{background:#ffe066;border-radius:6px}
+.patty{background:#7a4a2e;color:#fff;border-radius:20px}
+.bun-b{background:#e9a54e;border-radius:14px 14px 50px 50px;color:#4a2a00;font-weight:600;min-height:52px}
+/* write */
+.prompt{font-size:20px;font-weight:600;line-height:1.5}
+.starters{margin-top:8px}
+.starters span{display:inline-block;background:#fff;border:2px dashed var(--pink);border-radius:12px;padding:5px 12px;margin:4px;font-size:17px}
+.checks label{display:flex;align-items:center;gap:12px;font-size:19px;padding:8px 10px;background:#fff;border-radius:14px;margin:6px 0;cursor:pointer}
+.checks input{width:28px;height:28px;accent-color:var(--mint-d)}
+.buildRow{text-align:center;margin-top:16px}
+textarea{width:100%;min-height:170px;border-radius:16px;border:3px solid #e2dbff;padding:12px;font:inherit;font-size:17px;line-height:1.5}
+.scanOut{background:#fff;border-radius:16px;padding:14px;font-size:19px;line-height:1.8;margin-top:10px}
+.stats{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.stat{background:#fff;border-radius:14px;padding:8px 12px;font-weight:600;font-size:16px;box-shadow:0 3px 0 #0001}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+@media (max-width:600px){.compare{grid-template-columns:1fr}}
+.compare .card{padding:12px}
+input.txt{font:inherit;font-size:18px;padding:8px 12px;border-radius:12px;border:3px solid var(--mint-l);width:min(320px,100%)}
+.confetti{position:fixed;top:-40px;font-size:28px;z-index:99;pointer-events:none;animation:conf 2.6s ease-in forwards}
+@keyframes conf{to{transform:translateY(110vh) rotate(540deg)}}
+.toast{position:fixed;left:50%;top:30%;transform:translate(-50%,-50%) scale(0);background:#fff;border-radius:28px;padding:24px 34px;font-size:30px;font-weight:700;
+  color:var(--choc);box-shadow:0 10px 0 #0002;z-index:100;text-align:center;transition:transform .4s cubic-bezier(.3,1.6,.5,1)}
+.toast.show{transform:translate(-50%,-50%) scale(1)}
+@media (max-width:860px){.towerBox{position:static}.sky{min-height:0}.floor{height:40px}.moon{width:64px;height:64px}}
+.bank{background:#fff;border-radius:16px;padding:12px 16px;margin-top:16px;border:3px dashed var(--mint)}
+.bank h3{margin:0 0 6px;font-size:19px;color:var(--choc)} .bank h3 small{font-weight:500;color:var(--muted);font-size:14px}
+.bank ol{margin:0;padding-left:28px} .bank li{margin:10px 0;font-size:19px;line-height:1.55;animation:pop .5s}
+.bankDay{font-weight:700;color:var(--mint-d);margin-top:10px}
+.swaps{font-size:15px;color:var(--muted);margin-top:3px;line-height:1.9}
+.swaps span{display:inline-block;background:#f4ece5;border-radius:10px;padding:1px 9px;margin:2px 3px;color:var(--ink)}
+.bz{padding:1px 6px;border-radius:8px;line-height:1.8}
+</style>
+<div class="snow" id="snow"></div>
+<div class="wrap">
+  <header>
+    <h1>🍫 Mint Chocolate City <small>Peter's 7-Day Writing Builder</small></h1>
+    <div class="motto">👑 Your ideas are the boss · 🧰 Tools are the helpers</div>
+  </header>
+  <div class="layout">
+    <aside class="card towerBox">
+      <h3>My Mint Tower</h3>
+      <div class="sky">
+        <div class="moonLabel" id="moonLabel">Finish 7 floors to unlock… 🌙</div>
+        <div class="moon" id="moon"></div>
+        <div class="floors" id="floors"></div>
+        <div class="ground"></div>
+      </div>
+      <div class="progress" id="progress"></div>
+      <button class="reset" id="reset">Grown-ups: start again from Day 1</button>
+    </aside>
+    <main>
+      <nav class="days" id="days"></nav>
+      <section class="card mission" id="mission"></section>
+    </main>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- storage (per-browser convenience only) ---------- */
+const KEY = 'mcc-builder-v1';
+let state = { done: {}, nick: '', words: [], current: 1, bank: {} };
+try { const s = JSON.parse(localStorage.getItem(KEY)); if (s) state = Object.assign(state, s); } catch (e) {}
+function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+
+/* ---------- helpers ---------- */
+const $ = (s, el = document) => el.querySelector(s);
+const esc = t => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const cap = w => w.charAt(0).toUpperCase() + w.slice(1);
+const pick = a => a[Math.floor(Math.random() * a.length)];
+
+function say(t) {
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(t.replace(/<[^>]+>/g, ''));
+    u.lang = 'en-GB'; u.rate = 0.9;
+    const v = speechSynthesis.getVoices().find(v => v.lang === 'en-GB');
+    if (v) u.voice = v;
+    speechSynthesis.speak(u);
+  } catch (e) {}
+}
+const sayBtn = t => `<button class="say" title="Listen" data-say="${esc(t).replace(/"/g, '&quot;')}">🔊</button>`;
+document.addEventListener('click', e => { const b = e.target.closest('[data-say]'); if (b) say(b.dataset.say); });
+
+let actx;
+function ding(good = true) {
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const notes = good ? [660, 880, 1175] : [300, 240];
+    notes.forEach((f, i) => {
+      const o = actx.createOscillator(), g = actx.createGain();
+      o.type = good ? 'triangle' : 'sine'; o.frequency.value = f;
+      g.gain.setValueAtTime(0.18, actx.currentTime + i * 0.11);
+      g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + i * 0.11 + 0.25);
+      o.connect(g); g.connect(actx.destination);
+      o.start(actx.currentTime + i * 0.11); o.stop(actx.currentTime + i * 0.11 + 0.3);
+    });
+  } catch (e) {}
+}
+function confetti(n = 50) {
+  for (let i = 0; i < n; i++) {
+    const s = document.createElement('div');
+    s.className = 'confetti';
+    s.textContent = pick(['🍫', '🍦', '❄️', '✨', '🌙', '⭐', '🍨']);
+    s.style.left = Math.random() * 100 + 'vw';
+    s.style.animationDelay = Math.random() * 0.8 + 's';
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 3600);
+  }
+}
+function toast(msg) {
+  const t = $('#toast'); t.innerHTML = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* falling mint-chocolate snow */
+(function () {
+  const box = $('#snow');
+  for (let i = 0; i < 18; i++) {
+    const s = document.createElement('span');
+    s.textContent = pick(['❄️', '🍦', '❄️', '🍫']);
+    s.style.left = Math.random() * 100 + '%';
+    s.style.animationDuration = 9 + Math.random() * 12 + 's';
+    s.style.animationDelay = -Math.random() * 20 + 's';
+    s.style.fontSize = 14 + Math.random() * 16 + 'px';
+    box.appendChild(s);
+  }
+})();
+
+/* ---------- word lists (colours match Mr Peter's sheet) ---------- */
+const CONN = ['because', 'also', 'in addition', "what's more", 'furthermore', 'moreover', 'therefore', 'this means', 'which means',
+  'so', 'however', 'but', 'although', 'for example', 'for instance', 'firstly', 'first', 'next', 'then', 'finally', 'best of all',
+  'as a result', 'since', 'whenever', 'on top of that'];
+const MODAL = ['can', 'could', 'should', 'must', 'will', 'would', 'might', 'may'];
+const WOW = ['amazing', 'edible', 'delicious', 'numerous', 'affordable', 'entertaining', 'freezing', 'magical', 'enormous', 'colossal',
+  'gigantic', 'giant', 'colourful', 'colorful', 'fantastic', 'sparkling', 'beautiful', 'friendly', 'exciting', 'thrilling', 'scrumptious',
+  'mouth-watering', 'magnificent', 'extraordinary', 'marvellous', 'icy', 'frosty', 'countless', 'incredible', 'unbelievable', 'mysterious',
+  'ancient', 'majestic', 'brilliant', 'wonderful', 'interesting', 'invisible', 'automatic', 'slippery', 'sticky', 'special', 'cosy', 'cozy',
+  'creamy', 'minty', 'chocolatey', 'gooey', 'crunchy', 'fluffy', 'glittering', 'gorgeous', 'spectacular', 'dazzling', 'delightful',
+  'awesome', 'superb', 'splendid', 'unforgettable', 'breathtaking', 'yummiest', 'coldest', 'tallest', 'sweetest', 'mintastic', 'chocolicious'];
+const TO_STOP = ['the', 'a', 'an', 'my', 'your', 'his', 'her', 'its', 'our', 'their', 'this', 'that', 'these', 'those', 'me', 'you', 'him',
+  'them', 'us', 'it', 'school', 'bed', 'earth', 'antarctica'];
+
+/* ---------- Sentence Bank: every finished sentence stays on screen to copy ---------- */
+function bankOf(d) { state.bank = state.bank || {}; state.bank[d] = state.bank[d] || []; return state.bank[d]; }
+function addBank(d, html, swaps) {
+  const b = bankOf(d);
+  if (b.some(x => x.t === html)) return;
+  b.push({ t: html, s: swaps || [] }); save(); drawBank(d);
+}
+function bankItem(x) {
+  return `<li><div>${x.t} ${sayBtn(x.t)}</div>${x.s.length ? `<div class="swaps">🔁 You can also use: ${x.s.map(w => `<span>${w}</span>`).join('')}</div>` : ''}</li>`;
+}
+function drawBank(d) {
+  const el = document.getElementById('bank'); if (!el) return;
+  if (d === 7) {
+    const all = [1, 2, 3, 4, 5, 6].map(k => [k, bankOf(k)]).filter(([, b]) => b.length);
+    el.innerHTML = `<h3>📚 All my sentence banks <small>(ideas to borrow for your big rewrite)</small></h3>` +
+      (all.length ? all.map(([k, b]) => `<div class="bankDay">${DAYS[k - 1].e} Day ${k}</div><ol>${b.map(bankItem).join('')}</ol>`).join('')
+        : '<i>Play Days 1–6 and your sentences will be collected here.</i>');
+    return;
+  }
+  const b = bankOf(d);
+  el.innerHTML = `<h3>📋 My Sentence Bank <small>(copy these into your notebook)</small></h3>` +
+    (b.length ? `<ol>${b.map(bankItem).join('')}</ol>` : '<i>Your sentences appear here as you play, and they stay here so you can copy them.</i>');
+}
+
+/* ---------- Day 1: connective scoops ---------- */
+const TUBS = {
+  add:    { name: 'adding more',        flavour: '🍓 Strawberry', color: '#ffb3d1',
+            start: ['also', 'in addition', "what's more", 'furthermore', 'moreover', 'on top of that', 'besides'], mid: [] },
+  reason: { name: 'giving a reason',    flavour: '🍫 Chocolate',  color: '#c99674',
+            start: [], mid: ['because', 'as', 'since'] },
+  result: { name: 'showing a result',   flavour: '🌿 Mint',       color: '#8ee6c8',
+            start: ['therefore', 'this means', 'so', 'as a result', 'that is why', 'because of this'], mid: ['so', 'which means'] },
+  turn:   { name: 'changing direction', flavour: '🍋 Lemon',      color: '#ffe680',
+            start: ['however', 'on the other hand', 'even so'], mid: ['but', 'although', 'even though', 'yet'] }
+};
+const D1 = [
+  { a: 'Mint Chocolate City is freezing.', b: 'you can go ice-skating on the mint chocolate lake!', job: 'result', start: true },
+  { a: 'You can have snowball fights with ice cream snowflakes.', b: 'you can ride the brownie roller coaster.', job: 'add', start: true },
+  { a: 'Outside, it is icy and windy.', b: 'the apartments are warm and cosy inside.', job: 'turn', start: true },
+  { a: 'Children love this city', b: 'everything is edible!', job: 'reason', start: false },
+  { a: 'The tickets are affordable', b: 'every family can visit.', job: 'result', start: false },
+  { a: 'The city is freezing', b: 'nobody feels cold in their mint chocolate jumper.', job: 'turn', start: false },
+  { a: 'The apartments have numerous floors.', b: 'every floor has a different activity.', job: 'add', start: true },
+  { a: 'Penguins visit the city every winter', b: 'they love mint chocolate ice cream.', job: 'reason', start: false }
+];
+const noComma = ['so', 'this means', 'that is why'];
+const midComma = ['so', 'which means', 'but', 'yet'];
+function joinConn(it, w) {
+  return it.start ? `${it.a} <span class="conn">${cap(w)}${noComma.includes(w) ? '' : ','}</span> ${it.b}`
+                  : `${it.a}${midComma.includes(w) ? ',' : ''} <span class="conn">${w}</span> ${it.b}`;
+}
+function day1(el) {
+  let i = 0;
+  const tubs = Object.values(TUBS).map(t =>
+    `<div class="tub" style="background:${t.color}"><b>${t.flavour}</b>${cap(t.name)}<br><i>${[...new Set([...t.start, ...t.mid])].join(', ')}</i></div>`).join('');
+  el.innerHTML = `
+    <div class="coach">💬 <b>Coach says:</b> ⭐ "It rains snowflakes made of mint chocolate ice cream" is SUPER creative!
+      ⭐ Great WOW words: <span class="adj">edible</span>, <span class="adj">numerous</span>, <span class="adj">affordable</span>.<br>
+      🌟 <b>Wish:</b> your writing has <b>"because" × 7</b>! Connectives are like ice cream flavours. Let's try new ones.</div>
+    <div class="tubs">${tubs}</div>
+    <div id="q"></div>
+    <div class="feedback" id="fb"></div>
+    <div style="display:flex;align-items:flex-end;gap:16px"><b>My cone:</b><div class="cone" id="cone"><div class="base"></div></div></div>`;
+  function show() {
+    const it = D1[i];
+    if (!it) {
+      $('#q', el).innerHTML = `<div class="sentence good">🏆 ${D1.length} scoops! You are a Connective Champion! <button class="btn" id="again">Play again</button></div>`;
+      $('#again', el).onclick = () => { i = 0; $('#cone', el).innerHTML = '<div class="base"></div>'; $('#fb', el).innerHTML = ''; show(); };
+      return;
+    }
+    const pos = it.start ? 'start' : 'mid';
+    let words = [];
+    Object.entries(TUBS).forEach(([k, t]) => t[pos].forEach(w => words.push({ w, k })));
+    words = words.filter((x, j, arr) => arr.findIndex(y => y.w === x.w) === j).sort(() => Math.random() - 0.5);
+    $('#q', el).innerHTML = `<div><b>Scoop ${i + 1} of ${D1.length}</b></div>
+      <div class="sentence">${it.a} <span class="blank">?</span> ${it.b}</div>
+      <div>${words.map(x => `<button class="chip" style="background:${TUBS[x.k].color}" data-w="${x.w}" data-k="${x.k}">${it.start ? cap(x.w) : x.w}</button>`).join('')}</div>`;
+    $('#q', el).querySelectorAll('.chip').forEach(b => b.onclick = () => {
+      const w = b.dataset.w, k = b.dataset.k;
+      if (k === it.job) {
+        const others = TUBS[it.job][pos].filter(x => x !== w);
+        const filled = joinConn(it, w);
+        $('#fb', el).innerHTML = `<span class="good">🎉 Yes! "${w}" is a ${TUBS[it.job].flavour} word: it is for ${TUBS[it.job].name}.</span>`;
+        $('#q', el).querySelector('.sentence').innerHTML = filled;
+        $('#q', el).querySelectorAll('.chip').forEach(c => c.disabled = true);
+        addBank(1, filled, others.map(x => it.start ? cap(x) + (noComma.includes(x) ? '' : ',') : x));
+        const sc = document.createElement('div'); sc.className = 'scoop'; sc.style.background = TUBS[it.job].color;
+        $('#cone', el).appendChild(sc);
+        ding(true);
+        i++; setTimeout(show, 1600);
+      } else {
+        b.classList.add('shake'); setTimeout(() => b.classList.remove('shake'), 400);
+        ding(false);
+        $('#fb', el).innerHTML = `<span class="hint">🤔 "${w}" is for ${TUBS[k].name}. This sentence needs a word for <b>${TUBS[it.job].name}</b>. Try a ${TUBS[it.job].flavour} scoop!</span>`;
+      }
+    });
+  }
+  show();
+}
+
+/* ---------- Day 2: opener wheel + nicknames ---------- */
+const OPENERS = [
+  { o: 'Imagine…', e: 'Imagine a city where it rains mint chocolate ice cream!', c: '#ffb3d1',
+    alt: ['Picture this:', 'Close your eyes and imagine…', 'Just imagine…'] },
+  { o: 'Did you know…?', e: 'Did you know that every lamp post in my city is edible?', c: '#8ee6c8',
+    alt: ['Have you ever…?', 'Guess what?', 'Have you heard that…?'] },
+  { o: 'Every morning,', e: 'Every morning, the children skate to school on minty ice.', c: '#ffe680',
+    alt: ['Every weekend,', 'At night,', 'In winter,', 'On Sundays,'] },
+  { o: 'Surprisingly,', e: 'Surprisingly, nobody ever gets cold in Mint Chocolate City.', c: '#c9b8ff',
+    alt: ['Amazingly,', 'Incredibly,', 'Luckily,', 'Believe it or not,'] },
+  { o: 'Best of all,', e: 'Best of all, the moon is made of chocolate brownie!', c: '#c99674',
+    alt: ['Most importantly,', 'The best part is that', 'On top of that,'] },
+  { o: 'Right next to…', e: 'Right next to my apartment, there is a gooey chocolate river.', c: '#9fd9ff',
+    alt: ['High above…', 'Deep under…', 'In the middle of…', 'Behind…'] },
+  { o: 'Whenever you…,', e: 'Whenever you feel hungry, you can nibble a chocolate door.', c: '#ffcf9e',
+    alt: ['When you…,', 'As soon as you…,', 'After you…,'] },
+  { o: 'If you…,', e: 'If you climb to the top floor, you can touch the brownie moon.', c: '#b8f0a0',
+    alt: ['If you ever…,', 'Once you…,', 'Unless you…,'] }
+];
+const NICKS = ['this edible city', 'my frosty home', 'the minty metropolis', 'this delicious town', 'the chocolate capital',
+  'the frozen wonderland', 'this sweet city', 'the coolest city on Earth', 'my edible home', 'this icy paradise'];
+function day2(el) {
+  const seg = 360 / OPENERS.length;
+  const grad = OPENERS.map((x, k) => `${x.c} ${k * seg}deg ${(k + 1) * seg}deg`).join(',');
+  const labels = OPENERS.map((x, k) => `<div class="lab" style="transform:rotate(${k * seg + seg / 2}deg)"><span style="top:-95px">${x.o.replace('…', '').replace(',', '').replace('?', '')}</span></div>`).join('');
+  el.innerHTML = `
+    <div class="coach">💬 <b>Coach says:</b> Look how your sentences start:<br>
+      <i>"<u>Mint chocolate city</u> is… <u>Mint chocolate city</u> has… <u>Mint chocolate city</u> is…"</i> 😴<br>
+      Readers love surprises! Spin the wheel to get a <b>new way to start</b> a sentence.</div>
+    <div class="wheelArea">
+      <div class="wheelWrap"><div class="pointer">🍦</div>
+        <div class="wheel" id="wheel" style="background:conic-gradient(${grad})">${labels}</div></div>
+      <div class="result"><button class="btn pink" id="spin">🎡 SPIN!</button>
+        <div id="res" style="margin-top:14px"></div></div>
+    </div>
+    <h3 style="margin:18px 0 6px">🏷️ Give your city a nickname</h3>
+    <div>Instead of saying "Mint Chocolate City" again and again, use a nickname. Tap one to save it to your bank:</div>
+    <div id="nicks">${NICKS.map(n => `<button class="chip" style="background:var(--mint-l)" data-n="${n}">${n}</button>`).join('')}</div>
+    <div style="margin-top:8px">✨ Invent YOUR nickname: <input class="txt" id="nick" placeholder="the …" value="${esc(state.nick || '')}">
+      <button class="btn" id="savenick">Save</button></div>`;
+  let rot = 0;
+  $('#spin', el).onclick = () => {
+    const k = Math.floor(Math.random() * OPENERS.length);
+    const target = (360 - (k * seg + seg / 2)) % 360;
+    rot += 360 * 5 + ((target - (rot % 360)) + 360) % 360;
+    $('#wheel', el).style.transform = `rotate(${rot}deg)`;
+    $('#res', el).innerHTML = '';
+    setTimeout(() => {
+      const x = OPENERS[k];
+      $('#res', el).innerHTML = `<div class="bigOpener">${x.o}</div>
+        <div class="sentence">${x.e} ${sayBtn(x.e)}</div>
+        <div class="swaps">🔁 You can also use: ${x.alt.map(a => `<span>${a}</span>`).join('')}</div>
+        <div style="margin-top:8px"><b>Your turn:</b> say a sentence out loud that starts with <b>"${x.o}"</b> 🎤 then write it! ✏️</div>`;
+      const key = x.o.replace(/[…?,]/g, '').trim();
+      addBank(2, x.e.replace(key, `<span class="conn">${key}</span>`), x.alt);
+      ding(true);
+    }, 3300);
+  };
+  const nickSentence = n => `Welcome to <span class="adj">${esc(n)}</span>!`;
+  $('#nicks', el).querySelectorAll('[data-n]').forEach(b => b.onclick = () => {
+    say(b.dataset.n); ding(true);
+    addBank(2, `🏷️ Nickname: <span class="adj">${b.dataset.n}</span>`, NICKS.filter(n => n !== b.dataset.n).slice(0, 4));
+  });
+  $('#nick', el).oninput = e => { state.nick = e.target.value; save(); };
+  $('#savenick', el).onclick = () => {
+    const v = $('#nick', el).value.trim(); if (!v) return;
+    ding(true); addBank(2, `🏷️ My own nickname: ${nickSentence(v)}`, []);
+  };
+}
+
+/* ---------- Day 3: WOW word shop ---------- */
+const PLAIN = [
+  { w: 'nice', up: ['magnificent', 'extraordinary', 'marvellous', 'spectacular', 'wonderful', 'delightful'] },
+  { w: 'very cold', up: ['freezing', 'icy', 'frosty', 'chilly', 'frozen', 'bitterly cold'] },
+  { w: 'lots of', up: ['numerous', 'countless', 'loads of', 'plenty of', 'hundreds of', 'a huge number of'] },
+  { w: 'big', up: ['enormous', 'colossal', 'gigantic', 'massive', 'huge', 'towering'] },
+  { w: 'good', up: ['delicious', 'scrumptious', 'mouth-watering', 'tasty', 'yummy', 'delectable'] },
+  { w: 'fun', up: ['thrilling', 'entertaining', 'exciting', 'amazing', 'fantastic', 'unforgettable'] }
+];
+const MOST = ['the most delicious', 'the most entertaining', 'the most magical', 'the most extraordinary', 'the most incredible',
+  'the coldest', 'the yummiest', 'the tallest', 'the sweetest', 'the best'];
+function day3(el) {
+  const tmpl = ['Mint Chocolate City is a ', 0, ' city. It is ', 1, ' all year round. There are ', 2, ' ', 3,
+    ' buildings with chocolate balconies. The ice cream snowflakes taste ', 4, ' and the snowball fights are really ', 5, '!'];
+  const chosen = {};
+  el.innerHTML = `
+    <div class="coach">💬 <b>Coach says:</b> Welcome to the <b>WOW Word Ice Cream Shop</b> 🍨!
+      Tap a grey (boring) word, then pick a tastier one. Watch it turn <span class="adj">green</span> like on Mr Peter's sheet!
+      Tap a green word to try a different one.</div>
+    <div class="sentence" id="para"></div>
+    <div id="shelf" style="min-height:70px"></div>
+    <div class="feedback" id="fb"></div>
+    <h3 style="margin:14px 0 6px">🏆 The "most" shelf (superlatives). Tap one to save it.</h3>
+    <div id="most">${MOST.map(w => `<button class="chip" style="background:#fff0b3" data-m="${w}">${w}</button>`).join('')}</div>
+    <h3 style="margin:14px 0 6px">🧪 Word Lab: invent a WOW word!</h3>
+    <div>Mix two words: <b>mint + fantastic = mintastic</b>, <b>chocolate + delicious = chocolicious</b> 🤩</div>
+    <div style="margin-top:6px"><input class="txt" id="nw" placeholder="My new word…"> <button class="btn" id="addw">Add</button></div>
+    <div id="mywords" style="margin-top:6px"></div>`;
+  let sel = null;
+  const text = () => tmpl.map(p => typeof p === 'number' ? (chosen[p] ? `<span class="adj">${chosen[p]}</span>` : PLAIN[p].w) : p).join('');
+  function draw() {
+    $('#para', el).innerHTML = tmpl.map(p => typeof p === 'number'
+      ? `<span class="${chosen[p] ? 'adj' : 'plain'} ${sel === p ? 'sel' : ''}" data-p="${p}" style="cursor:pointer">${chosen[p] || PLAIN[p].w}</span>`
+      : p).join('') + ' ' + sayBtn(text());
+    $('#para', el).querySelectorAll('[data-p]').forEach(s => s.onclick = () => { sel = +s.dataset.p; draw(); shelf(); });
+    if (Object.keys(chosen).length === PLAIN.length) {
+      $('#fb', el).innerHTML = '<span class="good">🌟 6/6 upgrades! Your city sounds SO much tastier now! The paragraph is in your bank.</span>';
+      addBank(3, text(), []);
+    }
+  }
+  function shelf() {
+    if (sel === null) { $('#shelf', el).innerHTML = '<i>👆 Tap a grey word first.</i>'; return; }
+    const p = PLAIN[sel];
+    $('#shelf', el).innerHTML = `<b>Upgrade "${p.w}" to:</b><br>` + p.up.map(u =>
+      `<button class="chip" style="background:var(--adj)" data-u="${u}">${u}</button>`).join('');
+    $('#shelf', el).querySelectorAll('[data-u]').forEach(b => b.onclick = () => {
+      const u = b.dataset.u;
+      chosen[sel] = u; say(u); ding(true);
+      addBank(3, `${p.w} ➜ <span class="adj">${u}</span>`, p.up.filter(x => x !== u));
+      sel = null; draw(); shelf();
+    });
+  }
+  function words() {
+    $('#mywords', el).innerHTML = (state.words || []).map(w => `<span class="chip adj" style="cursor:default">${esc(w)}</span>`).join('');
+  }
+  $('#most', el).querySelectorAll('[data-m]').forEach(b => b.onclick = () => {
+    say(b.dataset.m); ding(true);
+    addBank(3, `Mint Chocolate City is <span class="adj">${b.dataset.m}</span> city in the world!`, MOST.filter(x => x !== b.dataset.m).slice(0, 5));
+  });
+  $('#addw', el).onclick = () => {
+    const v = $('#nw', el).value.trim(); if (!v) return;
+    state.words = [...(state.words || []), v]; save(); $('#nw', el).value = ''; words(); ding(true);
+    addBank(3, `🧪 My invented word: <span class="adj">${esc(v)}</span>`, []);
+  };
+  draw(); shelf(); words();
+}
+
+/* ---------- Day 4: power-up machine (modal + to + verb) ---------- */
+const REELS = [
+  { name: 'WHO', cls: '', items: ['Visitors', 'Children', 'You', 'Everyone', 'My family', 'Tourists', 'The penguins'] },
+  { name: 'MODAL VERB', cls: 'modal', items: ['can', 'could', 'should', 'must', 'will', 'might', 'may'] },
+  { name: 'ACTION', cls: '', items: ['ride the brownie lift', 'skate on the mint lake', 'climb the numerous floors', 'take a chocolate rocket',
+    'slide down the ice cream slide', 'visit the chocolate market', 'hop on the snowflake bus', 'walk across the candy bridge'] },
+  { name: 'TO + VERB (why?)', cls: 'inf', items: ['to reach the brownie moon.', 'to taste the edible walls.', 'to join a snowball fight.',
+    'to see the whole city.', 'to meet the friendly penguins.', 'to buy mint chocolate treats.', 'to explore the frozen caves.', 'to watch the ice cream rain.'] }
+];
+function day4(el) {
+  const idx = [0, 0, 0, 0];
+  el.innerHTML = `
+    <div class="coach">💬 <b>Coach says:</b> Mr Peter's Success Criteria: <span class="modal">modal verbs</span> + <span class="inf">to + verb</span>.<br>
+      Pull the lever 🎰 to build a sentence. Tap any box to change just that part. Is it sensible… or crazy? You decide! 😂</div>
+    <div class="slots" id="slots"></div>
+    <div style="text-align:center;margin:14px 0;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <button class="btn choc" id="pull">🎰 PULL THE LEVER!</button><button class="btn" id="keep">⭐ Save this sentence</button></div>
+    <div class="sentence" id="out" style="text-align:center"></div>
+    <div class="legend"><span class="modal">Blue = modal verb (can, could, should, must, will, might, may)</span><span class="inf">Pink = to + verb (tells WHY)</span></div>`;
+  const html = () => REELS.map((r, k) => r.cls ? `<span class="${r.cls}">${r.items[idx[k]]}</span>` : r.items[idx[k]]).join(' ');
+  const keep = () => {
+    const m = REELS[1].items[idx[1]];
+    const v = REELS[3].items[idx[3]];
+    addBank(4, html(), [...REELS[1].items.filter(x => x !== m), v.replace(/^to /, 'in order to ')]);
+  };
+  function draw(spinAll) {
+    $('#slots', el).innerHTML = REELS.map((r, k) =>
+      `<div class="reel ${spinAll ? 'spin' : ''}" data-k="${k}"><small>${r.name}</small><div class="${r.cls}">${r.items[idx[k]]}</div></div>`).join('');
+    $('#slots', el).querySelectorAll('.reel').forEach(d => d.onclick = () => {
+      const k = +d.dataset.k; idx[k] = (idx[k] + 1) % REELS[k].items.length; draw(false);
+      $('#slots', el).querySelector(`[data-k="${k}"]`).classList.add('spin');
+    });
+    $('#out', el).innerHTML = html() + ' ' + sayBtn(html());
+  }
+  $('#pull', el).onclick = () => {
+    REELS.forEach((r, k) => idx[k] = Math.floor(Math.random() * r.items.length));
+    draw(true); ding(true); keep();
+  };
+  $('#keep', el).onclick = () => { keep(); ding(true); };
+  draw(false);
+}
+
+/* ---------- Day 5: zoom machine (reason → explain → example) ---------- */
+const ZOOM = [
+  { r: 'Mint Chocolate City is freezing because it is in Antarctica.',
+    e: ['This means the lake turns into a giant ice rink.', 'So you can go ice-skating on mint chocolate ice.', 'I like pizza.'],
+    x: ['For example, you can slide all the way to the brownie café!', 'For example, my friends and I race on skates every Sunday.', 'My bag is blue.'] },
+  { r: 'The whole city is edible.',
+    e: ['This means you will never feel hungry.', 'So you can nibble your way to school.', 'It is Tuesday.'],
+    x: ['For example, the lamp posts are made of crunchy chocolate sticks.', 'For example, you can lick the minty windows when you are bored!', 'I have a pencil.'] },
+  { r: 'There are numerous floors in every apartment.',
+    e: ['This means there is space for a bunch of activities.', 'So every family has a floor to play on.', 'Cats are fluffy.'],
+    x: ['For example, the tenth floor has a mint chocolate trampoline park!', 'For example, there is a cinema on the top floor next to the moon.', 'The sky is up.'] },
+  { r: 'You can play numerous games outdoors.',
+    e: ['This means you will never be bored.', 'So there is always something exciting to do.', 'My shoes are new.'],
+    x: ['For example, you can have snowball fights with ice cream snowflakes!', 'For example, you can build a snowman out of mint chocolate.', 'The door is closed.'] },
+  { r: 'The moon above the city is made of chocolate brownie.',
+    e: ['This means the night sky smells delicious.', 'As a result, everyone looks up at night.', 'I can count to ten.'],
+    x: ['For example, astronauts take a big spoon when they fly there!', 'For example, chocolate powder falls from it like snow on Sundays.', 'It is a pen.'] }
+];
+const EXPLAIN_SWAPS = ['This means…', 'So…', 'As a result,…', 'Because of this,…', 'That is why…'];
+const EXAMPLE_SWAPS = ['For example,…', 'For instance,…', 'Just imagine…', 'Once, …'];
+function day5(el) {
+  let round = 0, stage = 0;
+  const picked = [];
+  el.innerHTML = `
+    <div class="coach">💬 <b>Coach says:</b> This is the <b>BIG secret</b> to go from Level 3 to Level 4! ⬆️<br>
+      Don't stop at one reason. <b>ZOOM IN</b> 🔍 with 3 scoops:
+      <span class="z1" style="padding:2px 8px;border-radius:8px">1 Reason</span> →
+      <span class="z2" style="padding:2px 8px;border-radius:8px">2 This means / so…</span> →
+      <span class="z3" style="padding:2px 8px;border-radius:8px">3 For example,…</span></div>
+    <div id="zb"></div><div class="feedback" id="fb"></div>`;
+  function show() {
+    const z = ZOOM[round];
+    if (!z) {
+      $('#zb', el).innerHTML = '<div class="sentence good">🔍 Zoom Master! All your zoomed paragraphs are in the bank below. Now zoom one of YOUR OWN reasons in Step 2 ✏️ <button class="btn" id="again">Play again</button></div>';
+      $('#again', el).onclick = () => { round = 0; stage = 0; picked.length = 0; $('#fb', el).innerHTML = ''; show(); };
+      return;
+    }
+    const stack = [`<div class="zs z1">🍫 ${z.r}</div>`];
+    if (picked[0]) stack.push(`<div class="zs z2">🌿 ${picked[0]}</div>`);
+    if (picked[1]) stack.push(`<div class="zs z3">🍓 ${picked[1]}</div>`);
+    const opts = stage === 0 ? z.e : stage === 1 ? z.x : null;
+    $('#zb', el).innerHTML = `<b>Reason ${round + 1} of ${ZOOM.length}</b><div class="zoomStack">${stack.join('')}</div>` +
+      (opts ? `<div><b>${stage === 0 ? 'Scoop 2: What does it mean?' : 'Scoop 3: Give an example!'}</b></div>` +
+        [...opts].sort(() => Math.random() - 0.5).map(o => `<button class="chip" style="background:${stage === 0 ? 'var(--mint-l)' : '#ffd6e8'}" data-o="${esc(o)}">${o}</button>`).join('')
+        : `<button class="btn" id="next">Next reason ➜</button>`);
+    $('#zb', el).querySelectorAll('[data-o]').forEach(b => b.onclick = () => {
+      const o = b.dataset.o, list = stage === 0 ? z.e : z.x;
+      if (o === list[2]) {
+        ding(false); b.classList.add('shake');
+        $('#fb', el).innerHTML = `<span class="hint">🤔 Hmm, does "${o}" ${stage === 0 ? 'explain the reason' : 'give an example about it'}? Try another scoop!</span>`;
+        return;
+      }
+      ding(true); picked[stage] = o; stage++;
+      $('#fb', el).innerHTML = '<span class="good">⭐ Yummy! That makes the idea bigger.</span>';
+      if (stage === 2) {
+        const other = [z.e.slice(0, 2).find(x => x !== picked[0]), z.x.slice(0, 2).find(x => x !== picked[1])];
+        addBank(5, `<span class="z1 bz">${z.r}</span> <span class="z2 bz">${picked[0]}</span> <span class="z3 bz">${picked[1]}</span>`,
+          [...EXPLAIN_SWAPS, ...EXAMPLE_SWAPS, ...other.map(x => `Another idea: ${x}`)]);
+      }
+      show();
+    });
+    const nx = $('#next', el);
+    if (nx) nx.onclick = () => { round++; stage = 0; picked.length = 0; $('#fb', el).innerHTML = ''; show(); };
+  }
+  show();
+}
+
+/* ---------- Day 6: hamburger hook + call ---------- */
+const HOOKS = ['Imagine a city where snowflakes taste like mint chocolate ice cream!',
+  'Have you ever wanted to eat your own house?',
+  'Welcome to Mint Chocolate City, the most delicious place on Earth!',
+  'Are you ready for the coolest holiday of your life?',
+  'Picture this: a brownie moon shining over an edible city.',
+  'Do you love ice cream? Then this city is made for you!'];
+const CALLS = ['Pack your bags and come to Mint Chocolate City today!',
+  "Don't miss the chance to skate under a brownie moon!",
+  'So what are you waiting for? Come and taste the magic!',
+  'Book your ticket now and bring a big spoon!',
+  'You will never forget your visit. Come and see it for yourself!',
+  'Hurry up! The ice cream snowflakes are waiting for you!'];
+const FILL_SWAPS = ['First, ➜ Firstly, / To begin with,', "In addition, ➜ Also, / Furthermore, / What's more,", 'Best of all, ➜ Most importantly, / Finally, / Last but not least,'];
+function day6(el) {
+  let hook = '', call = '';
+  el.innerHTML = `
+    <div class="coach">💬 <b>Coach says:</b> A great persuasive text is like a 🍔 hamburger!<br>
+      <b>Top bun</b> = a HOOK that grabs the reader. <b>Bottom bun</b> = a CALL that says "Come now!".</div>
+    <div class="burger" id="burger"></div>
+    <div style="text-align:center"><button class="btn" id="keep">⭐ Save my burger</button></div>
+    <h3 style="margin:10px 0 4px">🍞 Choose a top bun (hook)</h3><div id="hk"></div>
+    <div><input class="txt" id="myhook" placeholder="…or write your own hook!"></div>
+    <h3 style="margin:14px 0 4px">🍞 Choose a bottom bun (call to action)</h3><div id="cl"></div>
+    <div><input class="txt" id="mycall" placeholder="…or write your own ending!"></div>`;
+  const middle = '<span class="conn">First,</span> the whole city is edible. <span class="conn">In addition,</span> you can skate on mint chocolate ice. <span class="conn">Best of all,</span> the moon is a brownie.';
+  function keep() {
+    if (!hook || !call) return;
+    addBank(6, `<b>${esc(hook)}</b> ${middle} <b>${esc(call)}</b>`, FILL_SWAPS);
+  }
+  function draw() {
+    $('#burger', el).innerHTML = `
+      <div class="bl bun-t">${hook ? esc(hook) : '🍞 Top bun: HOOK'}</div>
+      <div class="bl lettuce"><span class="conn">First,</span> the whole city is edible…</div>
+      <div class="bl cheese"><span class="conn">In addition,</span> you can skate on mint chocolate ice…</div>
+      <div class="bl patty"><span class="conn">Best of all,</span> the moon is a brownie…</div>
+      <div class="bl bun-b">${call ? esc(call) : '🍞 Bottom bun: CALL TO ACTION'}</div>
+      ${hook && call ? `<div style="text-align:center">${sayBtn(hook + ' ' + middle + ' ' + call)} Listen to the whole burger!</div>` : ''}`;
+  }
+  $('#hk', el).innerHTML = HOOKS.map(h => `<button class="chip" style="background:#ffe1b3" data-h="${esc(h)}">${h}</button>`).join('');
+  $('#cl', el).innerHTML = CALLS.map(h => `<button class="chip" style="background:#ffe1b3" data-c="${esc(h)}">${h}</button>`).join('');
+  el.querySelectorAll('[data-h]').forEach(b => b.onclick = () => { hook = b.dataset.h; ding(true); draw(); keep(); });
+  el.querySelectorAll('[data-c]').forEach(b => b.onclick = () => { call = b.dataset.c; ding(true); draw(); keep(); });
+  $('#myhook', el).oninput = e => { hook = e.target.value; draw(); };
+  $('#mycall', el).oninput = e => { call = e.target.value; draw(); };
+  $('#keep', el).onclick = () => { if (hook && call) { keep(); ding(true); } };
+  draw();
+}
+
+/* ---------- Day 7: colour scanner + before/after ---------- */
+const ORIGINAL = `You should visit Mint chocolate city because it the most entertaining. I have a mint chocolate apartment because I am in a mint chocolate city. There are games to play outdoors like snowball fights because it rains snowflakes made out of mint chocolate ice cream. My Mint chocolate city is an edible delicious city because mint chocolate is a type of ice which is edible. In Mint chocolate city it is freezing because it is in Antarctic. Mint chocolate city has loads of people because it has a lot of apartments and numerous floors. Mint chocolate city is affordable, therefore it allows children to explore activities. In Mint chocolate city I live with my family and my friends because if I had no one to play I would be very bored.`;
+function scan(text) {
+  const extra = (state.words || []).map(w => w.toLowerCase());
+  const conn = [...CONN].sort((a, b) => b.length - a.length).map(w => w.replace(/'/g, "['’]"));
+  const re = new RegExp(`\\b(${conn.join('|')})\\b|\\b(${MODAL.join('|')})\\b|\\b(to\\s+[a-zA-Z]+)\\b|\\b([a-zA-Z-]+)\\b`, 'gi');
+  const st = { conn: {}, modal: 0, inf: 0, wow: new Set(), because: 0 };
+  const html = esc(text).replace(re, (m, c, mo, inf, word) => {
+    if (c) { const k = c.toLowerCase().replace('’', "'"); st.conn[k] = (st.conn[k] || 0) + 1; if (k === 'because') st.because++; return `<span class="conn">${m}</span>`; }
+    if (mo) { st.modal++; return `<span class="modal">${m}</span>`; }
+    if (inf) {
+      const v = inf.split(/\s+/)[1].toLowerCase();
+      if (TO_STOP.includes(v) || /^[A-Z]/.test(inf.split(/\s+/)[1])) return m;
+      st.inf++; return `<span class="inf">${m}</span>`;
+    }
+    if (word && (WOW.includes(word.toLowerCase()) || extra.includes(word.toLowerCase()))) { st.wow.add(word.toLowerCase()); return `<span class="adj">${m}</span>`; }
+    return m;
+  });
+  return { html, st };
+}
+function statsHtml(st) {
+  const kinds = Object.keys(st.conn).length;
+  return `<div class="stats">
+    <div class="stat" style="background:var(--conn)">"because" × ${st.because} ${st.because >= 5 ? '😮' : '👍'}</div>
+    <div class="stat" style="background:var(--conn)">Different connectives: ${kinds}</div>
+    <div class="stat" style="background:var(--adj)">WOW words: ${st.wow.size}</div>
+    <div class="stat" style="background:var(--modal)">Modal verbs: ${st.modal}</div>
+    <div class="stat" style="background:var(--inf)">to + verb: ${st.inf}</div></div>`;
+}
+function day7(el) {
+  const before = scan(ORIGINAL);
+  el.innerHTML = `
+    <div class="coach">💬 <b>Coach says:</b> GRAND OPENING DAY! 🎉 Write your Mint Chocolate City again with ALL your new tools.<br>
+      Then a grown-up types it into the <b>Colour Scanner</b> 🌈 to see your super-powers!</div>
+    <div class="legend"><span class="conn">Orange = connectives</span><span class="adj">Green = WOW adjectives</span><span class="modal">Blue = modal verbs</span><span class="inf">Pink = to + verb</span></div>
+    <div class="compare">
+      <div class="card"><b>📜 BEFORE (21 October)</b><div class="scanOut" style="font-size:16px">${before.html}</div>${statsHtml(before.st)}</div>
+      <div class="card"><b>🚀 AFTER (my new version)</b>
+        <textarea id="ta" placeholder="A grown-up types the new version here…"></textarea>
+        <div style="margin-top:8px"><button class="btn pink" id="go">🌈 SCAN!</button></div>
+        <div id="after"></div></div>
+    </div>`;
+  $('#go', el).onclick = () => {
+    const t = $('#ta', el).value.trim(); if (!t) return;
+    const a = scan(t);
+    const kindsB = Object.keys(before.st.conn).length, kindsA = Object.keys(a.st.conn).length;
+    const wins = [];
+    if (a.st.because < before.st.because) wins.push(`"because" went from ${before.st.because} to ${a.st.because}`);
+    if (kindsA > kindsB) wins.push(`connectives went from ${kindsB} kinds to ${kindsA} kinds`);
+    if (a.st.wow.size > before.st.wow.size) wins.push(`WOW words went up to ${a.st.wow.size}`);
+    if (a.st.modal > before.st.modal) wins.push(`more modal verbs`);
+    if (a.st.inf > before.st.inf) wins.push(`more "to + verb"`);
+    $('#after', el).innerHTML = `<div class="scanOut" style="font-size:16px">${a.html}</div>${statsHtml(a.st)}` +
+      (wins.length ? `<div class="sentence good">🏅 Look how you grew: ${wins.join(' · ')}!</div>` : '');
+    ding(true); if (wins.length) confetti(30);
+  };
+}
+
+/* ---------- the 7 days ---------- */
+const DAYS = [
+  { e: '🍦', t: 'Because Busters', s: 'Connective ice cream scoops', play: day1,
+    g: ["Goal: learn that connectives have 4 jobs (adding more, giving a reason, showing a result, changing direction) and use \"because\" less. The old text has it 7 times.", "Say: \"Today we are going on a because hunt!\" When Peter picks the right word, ask: \"Why did you choose that one?\"", "If the choice is wrong, don't say \"wrong\". Read the whole sentence aloud and ask: \"Does that sound right?\"", "Notebook: open the old Mint Chocolate City text, pick 3 sentences and rewrite them with a different connective."],
+    w: 'Pick 3 sentences from your old Mint Chocolate City writing. Rewrite them with a NEW connective — not "because"!',
+    st: ['Therefore, …', 'In addition, …', 'However, …', '… so …', 'This means …'],
+    c: ['I played the Scoop game 🍦', 'I wrote 3 sentences in my notebook ✏️', 'I used 3 different connectives 🌈'] },
+  { e: '🎡', t: 'Opener Wheel', s: 'New ways to start a sentence', play: day2,
+    g: ["Goal: stop starting every sentence with \"Mint chocolate city…\".", "How to play: spin the wheel, then Peter SAYS the sentence out loud before writing it. Talking first builds confidence and makes writing faster.", "Fun tip: take a turn yourself and say a really silly sentence. It makes Peter laugh and want to beat it.", "Praise every nickname Peter invents for the city, even a strange one."],
+    w: 'Spin 3 times. Write 3 sentences about your city — each one starts in a different way. Use your city nickname once!',
+    st: ['Imagine …', 'Did you know …?', 'Every morning, …', 'Best of all, …', 'If you …, you can …'],
+    c: ['I spun the wheel 3 times 🎡', 'I wrote 3 sentences with 3 different openers ✏️', 'I used my city nickname 🏷️'] },
+  { e: '🍨', t: 'WOW Word Shop', s: 'Upgrade boring words', play: day3,
+    g: ["Goal: swap plain words (nice, big, good, fun) for WOW words. This matches Mr Peter's \"adjectives\" success criterion.", "Tap 🔊 to hear each word, then ask Peter to repeat it twice.", "Word Lab: invented words (mintastic, chocolicious…) deserve big praise for creativity. In real writing, use one invented word for fun and real words for the rest.", "Don't push words that are too hard. Any word is fine as long as Peter knows what it means."],
+    w: 'Describe the brownie moon above your city in 3 sentences. Use 3 WOW words and one "the most …".',
+    st: ['High above the city, …', 'The brownie moon is the most …', 'It is covered in …', 'It smells …'],
+    c: ['I upgraded 6 boring words 🍨', 'I invented a WOW word 🧪', 'I wrote 3 sentences with 3 WOW words ✏️'] },
+  { e: '🎰', t: 'Power-up Machine', s: 'Modal verbs + to + verb', play: day4,
+    g: ["Goal: use modal verbs (can, should, must…) and \"to + verb\" to explain a purpose. These are the two success criteria Mr Peter set on 21 October.", "If the machine makes a silly sentence, laugh together. Then ask: \"Which box would you change to make it make sense?\"", "The colours match Mr Peter's model text: blue = modal verbs, pink = to + verb. Peter will recognise them in class."],
+    w: 'Write 2 sentences of your own: one with a modal verb (can / should / must) and one with "to + verb".',
+    st: ['Visitors can … to …', 'You should … because …', 'Everyone must try …', 'Children use … to …'],
+    c: ['I pulled the lever 5 times 🎰', 'I wrote a sentence with a modal verb 🔵', 'I wrote a sentence with to + verb 🩷'] },
+  { e: '🔍', t: 'Zoom Machine', s: 'Reason → This means → For example', play: day5,
+    g: ["This is the MOST IMPORTANT day for moving up to Level 4: every reason needs one sentence of explanation and one example.", "The two magic questions: \"So what?\" and \"Can you give me an example?\"", "Each round has one off-topic choice (like \"I like pizza.\"). If Peter picks it, ask: \"Does that explain the reason?\"", "Notebook: Peter picks one of Peter's OWN reasons (not one from the game) and zooms it into 3 sentences."],
+    w: 'Choose one of YOUR OWN reasons. Zoom it into 3 scoops: reason → this means / so → For example, …',
+    st: ['My city is … because …', 'This means …', 'So …', 'For example, …'],
+    c: ['I zoomed 3 reasons in the game 🔍', 'I zoomed one of MY reasons in my notebook ✏️', 'I used "For example," ⭐'] },
+  { e: '🍔', t: 'Hook & Goodbye', s: 'Hamburger: hook + call to action', play: day6,
+    g: ["Goal: a first sentence that pulls the reader in and a last sentence that invites them to visit.", "Encourage Peter to type a hook and an ending of Peter's own in the boxes. Choosing a ready-made one is optional.", "Play the whole burger with 🔊 and ask: \"After hearing that, would I want to visit your city?\""],
+    w: 'Write YOUR OWN hook (top bun) and YOUR OWN ending (bottom bun) for Mint Chocolate City.',
+    st: ['Imagine …', 'Have you ever …?', 'Welcome to …', "Don't miss …", 'So what are you waiting for?'],
+    c: ['I built a burger 🍔', 'I wrote my own hook ✏️', 'I wrote my own call to action 📣'] },
+  { e: '🏙️', t: 'Grand Opening!', s: 'Rewrite + colour scanner', play: day7,
+    g: ["Peter rewrites the whole Mint Chocolate City text in the notebook using the new tools. The ideas belong to Peter: add, remove or change anything.", "A grown-up types the new version into the AFTER box and taps SCAN to compare before and after in colour. Praise the progress first.", "Mark it with \"2 stars and a wish\": praise two things, suggest one.", "Take a photo of the notebook page and send it to Claude for marking against Levels 3–5."],
+    w: 'Rewrite your WHOLE Mint Chocolate City with your new toolbox. Your ideas, your city — the tools are just helpers!',
+    st: ['🍞 Hook', '🥬 First, … This means … For example, …', '🧀 In addition, …', '🥩 Best of all, …', '🍞 Call to action!'],
+    c: ['I wrote a hook and a call to action 🍔', 'I used 3+ different connectives 🧡', 'I used WOW words 💚', 'I used a modal verb and to + verb 💙🩷',
+        'Capital letters ✔ Full stops ✔ Finger spaces ✔'] }
+];
+const FLOOR_COLORS = ['#8ee6c8', '#c99674', '#b8f0a0', '#ffb3d1', '#9fd9ff', '#ffe680', '#c9b8ff'];
+
+/* ---------- render ---------- */
+function renderTower(popDay) {
+  $('#floors').innerHTML = DAYS.map((d, k) => {
+    const built = state.done[k + 1];
+    return `<div class="floor ${built ? 'built' : ''} ${popDay === k + 1 ? 'pop' : ''}" style="${built ? `background:${FLOOR_COLORS[k]}` : ''}">
+      <span>${built ? d.e : k + 1}</span><span class="win"><i></i><i></i><i></i><i></i></span></div>`;
+  }).join('');
+  const n = Object.values(state.done).filter(Boolean).length;
+  $('#progress').textContent = `🏗️ ${n} / 7 floors built`;
+  $('#moon').classList.toggle('show', n === 7);
+  $('#moonLabel').textContent = n === 7 ? '🌙 The Brownie Moon is open!' : 'Finish 7 floors to unlock… 🌙';
+}
+function renderDays() {
+  $('#days').innerHTML = DAYS.map((d, k) =>
+    `<button class="day ${state.current === k + 1 ? 'active' : ''} ${state.done[k + 1] ? 'done' : ''}" data-d="${k + 1}"><b>${d.e}</b><span>Day ${k + 1}</span></button>`).join('');
+  $('#days').querySelectorAll('.day').forEach(b => b.onclick = () => { state.current = +b.dataset.d; save(); render(); });
+}
+function render() {
+  renderDays();
+  const n = state.current, d = DAYS[n - 1];
+  $('#mission').innerHTML = `
+    <h2>${d.e} Day ${n}: ${d.t}</h2><div class="sub">${d.s}</div>
+    <details class="guide"><summary>👩‍👦 Grown-up guide (tap to open)</summary><ul>${d.g.map(x => `<li>${x}</li>`).join('')}</ul></details>
+    <div class="step s1"><h3><span class="n">1</span> Play 🎮 <small style="font-weight:500;color:var(--muted)">(5 minutes)</small></h3><div id="play"></div><div class="bank" id="bank"></div></div>
+    <div class="step s2"><h3><span class="n">2</span> Write in your notebook ✏️ <small style="font-weight:500;color:var(--muted)">(7 minutes)</small></h3>
+      <div class="prompt">${d.w}</div>
+      <div class="starters">Helpers: ${d.st.map(s => `<span>${s}</span>`).join('')}</div></div>
+    <div class="step s3"><h3><span class="n">3</span> Check ✅</h3>
+      <div class="checks">${d.c.map((c, k) => `<label><input type="checkbox" data-c="${k}" ${state.done[n] ? 'checked' : ''}> ${c}</label>`).join('')}</div>
+      <div class="buildRow"><button class="btn choc" id="build" ${state.done[n] ? 'disabled' : ''}>${state.done[n] ? '✅ Floor built!' : '🏗️ Build my floor!'}</button></div>
+      <div style="text-align:center;color:var(--muted);margin-top:6px">${state.done[n] ? '' : 'Tick all the boxes to build your floor.'}</div></div>`;
+  d.play($('#play'));
+  drawBank(n);
+  const boxes = [...$('#mission').querySelectorAll('.checks input')];
+  const btn = $('#build');
+  const upd = () => { if (!state.done[n]) btn.disabled = !boxes.every(b => b.checked); };
+  boxes.forEach(b => b.onchange = upd); upd();
+  btn.onclick = () => {
+    state.done[n] = true; save();
+    renderTower(n); ding(true); confetti();
+    const total = Object.values(state.done).filter(Boolean).length;
+    toast(total === 7 ? '🌙 THE BROWNIE MOON IS OPEN!<br>Mint Chocolate City is complete! 🎉' : `🏗️ Floor ${n} built!<br>${7 - total} more to the brownie moon!`);
+    if (n < 7) state.current = n + 1;
+    save();
+    setTimeout(render, 2300);
+  };
+}
+let resetArmed = false;
+$('#reset').onclick = () => {
+  const b = $('#reset');
+  if (!resetArmed) {
+    resetArmed = true; b.textContent = 'Tap again to delete all floors';
+    setTimeout(() => { resetArmed = false; b.textContent = 'Grown-ups: start again from Day 1'; }, 4000);
+    return;
+  }
+  resetArmed = false; b.textContent = 'Grown-ups: start again from Day 1';
+  state = { done: {}, nick: '', words: [], current: 1, bank: {} }; save(); renderTower(); render();
+};
+renderTower(); render();
+</script>
+
+<a href="../" aria-label="Back to Peter's World" style="position:fixed;left:calc(10px + env(safe-area-inset-left,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:2147483000;width:48px;height:48px;border-radius:50%;background:#fff;border:3px solid #5fd3b0;display:grid;place-items:center;font-size:22px;text-decoration:none;box-shadow:0 3px 0 rgba(0,0,0,.18)">🏠</a>
+</body></html>

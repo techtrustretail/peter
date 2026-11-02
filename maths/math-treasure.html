@@ -1,0 +1,673 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Math Treasure Quest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Titan+One&family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sea:#1aa6c4; --sea-deep:#0d7f99; --card:#ffffff; --ink:#1d2a4a; --muted:#5a6788; --soft:#eaf3ff;
+  --gold:#f5b700; --gold-deep:#b98300; --line:#1d2a4a;
+  --a1:#ffb627; --a1-d:#c98600; --a2:#3d8bff; --a2-d:#2560c4; --a3:#27b36a; --a3-d:#18814a; --a4:#ff5d73; --a4-d:#c93a4f;
+  --good:#27b36a; --bad:#ff5d73; --wood:#9c5a2c; --wood-l:#bf7640;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){ --sea:#0c5a6c; --sea-deep:#073f4c; --card:#15233b; --ink:#eef4ff; --muted:#a9b7d6; --soft:#20345a; --line:#cfe0ff; }
+}
+:root[data-theme="dark"]{ --sea:#0c5a6c; --sea-deep:#073f4c; --card:#15233b; --ink:#eef4ff; --muted:#a9b7d6; --soft:#20345a; --line:#cfe0ff; }
+html{scroll-padding-top:env(safe-area-inset-top,0px); height:100%}
+*,*::before,*::after{box-sizing:inherit}
+body{
+  margin:0; min-height:100%; font-family:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif; color:var(--ink);
+  background-color:var(--sea);
+  background-image:radial-gradient(circle at 25% 30%, rgba(255,255,255,.13) 0 3px, transparent 4px),
+                   radial-gradient(circle at 75% 70%, rgba(255,255,255,.08) 0 5px, transparent 6px);
+  background-size:46px 46px, 70px 70px;
+}
+button{font:inherit; cursor:pointer; color:inherit}
+button:focus-visible, input:focus-visible{outline:4px solid #fff; outline-offset:3px}
+.display{font-family:'Titan One','Arial Rounded MT Bold','Trebuchet MS',sans-serif; font-weight:400; letter-spacing:.01em}
+.wrap{max-width:1040px; margin:0 auto; padding:16px}
+.hidden{display:none !important}
+
+/* chunky button */
+.btn{border:0; border-radius:14px; padding:14px 26px; font-weight:900; font-size:1.15rem; color:#fff; background:var(--a3); box-shadow:0 6px 0 var(--a3-d); transition:transform .08s, box-shadow .08s}
+.btn:active{transform:translateY(4px); box-shadow:0 2px 0 var(--a3-d)}
+.btn.blue{background:var(--a2); box-shadow:0 6px 0 var(--a2-d)}
+.btn.ghost{background:rgba(255,255,255,.18); box-shadow:none; font-size:1rem; padding:10px 16px}
+
+/* ---------- start screen ---------- */
+.hero{text-align:center; color:#fff; padding:18px 8px 8px}
+.hero h1{font-size:clamp(2.3rem,7vw,4.2rem); margin:6px 0 0; line-height:1; color:#fff; text-shadow:0 5px 0 var(--sea-deep), 0 8px 18px rgba(0,0,0,.2)}
+.hero h1 span{display:block; color:var(--gold); font-size:.62em; margin-top:6px}
+.hero p{margin:10px 0 0; font-weight:800; opacity:.95}
+.panel{background:var(--card); border-radius:22px; padding:20px; margin-top:16px; box-shadow:0 8px 0 rgba(0,0,0,.12)}
+.panel h2{margin:0 0 12px; font-size:1.25rem}
+.avatars{display:grid; grid-template-columns:repeat(auto-fill,minmax(64px,1fr)); gap:10px}
+.av{font-size:2.2rem; aspect-ratio:1; border-radius:16px; border:4px solid transparent; background:var(--soft); display:grid; place-items:center}
+.av[aria-pressed="true"]{border-color:var(--gold); background:#fff3c4; transform:scale(1.06)}
+.row{display:flex; gap:12px; flex-wrap:wrap; align-items:center}
+.name{flex:1 1 200px; font:inherit; font-weight:800; font-size:1.1rem; padding:12px 14px; border-radius:12px; border:3px solid var(--soft); background:var(--soft); color:var(--ink)}
+.chips{display:flex; flex-wrap:wrap; gap:10px}
+.chip{border:3px solid var(--soft); background:var(--soft); border-radius:999px; padding:9px 16px; font-weight:800}
+.chip[aria-pressed="true"]{background:var(--a2); border-color:var(--a2); color:#fff}
+.seg{display:inline-flex; background:var(--soft); border-radius:14px; padding:4px}
+.seg button{border:0; background:transparent; padding:10px 18px; border-radius:10px; font-weight:900}
+.seg button[aria-pressed="true"]{background:var(--gold); color:#3a2a00}
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+@media (max-width:720px){ .grid2{grid-template-columns:1fr} }
+.startbar{display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-top:18px}
+.best{color:#fff; font-weight:800}
+.warn{color:var(--bad); font-weight:800; min-height:1.2em; margin:8px 0 0}
+
+/* ---------- play screen ---------- */
+.topbar{display:flex; align-items:center; gap:10px; flex-wrap:wrap; color:#fff; font-weight:900}
+.me{display:flex; align-items:center; gap:8px; background:rgba(0,0,0,.18); border-radius:999px; padding:6px 14px 6px 6px}
+.me .face{font-size:1.7rem; background:#fff; border-radius:50%; width:44px; height:44px; display:grid; place-items:center}
+.goldpill{display:flex; align-items:center; gap:6px; background:var(--gold); color:#3a2a00; border-radius:999px; padding:8px 14px; font-size:1.15rem}
+.goldpill.bump{animation:bump .5s}
+@keyframes bump{40%{transform:scale(1.25)}}
+.spacer{flex:1}
+.pill{background:rgba(0,0,0,.18); border-radius:999px; padding:8px 14px}
+.progress{height:10px; background:rgba(0,0,0,.2); border-radius:99px; margin:12px 0 0; overflow:hidden}
+.progress i{display:block; height:100%; background:var(--gold); width:0; transition:width .4s}
+
+.stage{display:grid; grid-template-columns:1fr 260px; gap:16px; margin-top:14px; align-items:start}
+@media (max-width:820px){ .stage{grid-template-columns:1fr} .board{order:-1} }
+.qcard{background:var(--card); border-radius:22px; padding:18px; box-shadow:0 8px 0 rgba(0,0,0,.12)}
+.qtag{display:inline-block; font-weight:800; font-size:.9rem; color:var(--muted); margin-bottom:6px}
+.retry{background:#fff3c4; color:#6b4b00; border-radius:8px; padding:2px 8px; margin-left:6px}
+.qtext{font-size:clamp(1.25rem,3.4vw,1.7rem); font-weight:900; margin:0 0 12px; line-height:1.25}
+.visual{display:flex; justify-content:center; align-items:center; min-height:60px; padding:6px 0 4px; overflow-x:auto}
+.visual svg{width:100%; height:auto}
+.answers{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px}
+.ans{border:0; border-radius:16px; padding:18px 12px; min-height:78px; font-family:'Titan One',sans-serif; font-size:clamp(1.3rem,4vw,1.9rem); color:#fff; position:relative; transition:transform .08s, box-shadow .08s, opacity .2s}
+.ans small{position:absolute; left:10px; top:6px; font-family:'Nunito',sans-serif; font-size:.8rem; font-weight:900; opacity:.75}
+.ans.c1{background:var(--a1); box-shadow:0 6px 0 var(--a1-d); color:#3a2600}
+.ans.c2{background:var(--a2); box-shadow:0 6px 0 var(--a2-d)}
+.ans.c3{background:var(--a3); box-shadow:0 6px 0 var(--a3-d)}
+.ans.c4{background:var(--a4); box-shadow:0 6px 0 var(--a4-d)}
+.ans:active{transform:translateY(4px)}
+.ans.txt{font-family:'Nunito',sans-serif; font-weight:900; font-size:clamp(1.05rem,3vw,1.35rem)}
+.ans.dim{opacity:.3}
+.ans.right{outline:5px solid var(--good); outline-offset:3px; opacity:1}
+.ans.wrong{outline:5px solid var(--ink); outline-offset:3px}
+.answers.locked .ans{pointer-events:none}
+
+.board{background:var(--card); border-radius:22px; padding:14px; box-shadow:0 8px 0 rgba(0,0,0,.12)}
+.board h3{margin:0 0 8px; font-size:1rem}
+.lb{list-style:none; margin:0; padding:0; display:grid; gap:6px}
+.lb li{display:flex; align-items:center; gap:8px; padding:6px 8px; border-radius:12px; background:var(--soft); font-weight:800; font-size:.95rem}
+.lb li.you{background:#fff3c4; color:#3a2a00}
+.lb .rk{width:1.4em; text-align:center; font-family:'Titan One',sans-serif}
+.lb li span:last-child{flex-shrink:0; white-space:nowrap}
+.lb .nm{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+@media (max-width:820px){ .lb{grid-template-columns:repeat(2,1fr)} }
+
+/* equation + visual pieces */
+.eq{font-family:'Titan One',sans-serif; font-size:clamp(1.8rem,6vw,2.8rem); display:flex; align-items:center; gap:.35em; flex-wrap:wrap; justify-content:center}
+.qbox{display:inline-grid; place-items:center; min-width:1.8em; padding:0 .2em; height:1.5em; border-radius:10px; background:#fff3c4; border:4px dashed var(--gold-deep); color:var(--gold-deep)}
+.numset{display:flex; flex-wrap:wrap; gap:10px; justify-content:center}
+.numset span{font-family:'Titan One',sans-serif; font-size:1.6rem; background:var(--soft); border-radius:12px; padding:8px 14px}
+.wall{display:flex; flex-direction:column; align-items:center; gap:4px}
+.wall .wr{display:flex; gap:4px}
+.brick{width:clamp(66px,20vw,92px); height:50px; display:grid; place-items:center; background:#ffd9b3; border:3px solid #c77b3a; border-radius:6px; font-family:'Titan One',sans-serif; font-size:1.4rem; color:#5a2e0c}
+.brick.ask{background:#fff3c4; border:3px dashed var(--gold-deep); color:var(--gold-deep)}
+.brick.blank{background:#fff4e8}
+.colsub{display:inline-grid; grid-template-columns:40px repeat(3,58px); gap:6px; align-items:center}
+.colsub .d{height:58px; display:grid; place-items:center; border:3px solid var(--line); border-radius:8px; font-family:'Titan One',sans-serif; font-size:1.7rem; background:var(--card)}
+.colsub .d.ask{background:#fff3c4; border:3px dashed var(--gold-deep); color:var(--gold-deep)}
+.colsub .op{font-family:'Titan One',sans-serif; font-size:1.8rem; text-align:center}
+.colsub hr{grid-column:1 / -1; border:0; border-top:4px solid var(--line); margin:0; width:100%}
+svg .ln{stroke:var(--line); stroke-width:3; fill:none}
+svg .cir{fill:var(--card); stroke:var(--line); stroke-width:3}
+svg .cir.ask{fill:#fff3c4; stroke:var(--gold-deep); stroke-width:4; stroke-dasharray:7 5}
+svg .t{font-family:'Titan One',sans-serif; fill:var(--ink); text-anchor:middle; dominant-baseline:central}
+svg .t.ask{fill:var(--gold-deep)}
+svg .box{fill:var(--card); stroke:var(--line); stroke-width:3}
+svg .box.ask{fill:#fff3c4; stroke:var(--gold-deep); stroke-dasharray:7 5}
+svg .box.think{fill:transparent; stroke:var(--muted); stroke-dasharray:5 5}
+svg .beam{fill:var(--line)}
+svg .fulcrum{fill:#9aa5bd}
+svg .arcA{stroke:var(--a2); stroke-width:4; fill:none}
+svg .arcB{stroke:var(--a4); stroke-width:4; fill:none}
+svg .lblA{fill:var(--a2)} svg .lblB{fill:var(--a4)}
+
+/* overlay */
+.overlay{position:fixed; inset:0; background:rgba(8,30,50,.55); display:grid; place-items:center; padding:16px; z-index:10}
+.sheet{background:var(--card); border-radius:24px; padding:22px; width:min(560px,100%); text-align:center; box-shadow:0 10px 0 rgba(0,0,0,.2); max-height:100%; overflow:auto}
+.sheet h2{font-size:clamp(1.8rem,6vw,2.4rem); margin:0}
+.sheet .sub{font-weight:800; color:var(--muted); margin:6px 0 14px}
+.chests{display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
+.chest{border:0; background:var(--soft); border-radius:18px; padding:10px 6px 6px; transition:transform .15s}
+.chest:hover{transform:translateY(-4px) rotate(-2deg)}
+.chest svg{width:100%; max-width:120px}
+.chest .k{font-weight:900; color:var(--muted); font-size:.85rem}
+.chest.opened{background:#fff3c4}
+.chest.gone{opacity:.25}
+.chest.shake{animation:shake .45s}
+@keyframes shake{20%{transform:rotate(-8deg)}40%{transform:rotate(8deg)}60%{transform:rotate(-5deg)}80%{transform:rotate(4deg)}}
+.ch-body{fill:var(--wood)} .ch-lid{fill:var(--wood-l)} .ch-band{fill:var(--gold)} .ch-lock{fill:var(--gold-deep)}
+.reveal{margin-top:14px; min-height:92px}
+.reveal .big{font-size:3rem; line-height:1}
+.reveal .what{font-family:'Titan One',sans-serif; font-size:1.5rem; margin-top:4px}
+.explain{background:var(--soft); border-radius:14px; padding:14px; font-weight:800; font-size:1.1rem; text-align:left; line-height:1.45}
+.explain b{font-family:'Titan One',sans-serif; font-weight:400; font-size:1.3rem; color:var(--good)}
+.toast{position:fixed; left:50%; top:calc(14px + env(safe-area-inset-top,0px)); transform:translateX(-50%); background:#ff7a1a; color:#fff; font-weight:900; padding:10px 18px; border-radius:999px; z-index:20; box-shadow:0 5px 0 #b64f00; animation:pop 1.8s forwards}
+@keyframes pop{0%{opacity:0; transform:translate(-50%,-10px)}12%{opacity:1; transform:translate(-50%,0)}85%{opacity:1}100%{opacity:0}}
+
+/* end */
+.podium{display:flex; justify-content:center; align-items:flex-end; gap:10px; margin:18px 0 8px}
+.pod{text-align:center; width:110px}
+.pod .f{font-size:2.6rem}
+.pod .n{font-weight:900; font-size:.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.pod .blk{border-radius:12px 12px 0 0; color:#fff; font-family:'Titan One',sans-serif; font-size:1.8rem; display:grid; place-items:center; margin-top:6px}
+.pod.p1 .blk{height:130px; background:var(--gold); color:#3a2a00}
+.pod.p2 .blk{height:95px; background:#9aa5bd}
+.pod.p3 .blk{height:70px; background:#c77b3a}
+.pod.you .n{color:var(--gold-deep)}
+.stars{font-size:2.4rem; letter-spacing:.1em}
+.stats{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:12px 0}
+.stat{background:var(--soft); border-radius:14px; padding:10px}
+.stat b{display:block; font-family:'Titan One',sans-serif; font-weight:400; font-size:1.6rem}
+.topicres{list-style:none; padding:0; margin:0; text-align:left; display:grid; gap:6px}
+.topicres li{display:flex; justify-content:space-between; background:var(--soft); border-radius:10px; padding:8px 12px; font-weight:800}
+.mist{list-style:none; padding:0; margin:0; text-align:left; display:grid; gap:6px}
+.mist li{background:#ffe9ec; color:#5a1a24; border-radius:10px; padding:8px 12px; font-weight:800}
+.mist li span{color:#18814a}
+.confetti{position:fixed; top:-20px; width:10px; height:16px; z-index:30; pointer-events:none; animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+@media (prefers-reduced-motion:reduce){ *{animation:none !important; transition:none !important} }
+</style>
+</head>
+<body>
+
+<!-- START -->
+<section id="start" class="wrap">
+  <div class="hero">
+    <svg viewBox="0 0 120 100" width="96" aria-hidden="true"><rect x="10" y="40" width="100" height="52" rx="8" class="ch-body"/><path d="M10 44 Q10 12 60 12 Q110 12 110 44 Z" class="ch-lid"/><rect x="10" y="40" width="100" height="8" class="ch-band"/><rect x="52" y="36" width="16" height="22" rx="4" class="ch-lock"/></svg>
+    <h1 class="display">Math Treasure<span>Quest</span></h1>
+    <p>Answer right, open a chest, grab the gold. Beat the pirate bots!</p>
+  </div>
+
+  <div class="panel">
+    <h2>1. Pick your buddy</h2>
+    <div class="avatars" id="avatars"></div>
+    <div class="row" style="margin-top:14px">
+      <input id="pname" class="name" maxlength="16" value="Peter" aria-label="Your name">
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="panel">
+      <h2>2. Choose what to practise</h2>
+      <div class="chips" id="topics"></div>
+      <p class="warn" id="warn"></p>
+    </div>
+    <div class="panel">
+      <h2>3. How many questions?</h2>
+      <div class="seg" id="lens"></div>
+      <p style="margin:14px 0 0; color:var(--muted); font-weight:800">Keys 1–4 pick an answer. Enter goes on.</p>
+    </div>
+  </div>
+
+  <div class="startbar">
+    <span class="best" id="best"></span>
+    <button class="btn" id="go" style="font-size:1.4rem; padding:16px 40px">Start quest</button>
+  </div>
+</section>
+
+<!-- PLAY -->
+<section id="play" class="wrap hidden">
+  <div class="topbar">
+    <div class="me"><span class="face" id="myface"></span><span id="myname"></span></div>
+    <div class="goldpill" id="goldpill">🪙 <span id="mygold">0</span></div>
+    <span class="pill" id="streak">🔥 0</span>
+    <span class="spacer"></span>
+    <span class="pill" id="qnum">1 / 20</span>
+    <button class="btn ghost" id="mute" aria-label="Sound on or off">🔊</button>
+    <button class="btn ghost" id="quit">Quit</button>
+  </div>
+  <div class="progress"><i id="prog"></i></div>
+  <div class="stage">
+    <div class="qcard">
+      <span class="qtag" id="qtag"></span>
+      <p class="qtext" id="qtext"></p>
+      <div class="visual" id="visual"></div>
+      <div class="answers" id="answers"></div>
+    </div>
+    <aside class="board">
+      <h3>Gold leaderboard</h3>
+      <ul class="lb" id="lb"></ul>
+    </aside>
+  </div>
+</section>
+
+<!-- END -->
+<section id="end" class="wrap hidden">
+  <div class="panel" style="text-align:center">
+    <h1 class="display" id="endtitle" style="margin:0; font-size:clamp(2rem,6vw,3rem)"></h1>
+    <div class="podium" id="podium"></div>
+    <div class="stars" id="stars"></div>
+    <div class="stats">
+      <div class="stat"><b id="sCorrect"></b>correct</div>
+      <div class="stat"><b id="sGold"></b>gold</div>
+      <div class="stat"><b id="sStreak"></b>best streak</div>
+    </div>
+    <div class="grid2" style="text-align:left">
+      <div><h2 style="font-size:1.1rem">By topic</h2><ul class="topicres" id="topicres"></ul></div>
+      <div><h2 style="font-size:1.1rem">Let's look again</h2><ul class="mist" id="mist"></ul></div>
+    </div>
+    <div class="row" style="justify-content:center; margin-top:20px">
+      <button class="btn" id="again">Play again</button>
+      <button class="btn blue" id="home">Change settings</button>
+    </div>
+  </div>
+</section>
+
+<div id="overlay" class="overlay hidden"><div class="sheet" id="sheet"></div></div>
+
+<script>
+/* ---------------- helpers ---------------- */
+const $ = s => document.querySelector(s);
+const rnd = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
+const pick = a => a[Math.floor(Math.random()*a.length)];
+const shuffle = a => { a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const qb = (t='?') => `<span class="qbox">${t}</span>`;
+
+function numOptions(ans, cands, min=0){
+  const set = new Set([ans]);
+  for(const c of shuffle(cands)){ if(set.size>=4) break; if(Number.isInteger(c) && c>=min && c!==ans) set.add(c); }
+  let k=1; while(set.size<4){ const c = ans + (k%2 ? 1 : -1)*Math.ceil(k/2)*10; if(c>=min) set.add(c); k++; }
+  return shuffle([...set]).map(String);
+}
+function digitOptions(ans, cands){
+  const set = new Set([ans]);
+  for(const c of shuffle(cands)){ if(set.size>=4) break; if(c>=0 && c<=9 && c!==ans) set.add(c); }
+  for(const c of shuffle([0,1,2,3,4,5,6,7,8,9])){ if(set.size>=4) break; set.add(c); }
+  return shuffle([...set]).map(String);
+}
+// the classic "no borrowing" mistake: subtract each column, smaller from bigger
+function noBorrow(a,b){
+  const A=String(a), B=String(b).padStart(A.length,'0'); let r='';
+  for(let i=0;i<A.length;i++) r += Math.abs(+A[i]-+B[i]);
+  return +r;
+}
+
+/* ---------------- question makers ---------------- */
+function genMissing(){
+  const T = Math.random()<0.45 ? rnd(2,9)*100 + pick([0,0,50]) : rnd(150,999);
+  const a = rnd(Math.max(11,Math.floor(T*0.15)), T-11);
+  const ans = T-a, before = Math.random()<0.3;
+  const eq = before ? `${qb()} <span>+</span> <span>${a}</span> <span>=</span> <span>${T}</span>`
+                    : `<span>${a}</span> <span>+</span> ${qb()} <span>=</span> <span>${T}</span>`;
+  return { topic:'missing', prompt:'Find the missing number', visual:`<div class="eq">${eq}</div>`,
+    summary: before ? `? + ${a} = ${T}` : `${a} + ? = ${T}`,
+    options:numOptions(ans,[ans+10,ans-10,ans+100,ans-100,ans+1,ans-1,noBorrow(T,a)]),
+    answer:String(ans), explain:`Take away: <b>${T} − ${a} = ${ans}</b><br>Check: ${a} + ${ans} = ${T} ✓` };
+}
+function genBalance(){
+  const a=rnd(100,480), b=rnd(100,Math.min(480,990-a)), S=a+b, c=rnd(Math.floor(S*0.3), S-40), ans=S-c;
+  const box=(x,v,cls='')=>`<rect class="box ${cls}" x="${x}" y="58" width="76" height="46" rx="6"/><text class="t ${cls}" x="${x+38}" y="82" font-size="22">${v}</text>`;
+  const svg=`<svg viewBox="0 0 520 180" style="max-width:520px" role="img" aria-label="Balance scale: ${a} and ${b} on the left, ${c} and a missing number on the right">
+    ${box(40,a)}${box(116,b)}${box(324,c)}${box(400,'?','ask')}
+    <rect class="beam" x="20" y="106" width="480" height="7" rx="3"/>
+    <polygon class="fulcrum" points="260,114 222,166 298,166"/></svg>`;
+  return { topic:'missing', prompt:'Which number makes the scale balance?', visual:svg, summary:`${a} + ${b} = ${c} + ?`,
+    options:numOptions(ans,[ans+10,ans-10,ans+100,ans-100,S,S-c+1,noBorrow(S,c)],1),
+    answer:String(ans), explain:`Left side: ${a} + ${b} = ${S}<br>Right side needs ${S} too: <b>${S} − ${c} = ${ans}</b>` };
+}
+function genEdges(){
+  const tri = Math.random()<0.4;
+  const T = pick(tri?[60,90,100,120]:[60,80,90,100,120]);
+  const maxC = Math.floor((T-10)/2/10)*10, cVal=()=>rnd(1,maxC/10)*10;
+  let pos, edges, vals, vb;
+  if(!tri){ pos=[[50,50],[150,50],[250,50],[250,150],[250,250],[150,250],[50,250],[50,150]];
+    edges=[[0,1,2],[2,3,4],[4,5,6],[6,7,0]]; vals=Array(8); [0,2,4,6].forEach(i=>vals[i]=cVal()); vb='0 0 300 300'; }
+  else { pos=[[150,45],[205,145],[260,245],[150,245],[40,245],[95,145]];
+    edges=[[0,1,2],[2,3,4],[4,5,0]]; vals=Array(6); [0,2,4].forEach(i=>vals[i]=cVal()); vb='0 0 300 290'; }
+  edges.forEach(e => vals[e[1]] = T - vals[e[0]] - vals[e[2]]);
+  const hid = rnd(0, vals.length-1), ans = vals[hid];
+  const e = edges.find(e=>e.includes(hid)), others = e.filter(i=>i!==hid).map(i=>vals[i]);
+  let s = `<svg viewBox="${vb}" style="max-width:300px" role="img" aria-label="Number ${tri?'triangle':'square'}">`;
+  s += `<polygon class="ln" points="${pos.map(p=>p.join(',')).join(' ')}"/>`;
+  pos.forEach((p,i)=>{ const a=i===hid?'ask':''; s+=`<circle class="cir ${a}" cx="${p[0]}" cy="${p[1]}" r="30"/><text class="t ${a}" x="${p[0]}" y="${p[1]}" font-size="22">${i===hid?'?':vals[i]}</text>`; });
+  s += `</svg>`;
+  return { topic:'edges', prompt:`Every edge adds up to ${T}. What goes in the ? circle?`, visual:s,
+    summary:`Edge total ${T}: ${others[0]} + ${others[1]} + ?`,
+    options:numOptions(ans,[ans+10,ans-10,ans+20,T-others[0],others[0]+others[1]],5),
+    answer:String(ans), explain:`Along that edge: ${others[0]} + ${others[1]} + ? = ${T}<br><b>${T} − ${others[0]} − ${others[1]} = ${ans}</b>` };
+}
+function lineSVG(add,a,rt,d){
+  const s = add?70:450, e = add?450:70, f = add?390:130, mid=(e+f)/2;
+  return `<svg viewBox="0 0 520 200" style="max-width:520px" role="img" aria-label="Number line jumps">
+    <line class="ln" x1="30" y1="100" x2="490" y2="100"/>
+    <polygon points="500,100 486,92 486,108" style="fill:var(--line)"/><polygon points="20,100 34,92 34,108" style="fill:var(--line)"/>
+    ${[s,e,f].map(x=>`<line class="ln" x1="${x}" y1="92" x2="${x}" y2="108"/>`).join('')}
+    <path class="arcA" d="M${s},98 Q260,-8 ${e},98"/>
+    <text class="t lblA" x="260" y="30" font-size="22">${add?'+':'−'} ${rt}</text>
+    <path class="arcB" d="M${e},102 Q${mid},150 ${f},102"/>
+    <text class="t lblB" x="${mid}" y="143" font-size="17">${add?'−':'+'}${d}</text>
+    <text class="t" x="${s}" y="128" font-size="22">${a}</text>
+    <rect class="box think" x="${e-24}" y="158" width="48" height="34" rx="6"/>
+    <rect class="box ask" x="${f-24}" y="158" width="48" height="34" rx="6"/><text class="t ask" x="${f}" y="175" font-size="20">?</text>
+  </svg>`;
+}
+function genLineAdd(){
+  const b = pick([19,29,39,49,59,18,28,38,48,69,29,49]), rt=Math.ceil(b/10)*10, d=rt-b, a=rnd(21,89), ans=a+b;
+  const ex = `${b} is close to ${rt}.<br>${a} + ${rt} = ${a+rt}, then take away ${d}:<br><b>${a+rt} − ${d} = ${ans}</b>`;
+  if(Math.random()<0.35){
+    return { topic:'lines', prompt:`Which is a smart way to work out ${a} + ${b}?`, visual:`<div class="eq">${a} + ${b}</div>`, txt:true,
+      summary:`Smart way for ${a} + ${b}`, answer:`${a} + ${rt} − ${d}`,
+      options:shuffle([`${a} + ${rt} − ${d}`,`${a} + ${rt} + ${d}`,`${a} + ${rt-10} − ${d}`,`${a} + ${rt} − ${d+1}`]), explain:ex };
+  }
+  return { topic:'lines', prompt:`Use the jumps: ${a} + ${b} = ?`, visual:lineSVG(true,a,rt,d), summary:`${a} + ${b}`,
+    options:numOptions(ans,[a+rt,a+rt+d,ans+10,ans-10,ans+1],0), answer:String(ans), explain:ex };
+}
+function genLineSub(){
+  const b = rnd(2,6)*10 + pick([6,7,8,9]), rt=Math.ceil(b/10)*10, d=rt-b, a=rnd(rt+5,99), ans=a-b;
+  const ex = `${b} is close to ${rt}.<br>${a} − ${rt} = ${a-rt}, then add back ${d}:<br><b>${a-rt} + ${d} = ${ans}</b>`;
+  if(Math.random()<0.35){
+    return { topic:'lines', prompt:`Which is a smart way to work out ${a} − ${b}?`, visual:`<div class="eq">${a} − ${b}</div>`, txt:true,
+      summary:`Smart way for ${a} − ${b}`, answer:`${a} − ${rt} + ${d}`,
+      options:shuffle([`${a} − ${rt} + ${d}`,`${a} − ${rt} − ${d}`,`${a} + ${rt} − ${d}`,`${a} − ${rt-10} + ${d}`]), explain:ex };
+  }
+  return { topic:'lines', prompt:`Use the jumps: ${a} − ${b} = ?`, visual:lineSVG(false,a,rt,d), summary:`${a} − ${b}`,
+    options:numOptions(ans,[a-rt,a-rt-d,ans+10,ans-10,ans-1],0), answer:String(ans), explain:ex };
+}
+function wallHTML(rows){
+  return `<div class="wall">${rows.map(r=>`<div class="wr">${r.map(v=>`<div class="brick ${v==='?'?'ask':v===''?'blank':''}">${v}</div>`).join('')}</div>`).join('')}</div>`;
+}
+function genWall(){
+  const b=[rnd(10,45),rnd(10,45),rnd(10,45)], m=[b[0]+b[1],b[1]+b[2]], t=m[0]+m[1];
+  const v = rnd(0,3); let rows, ans, ex, opts;
+  if(v===0){ rows=[['?'],['',''],b]; ans=t;
+    ex=`${b[0]} + ${b[1]} = ${m[0]}<br>${b[1]} + ${b[2]} = ${m[1]}<br><b>${m[0]} + ${m[1]} = ${t}</b>`;
+    opts=[t+10,t-10,b[0]+b[1]+b[2],t+1,t-1]; }
+  else if(v===1){ const i=rnd(0,1); rows=[[''], i?['','?']:['?',''], b]; ans=m[i];
+    ex=`The ? brick sits on ${b[i]} and ${b[i+1]}:<br><b>${b[i]} + ${b[i+1]} = ${ans}</b>`;
+    opts=[ans+10,ans-10,m[1-i],ans+1]; }
+  else if(v===2){ rows=[[''],[m[0],''],[b[0],'?',b[2]]]; ans=b[1];
+    ex=`${b[0]} + ? = ${m[0]}<br><b>${m[0]} − ${b[0]} = ${ans}</b>`;
+    opts=[ans+10,ans-10,m[0]+b[0],ans+1,ans-1]; }
+  else { rows=[[t],[m[0],'?'],['','','']]; ans=m[1];
+    ex=`${m[0]} + ? = ${t}<br><b>${t} − ${m[0]} = ${ans}</b>`;
+    opts=[ans+10,ans-10,t+m[0],ans+1]; }
+  return { topic:'walls', prompt:'Each brick is the total of the two bricks below it. What is the ? brick?', visual:wallHTML(rows),
+    summary:'Number wall', options:numOptions(ans,opts,1), answer:String(ans), explain:ex };
+}
+function genTotal(){
+  let nums;
+  do{ nums=[rnd(11,40),rnd(41,99),rnd(100,130),rnd(131,160),rnd(161,199),rnd(50,99),rnd(100,150)]; } while(new Set(nums).size<7);
+  nums = shuffle(nums);
+  const pickI = shuffle([0,1,2,3,4,5,6]).slice(0,3), trip = pickI.map(i=>nums[i]).sort((x,y)=>x-y);
+  const target = trip.reduce((s,x)=>s+x,0), key=t=>t.slice().sort((x,y)=>x-y).join(', ');
+  const opts = new Set([key(trip)]); let guard=0;
+  while(opts.size<4 && guard++<500){
+    let t;
+    if(Math.random()<0.5){ const rest=nums.filter(n=>!trip.includes(n)); t=trip.slice(); t[rnd(0,2)]=pick(rest); }
+    else t = shuffle(nums).slice(0,3);
+    if(t.reduce((s,x)=>s+x,0)!==target && new Set(t).size===3) opts.add(key(t));
+  }
+  return { topic:'total', prompt:`Which three numbers add up to ${target}?`, txt:true, summary:`Three numbers that total ${target}`,
+    visual:`<div class="numset">${nums.map(n=>`<span>${n}</span>`).join('')}</div>`,
+    options:shuffle([...opts]), answer:key(trip),
+    explain:`${trip[0]} + ${trip[1]} = ${trip[0]+trip[1]}<br><b>${trip[0]+trip[1]} + ${trip[2]} = ${target}</b> ✓` };
+}
+function genColumn(){
+  let a,b,c;
+  const wantBorrow = Math.random()<0.75;
+  do{ a=rnd(300,999); b=rnd(100,a-100); c=a-b; }
+  while(c<100 || (wantBorrow && !((a%10)<(b%10) || (Math.floor(a/10)%10)<(Math.floor(b/10)%10))));
+  const rowsN=[a,b,c], r=rnd(0,2), col=rnd(0,2), D=rowsN.map(n=>String(n).split('').map(Number)), ans=D[r][col];
+  const cell=(ri,ci)=> ri===r&&ci===col ? `<div class="d ask">?</div>` : `<div class="d">${D[ri][ci]}</div>`;
+  const html=`<div class="colsub"><span></span>${[0,1,2].map(i=>cell(0,i)).join('')}
+    <span class="op">−</span>${[0,1,2].map(i=>cell(1,i)).join('')}<hr><span></span>${[0,1,2].map(i=>cell(2,i)).join('')}</div>`;
+  const ex = r===2 ? `Work it out: <b>${a} − ${b} = ${c}</b>` : r===0 ? `Add back to check: <b>${b} + ${c} = ${a}</b>` : `The bottom number is <b>${a} − ${c} = ${b}</b>`;
+  const nb = String(noBorrow(a,b)).padStart(3,'0');
+  return { topic:'columns', prompt:'Find the missing digit', visual:html, summary:`${a} − ${b} = ${c} (missing digit)`,
+    options:digitOptions(ans,[ans+1,ans-1,ans+2,ans-2,(10-ans)%10, r===2?+nb[col]:ans+1]), answer:String(ans), explain:ex };
+}
+function genOddEven(){
+  const v = rnd(0,3);
+  const odd = () => rnd(5,99)*10 + pick([1,3,5,7,9]), even = () => rnd(5,99)*10 + pick([0,2,4,6,8]);
+  if(v<2){
+    const wantOdd = v===0, right = wantOdd?odd():even(), wrong=[]; while(wrong.length<3){ const n=wantOdd?even():odd(); if(!wrong.includes(n)) wrong.push(n); }
+    return { topic:'oddeven', prompt:`Which number is ${wantOdd?'odd':'even'}?`, visual:'', summary:`Find the ${wantOdd?'odd':'even'} number`,
+      options:shuffle([right,...wrong]).map(String), answer:String(right),
+      explain:`Look at the last digit only!<br>Odd numbers end in 1, 3, 5, 7, 9. Even numbers end in 0, 2, 4, 6, 8.<br><b>${right}</b> ends in ${right%10}, so it is ${wantOdd?'odd':'even'}.` };
+  }
+  const rules = [['odd','odd','even',3,5],['odd','even','odd',3,4],['even','even','even',2,6],['even','odd','odd',4,3]];
+  if(v===2){
+    const [p,q,r,x,y] = pick(rules);
+    return { topic:'oddeven', prompt:`${p} + ${q} = ?`, visual:`<div class="eq" style="font-size:2rem">${p} + ${q} = ${qb()}</div>`, txt:true, two:true,
+      summary:`${p} + ${q}`, options:['odd','even'], answer:r, explain:`Try an example: ${x} + ${y} = ${x+y}.<br><b>${p} + ${q} = ${r}</b>` };
+  }
+  const x = Math.random()<0.5?odd():even(), y = Math.random()<0.5?odd():even(), px=x%2?'odd':'even', py=y%2?'odd':'even', r=(x+y)%2?'odd':'even';
+  return { topic:'oddeven', prompt:`Is the answer odd or even? (No need to add!)`, visual:`<div class="eq">${x} + ${y}</div>`, txt:true, two:true,
+    summary:`${x} + ${y}: odd or even?`, options:['odd','even'], answer:r,
+    explain:`${x} is ${px}, ${y} is ${py}.<br><b>${px} + ${py} = ${r}</b> (${x} + ${y} = ${x+y})` };
+}
+
+const TOPICS = {
+  missing:{label:'Missing numbers', icon:'❓', gen:()=>Math.random()<0.6?genMissing():genBalance()},
+  edges:  {label:'Edge puzzles', icon:'🔺', gen:genEdges},
+  lines:  {label:'Number line jumps', icon:'🦘', gen:()=>Math.random()<0.5?genLineAdd():genLineSub()},
+  walls:  {label:'Number walls', icon:'🧱', gen:genWall},
+  total:  {label:'Find the total', icon:'🎯', gen:genTotal},
+  columns:{label:'Column subtraction', icon:'➖', gen:genColumn},
+  oddeven:{label:'Odd & even', icon:'🔢', gen:genOddEven},
+};
+
+/* ---------------- sound ---------------- */
+let AC=null, muted=false;
+function tone(freq,dur,type='sine',when=0,vol=.14){
+  if(muted) return;
+  try{ AC = AC || new (window.AudioContext||window.webkitAudioContext)();
+    const o=AC.createOscillator(), g=AC.createGain(), t=AC.currentTime+when;
+    o.type=type; o.frequency.value=freq; g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.001,t+dur);
+    o.connect(g).connect(AC.destination); o.start(t); o.stop(t+dur+.02);
+  }catch(e){}
+}
+const sfx = {
+  good(){ tone(660,.14,'triangle'); tone(990,.25,'triangle',.11); },
+  bad(){ tone(200,.32,'sawtooth',0,.07); },
+  coin(){ tone(1320,.08,'square',0,.05); tone(1760,.22,'square',.08,.05); },
+  sad(){ tone(400,.2,'triangle'); tone(300,.3,'triangle',.18); },
+  win(){ [523,659,784,1047].forEach((f,i)=>tone(f,.3,'triangle',i*.14)); },
+};
+
+/* ---------------- setup screen ---------------- */
+const AVATARS = ['🦖','🐙','🦊','🐸','🐼','🐯','🦈','🐲','🦄','👾','🐧','🤖'];
+const BOTS = [['Captain Kiki','🦜'],['Professor Hoot','🦉'],['Turbo Tim','🐢'],['Lady Luna','🐱'],['Sir Splash','🐬'],['Rocky','🦀']];
+let cfg = { avatar:'🦖', topics:new Set(Object.keys(TOPICS)), len:20 };
+
+function loadBest(){ try{ return JSON.parse(localStorage.getItem('mtq-best')||'null'); }catch(e){ return null; } }
+function saveBest(v){ try{ localStorage.setItem('mtq-best', JSON.stringify(v)); }catch(e){} }
+
+function buildSetup(){
+  $('#avatars').innerHTML = AVATARS.map(a=>`<button class="av" aria-pressed="${a===cfg.avatar}" data-a="${a}" aria-label="Buddy ${a}">${a}</button>`).join('');
+  $('#topics').innerHTML = Object.entries(TOPICS).map(([k,t])=>`<button class="chip" aria-pressed="${cfg.topics.has(k)}" data-k="${k}">${t.icon} ${t.label}</button>`).join('');
+  $('#lens').innerHTML = [10,20,30].map(n=>`<button aria-pressed="${n===cfg.len}" data-n="${n}">${n}</button>`).join('');
+  const best = loadBest(); $('#best').textContent = best ? `🏆 Best: ${best.gold} gold (${best.correct}/${best.total} correct)` : '';
+}
+$('#avatars').onclick = e => { const b=e.target.closest('.av'); if(!b) return; cfg.avatar=b.dataset.a; buildSetup(); tone(880,.08,'triangle'); };
+$('#topics').onclick = e => { const b=e.target.closest('.chip'); if(!b) return; const k=b.dataset.k; cfg.topics.has(k)?cfg.topics.delete(k):cfg.topics.add(k); $('#warn').textContent=''; buildSetup(); };
+$('#lens').onclick = e => { const b=e.target.closest('button'); if(!b) return; cfg.len=+b.dataset.n; buildSetup(); };
+$('#go').onclick = () => { if(!cfg.topics.size){ $('#warn').textContent='Pick at least one topic to start.'; return; } startGame(); };
+
+/* ---------------- game ---------------- */
+let S;
+function show(id){ ['start','play','end'].forEach(x=>$('#'+x).classList.toggle('hidden', x!==id)); window.scrollTo(0,0); }
+
+function startGame(){
+  const keys = [...cfg.topics]; let order=[];
+  while(order.length<cfg.len) order = order.concat(shuffle(keys));
+  order = order.slice(0,cfg.len);
+  const bots = shuffle(BOTS).slice(0,3).map(([name,face])=>({name,face,gold:0}));
+  S = { name:($('#pname').value.trim()||'You').slice(0,16), face:cfg.avatar, gold:0, bots,
+        queue:order.map(k=>TOPICS[k].gen()), i:0, correct:0, streak:0, bestStreak:0, stats:{}, mistakes:[], busy:false, phase:'q' };
+  $('#myface').textContent=S.face; $('#myname').textContent=S.name;
+  show('play'); renderQ();
+}
+
+function renderBoard(){
+  const all = [{name:S.name, face:S.face, gold:S.gold, you:true}, ...S.bots].sort((a,b)=>b.gold-a.gold);
+  $('#lb').innerHTML = all.map((p,i)=>`<li class="${p.you?'you':''}"><span class="rk">${i+1}</span><span>${p.face}</span><span class="nm">${esc(p.name)}</span><span>🪙${p.gold}</span></li>`).join('');
+  $('#mygold').textContent=S.gold; $('#streak').textContent=`🔥 ${S.streak}`;
+}
+function bumpGold(){ const g=$('#goldpill'); g.classList.remove('bump'); void g.offsetWidth; g.classList.add('bump'); }
+
+function renderQ(){
+  const q = S.queue[S.i];
+  S.phase='q'; S.busy=false;
+  $('#qnum').textContent = `${S.i+1} / ${S.queue.length}`;
+  $('#prog').style.width = `${S.i/S.queue.length*100}%`;
+  $('#qtag').innerHTML = `${TOPICS[q.topic].icon} ${TOPICS[q.topic].label}${q.retry?'<span class="retry">Second try!</span>':''}`;
+  $('#qtext').textContent = q.prompt;
+  $('#visual').innerHTML = q.visual; $('#visual').classList.toggle('hidden', !q.visual);
+  const cols = q.two ? ['c2','c4'] : ['c1','c2','c3','c4'];
+  $('#answers').className='answers';
+  $('#answers').innerHTML = q.options.map((o,i)=>`<button class="ans ${cols[i]} ${q.txt?'txt':''}" data-i="${i}"><small>${i+1}</small>${esc(o)}</button>`).join('');
+  renderBoard();
+}
+$('#answers').onclick = e => { const b=e.target.closest('.ans'); if(b) answer(+b.dataset.i); };
+
+function answer(i){
+  if(S.busy || S.phase!=='q') return;
+  const q=S.queue[S.i]; if(i>=q.options.length) return;
+  S.busy=true; $('#answers').classList.add('locked');
+  const btns=[...document.querySelectorAll('.ans')], ok = q.options[i]===q.answer, ci=q.options.indexOf(q.answer);
+  btns.forEach((b,k)=>{ if(k===ci) b.classList.add('right'); else b.classList.add('dim'); });
+  const st = S.stats[q.topic] = S.stats[q.topic] || {c:0,t:0}; st.t++;
+  if(ok){
+    st.c++; S.correct++; S.streak++; S.bestStreak=Math.max(S.bestStreak,S.streak); sfx.good();
+    if(S.streak>=3 && S.streak%3===0){ S.gold+=10; toast(`🔥 ${S.streak} in a row! +10 bonus gold`); bumpGold(); }
+    setTimeout(showChests, 650);
+  } else {
+    btns[i].classList.remove('dim'); btns[i].classList.add('wrong'); S.streak=0; sfx.bad();
+    S.mistakes.push({s:q.summary, a:q.answer});
+    if(!q.retry){ // bring it back a bit later for a second try
+      const again = Object.assign({}, q, {retry:true, options:shuffle(q.options)});
+      const at = Math.min(S.i+3, S.queue.length);
+      if(at < S.queue.length){ S.queue.splice(at,0,again); S.queue.pop(); }
+    }
+    setTimeout(()=>showWrong(q), 700);
+  }
+  botsPlay(); renderBoard();
+}
+
+function botsPlay(){
+  S.bots.forEach(b=>{ if(Math.random()<0.7){ let g=pick([10,10,20,20,30,40]); if(b.gold>60 && Math.random()<0.05) g=b.gold; b.gold+=g; } });
+}
+
+function showWrong(q){
+  S.phase='wrong';
+  openSheet(`<h2 class="display" style="color:var(--bad)">Not quite!</h2>
+    <p class="sub">The answer is <span style="color:var(--good); font-family:'Titan One',sans-serif; font-size:1.4rem">${esc(q.answer)}</span></p>
+    <div class="explain">${q.explain}</div>
+    <p class="sub" style="margin-top:12px">${q.retry?'Keep going, you have got this!':'This one will come back later for a second try.'}</p>
+    <button class="btn blue" id="nextBtn">Got it</button>`);
+  $('#nextBtn').onclick = next; $('#nextBtn').focus();
+}
+
+const CHEST = `<svg viewBox="0 0 120 100" aria-hidden="true"><rect x="10" y="40" width="100" height="52" rx="8" class="ch-body"/><path d="M10 44 Q10 12 60 12 Q110 12 110 44 Z" class="ch-lid"/><rect x="10" y="40" width="100" height="8" class="ch-band"/><rect x="52" y="36" width="16" height="22" rx="4" class="ch-lock"/></svg>`;
+function showChests(){
+  S.phase='chest';
+  openSheet(`<h2 class="display" style="color:var(--good)">Correct!</h2>
+    <p class="sub">Pick a treasure chest</p>
+    <div class="chests">${[0,1,2].map(i=>`<button class="chest" data-c="${i}" aria-label="Chest ${i+1}">${CHEST}<div class="k">${i+1}</div></button>`).join('')}</div>
+    <div class="reveal" id="reveal"></div>`);
+  document.querySelector('.chests').onclick = e => { const b=e.target.closest('.chest'); if(b) openChest(+b.dataset.c); };
+}
+
+function rollOutcome(){
+  const richest = () => S.bots.slice().sort((a,b)=>b.gold-a.gold)[0];
+  const gain = n => ({icon:'🪙', what:`+${n} gold`, run(){ S.gold+=n; }});
+  const table = [
+    [3, ()=>gain(10)], [3, ()=>gain(20)], [2, ()=>gain(30)], [1.2, ()=>gain(50)], [.4, ()=>gain(100)],
+    [.7, ()=> S.gold<10 ? gain(20) : {icon:'✨', what:'Double your gold!', run(){ S.gold*=2; }}],
+    [.25,()=> S.gold<10 ? gain(30) : {icon:'🌟', what:'TRIPLE your gold!', run(){ S.gold*=3; }}],
+    [.8, ()=>{ const b=richest(); if(b.gold<20) return gain(20); const amt=Math.max(10,Math.round(b.gold*.2));
+                return {icon:'🏴‍☠️', what:`You grabbed ${amt} gold from ${b.name}!`, run(){ b.gold-=amt; S.gold+=amt; }}; }],
+    [.5, ()=>{ if(S.gold<30) return gain(10); const amt=Math.round(S.gold*.1);
+                return {icon:'🦀', what:`A crab pinched ${amt} gold!`, bad:true, run(){ S.gold-=amt; }}; }],
+    [.6, ()=>({icon:'🦗', what:'Empty chest… just a cricket', bad:true, run(){}})],
+    [.3, ()=>{ const b=richest(); if(b.gold<=S.gold+20) return gain(30);
+                return {icon:'🔄', what:`Swap! You trade gold with ${b.name}!`, run(){ const t=b.gold; b.gold=S.gold; S.gold=t; }}; }],
+  ];
+  let r = Math.random()*table.reduce((s,x)=>s+x[0],0);
+  for(const [w,f] of table){ r-=w; if(r<=0) return f(); }
+  return gain(10);
+}
+
+function openChest(i){
+  if(S.phase!=='chest') return; S.phase='opening';
+  const chests=[...document.querySelectorAll('.chest')];
+  chests.forEach((c,k)=>{ c.disabled=true; c.classList.add(k===i?'shake':'gone'); });
+  setTimeout(()=>{
+    const o = rollOutcome(); o.run(); chests[i].classList.add('opened');
+    o.bad ? sfx.sad() : sfx.coin(); bumpGold(); renderBoard();
+    $('#reveal').innerHTML = `<div class="big">${o.icon}</div><div class="what">${esc(o.what)}</div>
+      <button class="btn blue" id="nextBtn" style="margin-top:12px">Next question</button>`;
+    S.phase='chestdone'; $('#nextBtn').onclick = next; $('#nextBtn').focus();
+  }, 480);
+}
+
+function next(){
+  closeSheet(); S.i++;
+  if(S.i>=S.queue.length) endGame(); else renderQ();
+}
+
+function openSheet(html){ $('#sheet').innerHTML=html; $('#overlay').classList.remove('hidden'); }
+function closeSheet(){ $('#overlay').classList.add('hidden'); }
+function toast(t){ const d=document.createElement('div'); d.className='toast'; d.textContent=t; document.body.appendChild(d); setTimeout(()=>d.remove(),1900); }
+
+function endGame(){
+  S.phase='end'; $('#prog').style.width='100%';
+  const all = [{name:S.name, face:S.face, gold:S.gold, you:true}, ...S.bots].sort((a,b)=>b.gold-a.gold);
+  const rank = all.findIndex(p=>p.you)+1, total=S.queue.length, pct=S.correct/total;
+  $('#endtitle').textContent = rank===1 ? `${S.name} wins the treasure!` : rank===2 ? 'So close! 2nd place' : 'Quest complete!';
+  const podOrder=[1,0,2];
+  $('#podium').innerHTML = podOrder.map(k=>{ const p=all[k]; return `<div class="pod p${k+1} ${p.you?'you':''}"><div class="f">${p.face}</div><div class="n">${esc(p.name)}</div><div style="font-weight:900">🪙${p.gold}</div><div class="blk">${k+1}</div></div>`; }).join('')
+    + (rank===4 ? `<div class="pod you"><div class="f">${S.face}</div><div class="n">${esc(S.name)}</div><div style="font-weight:900">🪙${S.gold}</div><div class="blk" style="height:40px;background:var(--soft);color:var(--ink)">4</div></div>`:'');
+  const stars = pct>=.9?3:pct>=.7?2:pct>=.5?1:0;
+  $('#stars').textContent = '★'.repeat(stars)+'☆'.repeat(3-stars);
+  $('#stars').style.color='var(--gold)';
+  $('#sCorrect').textContent=`${S.correct}/${total}`; $('#sGold').textContent=S.gold; $('#sStreak').textContent=S.bestStreak;
+  $('#topicres').innerHTML = Object.entries(S.stats).map(([k,v])=>`<li><span>${TOPICS[k].icon} ${TOPICS[k].label}</span><span>${v.c}/${v.t} ${v.c===v.t?'✅':''}</span></li>`).join('');
+  $('#mist').innerHTML = S.mistakes.length ? S.mistakes.map(m=>`<li>${esc(m.s)} → <span>${esc(m.a)}</span></li>`).join('') : '<li style="background:#e3f8ec;color:#18814a">No mistakes. Amazing! 🎉</li>';
+  const best = loadBest(); if(!best || S.gold>best.gold) saveBest({gold:S.gold, correct:S.correct, total});
+  show('end'); sfx.win();
+  if(rank===1 && !matchMedia('(prefers-reduced-motion: reduce)').matches) confetti();
+}
+function confetti(){
+  const cols=['#ffb627','#3d8bff','#27b36a','#ff5d73','#f5b700','#fff'];
+  for(let i=0;i<90;i++){ const c=document.createElement('div'); c.className='confetti';
+    c.style.left=Math.random()*100+'vw'; c.style.background=pick(cols); c.style.animationDuration=(2+Math.random()*2.5)+'s'; c.style.animationDelay=Math.random()*.8+'s';
+    document.body.appendChild(c); setTimeout(()=>c.remove(),5500); }
+}
+
+$('#again').onclick = startGame;
+$('#home').onclick = () => { buildSetup(); show('start'); };
+$('#quit').onclick = () => { if(confirm('Stop this quest and go back to the start?')){ closeSheet(); buildSetup(); show('start'); } };
+$('#mute').onclick = () => { muted=!muted; $('#mute').textContent = muted?'🔇':'🔊'; };
+
+document.addEventListener('keydown', e=>{
+  if(!S) return;
+  if(S.phase==='q' && !$('#play').classList.contains('hidden') && /^[1-4]$/.test(e.key)) answer(+e.key-1);
+  else if(S.phase==='chest' && /^[1-3]$/.test(e.key)) openChest(+e.key-1);
+  else if((S.phase==='wrong'||S.phase==='chestdone') && e.key==='Enter'){ e.preventDefault(); next(); }
+});
+
+buildSetup();
+</script>
+<a href="../" aria-label="Back to Peter's World" style="position:fixed;left:calc(10px + env(safe-area-inset-left,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:2147483000;width:48px;height:48px;border-radius:50%;background:#fff;border:3px solid #5fd3b0;display:grid;place-items:center;font-size:22px;text-decoration:none;box-shadow:0 3px 0 rgba(0,0,0,.18)">🏠</a>
+</body>
+</html>

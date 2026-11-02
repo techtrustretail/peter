@@ -1,0 +1,858 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,-apple-system,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
+<title>Magic Carpet Story Quest</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Lexend:wght@400;500;700&display=swap">
+<style>
+/* Layout: a night-sky journey. One column of "lands" the carpet flies to; parchment cards for anything long to read. Single dark theme by choice. */
+:root{
+  --sky:#1b1540; --sky-deep:#110d2b; --panel:#271f57; --panel-2:#322872;
+  --ink:#f1edff; --muted:#bdb4e6; --line:#4a3f8f;
+  --saffron:#f6b73c; --teal:#2ec4b6; --pom:#e5485f; --indigo:#6c5ce7; --leaf:#7bc96f;
+  --parch:#fbf1dc; --parch-ink:#2f2219; --parch-line:#e6d3ad;
+  --ok:#5fd38d; --bad:#ff7a8a;
+  --display:"Baloo 2","Chalkboard SE","Comic Sans MS",system-ui,sans-serif;
+  --body:"Lexend","Avenir Next","Segoe UI",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;
+  background-image:radial-gradient(circle at 15% 8%,rgba(246,183,60,.12),transparent 30%),radial-gradient(circle at 85% 20%,rgba(46,196,182,.10),transparent 35%);
+  background-attachment:fixed}
+.wrap{max-width:860px;margin:0 auto;padding-block:18px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--display);line-height:1.15;text-wrap:balance;margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--saffron);outline-offset:2px}
+.stars-bg{position:fixed;inset:0;pointer-events:none;z-index:0}
+#app{position:relative;z-index:1}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:50}
+
+/* hero */
+.hero{display:grid;gap:6px;text-align:center;padding-block:10px 4px}
+.hero .eyebrow{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--saffron)}
+.hero h1{font-size:clamp(34px,7vw,54px);font-weight:800;color:var(--ink)}
+.hero h1 span{color:var(--saffron)}
+.hero p{margin:0;color:var(--muted)}
+.carpet-box{display:grid;justify-items:center;gap:8px;margin-block:10px 4px}
+.carpet{width:min(520px,100%);height:auto;animation:bob 4s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-8px) rotate(1deg)}}
+.legend{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 14px;font-size:13px;color:var(--muted)}
+.legend b{color:var(--ink)}
+.threads{display:inline-flex;gap:8px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-weight:700}
+
+.section-h{font-size:26px;margin-block:30px 6px}
+.sub{color:var(--muted);margin:0 0 14px}
+
+/* today card */
+.today{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;background:linear-gradient(120deg,var(--panel-2),var(--panel));border:2px solid var(--saffron);border-radius:20px;padding:16px 18px;margin-top:18px}
+.today .big{font-size:44px}
+.today h3{font-size:22px}
+.today p{margin:2px 0 0;color:var(--muted);font-size:15px}
+@media (max-width:560px){.today{grid-template-columns:auto 1fr}.today .btn{grid-column:1/-1}}
+
+/* lands */
+.lands{display:grid;gap:12px}
+.land{display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:center;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:14px 16px;width:100%;transition:transform .15s,border-color .15s}
+.land:hover{transform:translateY(-2px);border-color:var(--saffron)}
+.land .ic{font-size:40px;display:grid;place-items:center;width:64px;height:64px;border-radius:16px;background:var(--sky-deep)}
+.land h3{font-size:21px}
+.land .meta{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--saffron);font-weight:700}
+.land p{margin:2px 0 0;font-size:14.5px;color:var(--muted)}
+.land .st{font-size:13px;color:var(--muted);text-align:right;white-space:nowrap}
+.land.done{border-color:var(--teal)}
+.land.done .st{color:var(--teal);font-weight:700}
+@media (max-width:520px){.land{grid-template-columns:52px 1fr}.land .ic{width:52px;height:52px;font-size:32px}.land .st{grid-column:2;text-align:left}}
+.extras{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+
+/* plan table */
+.plan{display:grid;gap:8px}
+.day{display:grid;grid-template-columns:92px 1fr;gap:12px;background:var(--sky-deep);border:1px solid var(--line);border-radius:14px;padding:10px 14px;font-size:15px}
+.day b{font-family:var(--display);color:var(--saffron);font-size:17px}
+@media (max-width:480px){.day{grid-template-columns:1fr;gap:2px}}
+
+/* buttons */
+.btn{background:var(--saffron);color:#2a1a00;border:0;border-radius:14px;padding:11px 18px;font-weight:700;font-size:16px}
+.btn.alt{background:var(--panel-2);color:var(--ink);border:1px solid var(--line)}
+.btn.teal{background:var(--teal);color:#032a26}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+
+/* topbar */
+.topbar{display:flex;gap:12px;align-items:center;margin-bottom:14px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--sky);padding-block:8px;z-index:5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--sky)}
+.back{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:7px 12px;font-weight:600}
+.crumb{font-family:var(--display);font-size:20px;color:var(--saffron);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* steps in a land */
+.steps{display:grid;gap:10px}
+.step{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px 14px;text-align:left;width:100%}
+.step .n{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--sky-deep);font-family:var(--display);font-size:20px;color:var(--saffron)}
+.step.done .n{background:var(--teal);color:#032a26}
+.step h3{font-size:18px}
+.step p{margin:0;font-size:14px;color:var(--muted)}
+.step .st{font-size:13px;color:var(--muted)}
+
+/* learn cards */
+.card{background:var(--parch);color:var(--parch-ink);border-radius:18px;padding:18px 20px;margin-bottom:14px;border:1px solid var(--parch-line)}
+.card h3{font-size:23px;color:#5b2a86;margin-bottom:6px}
+.card p{margin:6px 0}
+.card .vn{background:#efe2c4;border-radius:10px;padding:8px 12px;font-size:14.5px;margin-top:10px}
+.card table{border-collapse:collapse;width:100%;font-size:15.5px}
+.card td,.card th{border-bottom:1px solid var(--parch-line);padding:6px 8px;text-align:left;vertical-align:top}
+.card th{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#7a5a3a}
+.tbl{overflow-x:auto}
+.ok-ex{color:#1d7a46;font-weight:700}.no-ex{color:#b3263a;text-decoration:line-through}
+.stage-list{display:grid;gap:8px;margin-top:8px}
+.stage{display:grid;grid-template-columns:38px 1fr;gap:10px;align-items:center;border-radius:12px;padding:8px 12px;background:#f3e6c8}
+.stage i{font-style:normal;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;font-family:var(--display);font-size:19px}
+.sp{background:#ffe0a3;border-radius:4px;padding:0 3px}
+.mk{color:#c2185b;font-weight:800}
+
+/* story text */
+.story{background:var(--parch);color:var(--parch-ink);border-radius:18px;padding:20px 22px;border:1px solid var(--parch-line);font-size:18px;line-height:1.75}
+.story h3{font-size:28px;color:#8a3b12}
+.story .by{font-size:14px;color:#7a5a3a;margin-bottom:8px}
+.story p{margin:10px 0}
+.story .tag{display:inline-block;font-family:var(--display);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#fff;border-radius:6px;padding:0 7px;margin-right:6px;vertical-align:2px}
+.story.hide-tags .tag{display:none}
+
+/* quiz */
+.qwrap{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:18px}
+.qhead{display:flex;justify-content:space-between;gap:10px;font-size:14px;color:var(--muted);margin-bottom:6px}
+.prog{height:8px;border-radius:99px;background:var(--sky-deep);overflow:hidden;margin-bottom:14px}
+.prog i{display:block;height:100%;background:linear-gradient(90deg,var(--teal),var(--saffron));transition:width .3s}
+.q{font-size:20px;font-weight:500;margin:0 0 14px}
+.choices{display:grid;gap:10px}
+.choice{background:var(--sky-deep);border:2px solid var(--line);border-radius:14px;padding:12px 14px;text-align:left;font-size:17px}
+.choice:hover{border-color:var(--saffron)}
+.choice.right{border-color:var(--ok);background:rgba(95,211,141,.15)}
+.choice.wrong{border-color:var(--bad);background:rgba(255,122,138,.12);animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.tip{margin-top:12px;background:var(--sky-deep);border-left:4px solid var(--saffron);border-radius:10px;padding:10px 14px;font-size:15.5px}
+.tip.good{border-color:var(--ok)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:var(--sky-deep);border:2px solid var(--line);border-radius:12px;padding:8px 12px;font-size:16px;text-align:left}
+.answer-row{min-height:58px;border:2px dashed var(--line);border-radius:14px;padding:8px;margin-bottom:12px;display:flex;flex-wrap:wrap;gap:8px}
+.answer-row.stack,.chips.stack{flex-direction:column}
+.answer-row .chip{border-color:var(--saffron)}
+.tin{width:100%;font:inherit;font-size:18px;padding:12px 14px;border-radius:12px;border:2px solid var(--line);background:var(--sky-deep);color:var(--ink)}
+.say{background:transparent;border:1px solid var(--line);border-radius:10px;padding:4px 10px;font-size:14px;color:var(--muted)}
+
+/* results */
+.result{text-align:center;display:grid;gap:10px;justify-items:center;padding:10px}
+.result .big{font-family:var(--display);font-size:56px;color:var(--saffron)}
+.code{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;background:var(--sky-deep);border:1px solid var(--line);border-radius:10px;padding:10px;white-space:pre-wrap;word-break:break-all;max-width:100%;text-align:left}
+
+/* writing */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:600px){.grid2{grid-template-columns:1fr}}
+label.fl{display:grid;gap:4px;font-size:14.5px;color:var(--muted)}
+textarea,.field{width:100%;font:inherit;font-size:17px;line-height:1.6;padding:12px 14px;border-radius:12px;border:2px solid var(--line);background:var(--sky-deep);color:var(--ink)}
+textarea{min-height:90px;resize:vertical}
+textarea.big{min-height:320px}
+select.field{appearance:auto}
+.helpers{display:grid;gap:8px;font-size:15px}
+.helpers details{background:var(--sky-deep);border:1px solid var(--line);border-radius:12px;padding:8px 12px}
+.helpers summary{cursor:pointer;font-weight:700;color:var(--saffron)}
+.wordbank{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.wordbank button{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:3px 9px;font-size:14.5px}
+.check{display:grid;gap:6px}
+.check div{display:grid;grid-template-columns:28px 1fr auto;gap:8px;align-items:start;background:var(--sky-deep);border-radius:10px;padding:8px 10px;font-size:15.5px}
+.check .pts{font-weight:700;color:var(--saffron);white-space:nowrap}
+.fixes{margin:8px 0 0;padding-left:20px;font-size:15.5px}
+.fixes li{margin:4px 0}
+.counter{font-size:13px;color:var(--muted);text-align:right}
+.profile{background:var(--parch);color:var(--parch-ink);border-radius:18px;padding:18px;border:6px double #c99a45}
+.profile h3{font-size:28px;color:#8a3b12}
+.profile dl{display:grid;grid-template-columns:max-content 1fr;gap:6px 14px;margin:10px 0 0}
+.profile dt{font-weight:700;color:#7a5a3a}
+.profile dd{margin:0}
+@media (max-width:480px){.profile dl{grid-template-columns:1fr}}
+.timer{font-family:var(--display);font-size:64px;color:var(--saffron);text-align:center}
+.rate{display:grid;gap:8px}
+.rate div{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;background:var(--sky-deep);border-radius:12px;padding:8px 12px}
+.rate .s button{background:none;border:0;font-size:24px;padding:0 2px;filter:grayscale(1);opacity:.45}
+.rate .s button.on{filter:none;opacity:1}
+
+/* parent */
+.vnbox{background:var(--parch);color:var(--parch-ink);border-radius:18px;padding:18px 20px}
+.vnbox h3{font-size:22px;color:#5b2a86}
+.vnbox ul{margin:8px 0;padding-left:20px;font-size:15.5px}
+.vnbox li{margin:5px 0}
+.vnbox table{border-collapse:collapse;width:100%;font-size:15px}
+.vnbox td,.vnbox th{border-bottom:1px solid var(--parch-line);padding:6px 8px;text-align:left}
+.vnbox .code{background:#fff7e6;color:#2f2219;border-color:var(--parch-line)}
+.vnbox .btn.alt{background:#5b2a86;color:#fff;border:0}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<canvas class="stars-bg" id="starsBg"></canvas>
+<canvas id="fx"></canvas>
+<div class="wrap"><div id="app"></div></div>
+
+<script>
+/* ============ STATE ============ */
+const KEY="carpetQuest.u4.v1";
+let S={best:{},done:{},log:[],threads:0,drafts:{},speak:{}};
+try{const raw=localStorage.getItem(KEY);if(raw)S=Object.assign(S,JSON.parse(raw))}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+const $=s=>document.querySelector(s);
+const app=$("#app");
+function esc(t){return String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function stamp(){const d=new Date(),p=n=>String(n).padStart(2,"0");return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}`}
+function code(id,score,max,per){return `QQ|EFL|${id}|${stamp()}|${score}/${max}|`+Object.entries(per).map(([k,v])=>`${k}:${v[0]}/${v[1]}`).join(";")}
+function logResult(id,score,max,per){const c=code(id,score,max,per);S.log.push({id,when:stamp(),score,max,per,code:c});S.best[id]=Math.max(S.best[id]||0,Math.round(100*score/max));save();return c}
+function markDone(k){S.done[k]=true;save()}
+
+/* ============ SOUND, SPEECH, FX ============ */
+let AC=null;
+function tone(fs,dur=.12,type="sine"){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const t=AC.currentTime;fs.forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(.16,t+i*dur);g.gain.exponentialRampToValueAtTime(.001,t+i*dur+dur*1.6);o.connect(g).connect(AC.destination);o.start(t+i*dur);o.stop(t+i*dur+dur*1.7)})}catch(e){}}
+const yay=()=>tone([587,784,988,1175],.1),oops=()=>tone([300,220],.14,"triangle");
+function speak(text,btn){try{const ss=window.speechSynthesis;if(!ss)return;if(ss.speaking){ss.cancel();if(btn)btn.textContent="🔊 Listen";return}
+ const u=new SpeechSynthesisUtterance(text.replace(/[“”]/g,'"'));u.lang="en-GB";u.rate=.9;
+ const v=ss.getVoices().find(v=>/en-GB/i.test(v.lang))||ss.getVoices().find(v=>/^en/i.test(v.lang));if(v)u.voice=v;
+ if(btn){btn.textContent="⏹ Stop";u.onend=()=>btn.textContent="🔊 Listen"}ss.speak(u)}catch(e){}}
+const fx=$("#fx"),cx=fx.getContext("2d");let parts=[];
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+function burst(n=90){if(reduce)return;fx.width=innerWidth;fx.height=innerHeight;const cols=["#f6b73c","#2ec4b6","#e5485f","#6c5ce7","#7bc96f"];const start=!parts.length;for(let i=0;i<n;i++)parts.push({x:innerWidth/2,y:innerHeight*.35,vx:(Math.random()-.5)*14,vy:Math.random()*-12-3,r:3+Math.random()*5,c:cols[i%5],l:90});if(start)requestAnimationFrame(step)}
+function step(){cx.clearRect(0,0,fx.width,fx.height);parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.35;p.l--;cx.fillStyle=p.c;cx.beginPath();cx.arc(p.x,p.y,p.r,0,7);cx.fill()});parts=parts.filter(p=>p.l>0&&p.y<fx.height+20);if(parts.length)requestAnimationFrame(step);else cx.clearRect(0,0,fx.width,fx.height)}
+(function stars(){const c=$("#starsBg"),g=c.getContext("2d");function draw(){c.width=innerWidth;c.height=innerHeight;for(let i=0;i<120;i++){g.fillStyle=`rgba(255,255,255,${.15+Math.random()*.5})`;g.beginPath();g.arc(Math.random()*c.width,Math.random()*c.height,Math.random()*1.4+.2,0,7);g.fill()}}draw();addEventListener("resize",draw)})();
+
+/* ============ CONTENT ============ */
+const STAGE_COL=["#3d7be0","#2f9e5b","#e0a21b","#d6436a","#7b4fd6"];
+const STAGES=[["Opening","Introduce the characters and the setting.","Introduction"],["Build-up","Describe what is happening. Something starts to happen.","Problem/Build-up"],["Problem","A challenge or dilemma. The most exciting part!","Climax/Conflict"],["Resolution","How the problem is solved.","Resolution"],["Ending","The story finishes. Loose ends are tied up.","Conclusion"]];
+
+const SELAM={title:"Selam and the Silver Spring",by:"A trickster tale set in Eritrea, East Africa (written for this quest)",paras:[
+ [0,"High in the hills of Eritrea, where the air is cool and the fields are golden, there lived a young farmer called Selam. Every morning she walked her two oxen across the dusty plateau, past the tall acacia tree, to the silver spring at the edge of the village. Selam was small, but her mind was as quick as a desert fox. Everyone knew it."],
+ [1,"That summer, no rain fell. Day after day, the sun burned in the sky. All of the wells in the village dried up, until only the silver spring was left. Some families walked for hours to fetch water, and both of Selam’s oxen grew thin and tired."],
+ [2,"One morning, a rich trader named Tesfay built a tall wooden fence around the spring. “This spring is mine now!” he announced. “If you want water, you must pay me one silver coin for every jar.” The villagers gasped and held their empty jars tightly. Nobody had that much money. Selam’s heart sank… but then a clever idea sparkled in her eyes."],
+ [3,"That afternoon, Selam sat in the shade of the trader’s fence and began to sing. She sang about the old days, when the spring belonged to everyone. Soon all the children joined in, then the mothers, then the old men. “What is this noise?” grumbled Tesfay. “We are singing to the spring,” Selam said calmly. “Grandmother says the spring only gives water to people who share it.” Tesfay looked down. The water was lower than yesterday. He was a greedy man, but he was also a worried one. With shaking hands, he pulled down his fence."],
+ [4,"Before long, the rain came back to the hills. The villagers shared the silver spring again, and Tesfay even carried water for the oldest grandmother. From that day on, people said, “If you have a problem, ask Selam. Her ideas are worth more than silver.”"]
+]};
+
+const ORDER_SELAM=["Selam lives in the hills of Eritrea with her two oxen.","No rain falls and all the wells dry up.","Tesfay builds a fence and wants a coin for every jar.","Selam’s singing worries Tesfay, so he pulls down the fence.","The rain returns and everyone shares the spring."];
+const ORDER_ABU=["Cunning Abunuwasi builds a house and sells the upstairs to a greedy merchant.","Abunuwasi wants to move far away, so he tries to sell the downstairs too.","The merchant refuses. He hopes to get the whole house for free.","Abunuwasi’s friends arrive with mallets, so the merchant quickly buys his half.","Abunuwasi takes the money and starts a new life, a long, long way away."];
+const ORDER_BABY=["The chief is brave and fierce, and everyone is afraid of him.","A wise old woman says she knows someone who is not afraid of him.","Baby Wasso will not go to the chief, even when he shouts.","The chief dances and dances until Wasso laughs and falls asleep.","The chief says Wasso is braver than him, and he falls asleep too."];
+
+/* question helpers: mc(skill,q,choices,tip) -> first choice is correct; shuffled at play time */
+const mc=(skill,q,choices,tip,say)=>({type:"mc",skill,q,choices,tip,say});
+const ord=(skill,q,items,tip,stack)=>({type:"order",skill,q,items,tip,stack});
+const typ=(skill,q,answers,tip,strict)=>({type:"type",skill,q,answers,tip,strict});
+
+const QUIZ={
+"q-d1":{title:"Story Detectives",land:"d1",intro:"Read “Selam and the Silver Spring” first. You can open the story again from the button at the top.",story:true,qs:[
+ mc("nhan-vat-boi-canh","Where is the story set?",["In the hills of Eritrea","In a busy city in Kenya","On a snowy mountain","Under the sea"],"Look at the first sentence: “High in the hills of Eritrea…”"),
+ mc("nhan-vat-boi-canh","Which clue tells us about the WEATHER that summer?",["“Day after day, the sun burned in the sky.”","“She walked her two oxen across the plateau.”","“The villagers gasped.”","“Tesfay built a tall wooden fence.”"],"The setting is WHERE and WHEN. Weather is part of the setting."),
+ mc("suy-luan","“Selam’s heart sank.” How did Selam feel?",["Worried and sad","Excited","Sleepy","Angry with her oxen"],"A heart that ‘sinks’ feels heavy. The text does not say ‘sad’, so we INFER it from the clue."),
+ mc("suy-luan","Which word best describes Tesfay at the start of the story?",["greedy","generous","shy","brave"],"He wants money for water that used to be free."),
+ mc("suy-luan","Which clue PROVES that Tesfay is greedy?",["He wants one silver coin for every jar of water.","He lives near the village.","He hears the singing.","He looks down at the water."],"Clue + what I know = inference."),
+ mc("suy-luan","Why was the water lower than yesterday? Think like Selam!",["No rain had fallen for a long time.","The singing made the water go away.","Tesfay hid the water in a jar.","The oxen drank it all."],"Remember the Build-up: no rain fell all summer. Clever Selam used this fact to scare Tesfay!"),
+ mc("doc-hieu","Why did Tesfay pull down the fence?",["He was worried the spring would stop giving water.","Selam paid him a silver coin.","The wind broke the fence.","The oxen pushed it over."],"“He was a greedy man, but he was also a worried one.”"),
+ mc("cau-truc-truyen","Which part is the PROBLEM of the story?",["Tesfay fences the spring and wants money.","Selam walks her oxen every morning.","The rain comes back.","People say Selam’s ideas are worth more than silver."],"The problem is the challenge the characters must solve."),
+ mc("cau-truc-truyen","Which stage introduces the characters and the setting?",["Opening","Problem","Resolution","Ending"],"Stage 1, the Opening (your book calls it the Introduction)."),
+ mc("cau-truc-truyen","The RESOLUTION is…",["how the problem is solved","the first sentence","where the story happens","a word that sounds like another word"],"Resolve = solve."),
+ ord("cau-truc-truyen","Put Selam’s story in the 5-stage order. Tap the sentences in order.",ORDER_SELAM,"Opening → Build-up → Problem → Resolution → Ending.",true),
+ ord("cau-truc-truyen","Now Abunuwasi’s House (Student Book page 40). Put it in order.",ORDER_ABU,"Who and where first. Then what he wants. Then the problem (the merchant refuses). Then the clever solution. Then the end.",true),
+ mc("suy-luan","What does INFERENCE mean?",["Using clues to work out something the text does not say","Copying a sentence from the text","Reading very fast","A word that shows who owns something"],"Detectives infer. They use clues!")
+]},
+"q-d2":{title:"Word Market: Homophones",land:"d2",intro:"Homophones sound the same but have different spellings and meanings. Tap 🔊 to hear the sentence.",qs:[
+ mc("dong-am","I want to go ___ the market.",["to","two","too"],"to = towards a place (đến). two = 2. too = also / very.","I want to go to the market."),
+ mc("dong-am","Selam had ___ oxen.",["two","to","too"],"two = the number 2."),
+ mc("dong-am","Can I come ___?",["too","to","two"],"too = also (cũng)."),
+ mc("dong-am","The water was ___ low to fill the jars.",["too","to","two"],"too = more than it should be (quá)."),
+ mc("dong-am","The villagers carried ___ empty jars.",["their","there"],"their = belongs to them (của họ)."),
+ mc("dong-am","Put the basket over ___.",["there","their"],"there = a place. Look: there has ‘here’ inside it!"),
+ mc("dong-am","I don’t ___ where my hat is.",["know","no","now"],"know = biết (the k is silent). In your homework you wrote “I don’t now…”. now = bây giờ."),
+ mc("dong-am","There are ___ apples left.",["no","know"],"no = not any (không còn)."),
+ mc("dong-am","Abunuwasi ___ the merchant was greedy.",["knew","new"],"knew = the past of know (đã biết). new = mới."),
+ mc("dong-am","Lila wore her ___ shoes to the market.",["new","knew"],"new = mới."),
+ mc("dong-am","Can you ___ the drums at the market?",["hear","here"],"You hear with your EAR: h-EAR."),
+ mc("dong-am","I need some ___ to make bread.",["flour","flower"],"flour = bột. flower = bông hoa."),
+ mc("dong-am","It was a busy ___ with lots of people.",["scene","seen"],"scene = a place or view (cảnh). seen = past of see."),
+ typ("chinh-ta","Type the missing word: I don’t ____ the answer.",["know"],"k-n-o-w. Say it: ‘k is silent’."),
+ typ("dong-am","Fix the mistake. Type the whole sentence:\nI don’t now where my hat is.",["I don't know where my hat is."],"now → know. Keep the capital I and the full stop.",true),
+ typ("dong-am","Fix the mistake. Type the whole sentence:\nTheir is a rusty key on the step.",["There is a rusty key on the step."],"‘There is’ tells us where something is.",true)
+]},
+"q-d3":{title:"Apostrophe Bazaar",land:"d3",intro:"Who owns it? Add ’s to the OWNER. Never use an apostrophe just to make a plural.",qs:[
+ mc("so-huu","The purse belongs to the woman. Which is correct?",["the woman’s purse","the womans purse","the womans’ purse"],"One owner: add ’s → woman’s."),
+ mc("so-huu","The streets belong to the city. Which is correct?",["the city’s streets","the city’s street’s","the citys streets"],"Only the OWNER gets ’s. ‘streets’ is just a plural, so no apostrophe!"),
+ mc("so-huu","Which sentence is correct?",["The fruit seller’s apples looked fresh.","The fruit seller’s apple’s looked fresh.","The fruit sellers apple’s looked fresh."],"The seller owns the apples → seller’s. ‘apples’ is a plural → no apostrophe."),
+ mc("so-huu","🚨 Apostrophe police! Which sentence has a WRONG apostrophe?",["I bought three apple’s.","Selam’s oxen were thin.","The man’s hat was red."],"We never use an apostrophe just to make a plural: three apples."),
+ mc("so-huu","The toys belong to the children. Which is correct?",["the children’s toys","the childrens’ toys","the childrens toys"],"‘children’ does not end in s, so add ’s (like men’s, people’s)."),
+ mc("so-huu","Two goats share their food. Which is correct?",["the goats’ food","the goat’s foods","the goats food"],"Many owners ending in s: put the apostrophe AFTER the s → goats’."),
+ mc("so-huu","In “don’t”, what does the apostrophe show?",["A missing letter (do not)","Who owns something","That there are many"],"Apostrophes have two jobs: missing letters (don’t) and possession (Selam’s)."),
+ typ("so-huu","Write it with an apostrophe:\nthe hat of the man",["the man's hat"],"Owner + ’s + thing: the man’s hat."),
+ typ("so-huu","Fix the mistake. Type the whole sentence:\nThe wise mans advice was very helpful.",["The wise man's advice was very helpful."],"Who owns the advice? The man → man’s.",true),
+ typ("so-huu","Fix the mistake. Type the whole sentence:\nThe citys streets were narrow.",["The city's streets were narrow."],"city’s (owner) + streets (plural, no apostrophe).",true),
+ mc("luong-tu","___ the man and the woman were happy at the end.",["Both","Either","Some"],"both = the two of them together (cả hai)."),
+ mc("luong-tu","You may choose ___ the red purse or the blue purse.",["either","both","all"],"either … or = one of the two (một trong hai)."),
+ mc("luong-tu","___ of the six stalls were busy. Every stall had customers.",["All","Some","Either"],"Every stall = all of them (tất cả)."),
+ mc("luong-tu","I have ___ coins left, enough to buy an apple.",["some","both","either"],"some = a few, not all (một vài)."),
+ mc("luong-tu","Wasso and the chief were tired. ___ of them could stay awake!",["Neither","Both","All"],"neither = not this one and not that one (không ai trong hai)."),
+ mc("luong-tu","Which word is a QUANTIFIER?",["some","purse","quickly"],"Quantifiers tell us how much or how many: some, all, both, either, neither, none.")
+]},
+"q-d4":{title:"Tent Talk: Speech & Tenses",land:"d4",intro:"Speech marks go around the words a character SAYS. The story is in the past tense.",qs:[
+ mc("loi-thoai","Which words are DIRECT SPEECH?\n“Come here, child!” cried the chief.",["Come here, child!","cried the chief","the chief"],"Direct speech = the exact words spoken. They sit inside the speech marks."),
+ mc("loi-thoai","Which one is punctuated correctly?",["“Come back!” said the cat.","“Come back! said the cat.”","“Come back” said the cat!","“come back!” said the cat."],"Speech starts with a capital. The ! goes inside the speech marks. ‘said the cat.’ stays outside."),
+ mc("loi-thoai","Which one is correct?",["“Where is this man?” asked the chief.","“Where is this man”? asked the chief.","“Where is this man.” asked the chief?"],"The ? goes INSIDE the closing speech marks."),
+ mc("loi-thoai","“Good day, my friend___” said Abunuwasi.\nWhat goes in the gap?",[", (comma)",". (full stop)","nothing"],"When ‘said …’ comes after the speech, use a comma, not a full stop, before the closing speech marks."),
+ mc("loi-thoai","A new character starts speaking. What should you do?",["Start a new line","Write it in capital letters","Leave out the speech marks"],"New speaker = new line. It makes a conversation easy to read."),
+ mc("loi-thoai","Which is the best word instead of ‘said’ for a SCARED character?",["whispered","laughed","cheered"],"Try: whispered, gasped, trembled, stammered."),
+ ord("loi-thoai","Build the sentence in the right order.",["“I know someone","who is not","afraid of you,”","said the","wise old woman."],"Speech first, then who said it."),
+ typ("loi-thoai","Add speech marks and punctuation. Type the whole sentence:\nYou've broken my pen said Abbie crossly",['"You\'ve broken my pen," said Abbie crossly.','"You\'ve broken my pen!" said Abbie crossly.'],"“You’ve broken my pen,” said Abbie crossly.  (A ! is fine too.)",true),
+ mc("thi-dong-tu","The Brave Baby is told mostly in which tense?",["Past","Present","Future"],"Story-tellers usually use the past tense: The chief WAS brave."),
+ mc("thi-dong-tu","The chief ___ brave and fierce.",["was","is","will be"],"Telling the story → past tense."),
+ mc("thi-dong-tu","“Wasso ___ braver than me,” said the chief.",["is","was","were"],"Inside speech, characters often talk in the PRESENT tense."),
+ mc("thi-dong-tu","“I ___ never give up!” said Lila.",["will","did","was"],"Future tense: will + verb."),
+ mc("thi-dong-tu","Past tense: Wasso ___ when the chief shouted. (cry)",["cried","cryed","crys"],"Consonant + y → change y to i, add -ed: cry → cried."),
+ mc("thi-dong-tu","Past tense: The chief ___ fast asleep. (fall)",["fell","falled","fallen"],"fall is irregular: fall → fell."),
+ ord("cau-truc-truyen","Put The Brave Baby (Student Book page 44) in order.",ORDER_BABY,"Opening → Build-up → Problem → Resolution → Ending.",true),
+ mc("nhan-vat-boi-canh","Which PAIR of adjectives describes the chief best?",["proud and courageous","weak and sad","dishonest and helpful"],"Look at the word box on page 45.")
+]}
+};
+
+/* ============ LANDS ============ */
+const LANDS=[
+ {id:"d1",day:1,icon:"🌾",name:"Eritrea Hills",stage:0,blurb:"The 5-stage story, characters, setting and inference.",steps:[
+   {k:"learn-d1",t:"Learn",d:"The 5 stages of a story + how detectives infer.",go:"learn-d1"},
+   {k:"read-selam",t:"Read & listen",d:"Selam and the Silver Spring.",go:"read-selam"},
+   {k:"q-d1",t:"Play",d:"Story Detectives, 13 questions.",go:"q-d1"}]},
+ {id:"d2",day:2,icon:"🏺",name:"Kenya Word Market",stage:1,blurb:"Homophones: to / two / too, their / there, know / no…",steps:[
+   {k:"learn-d2",t:"Learn",d:"Homophone table with memory tricks.",go:"learn-d2"},
+   {k:"q-d2",t:"Play",d:"Word Market, 16 questions.",go:"q-d2"},
+   {k:"profile",t:"Make",d:"A character profile card.",go:"profile"}]},
+ {id:"d3",day:3,icon:"🧺",name:"Old City Bazaar",stage:2,blurb:"Apostrophes for possession + quantifiers.",steps:[
+   {k:"learn-d3",t:"Learn",d:"Who owns it? + some / all / both / either.",go:"learn-d3"},
+   {k:"q-d3",t:"Play",d:"Apostrophe Bazaar, 16 questions.",go:"q-d3"},
+   {k:"campfire",t:"Speak",d:"Campfire story: retell Selam in 1 minute.",go:"campfire"}]},
+ {id:"d4",day:4,icon:"⛺",name:"Desert Tent",stage:3,blurb:"Direct speech punctuation + past, present, future.",steps:[
+   {k:"learn-d4",t:"Learn",d:"Speech mark rules + verb tenses.",go:"learn-d4"},
+   {k:"q-d4",t:"Play",d:"Tent Talk, 16 questions.",go:"q-d4"},
+   {k:"ending",t:"Make",d:"Write a new ending for The Brave Baby.",go:"ending"}]},
+ {id:"d5",day:5,icon:"🏮",name:"Lila’s Secret Door",stage:4,blurb:"Weave your own story, then face the Boss.",steps:[
+   {k:"lila",t:"Write",d:"Continue Lila’s story. The coach marks it out of 25.",go:"lila"},
+   {k:"boss",t:"Boss Battle",d:"15 mixed questions. Can you score 8/10?",go:"boss"}]}
+];
+function landDone(L){return L.steps.every(s=>S.done[s.k])}
+function landProgress(L){return L.steps.filter(s=>S.done[s.k]).length}
+
+/* ============ CARPET SVG ============ */
+function carpetSVG(){
+ const W=520,H=230,x0=40,w=440,y0=30,h=170,sw=w/5;
+ let s=`<svg class="carpet" viewBox="0 0 ${W} ${H}" role="img" aria-label="Your story carpet: ${LANDS.filter(landDone).length} of 5 stripes woven"><defs>`;
+ STAGE_COL.forEach((c,i)=>{s+=`<pattern id="pt${i}" width="22" height="22" patternUnits="userSpaceOnUse">
+  <rect width="22" height="22" fill="${c}"/>${["<path d='M11 2 L20 11 L11 20 L2 11Z' fill='rgba(255,255,255,.28)'/>","<circle cx='11' cy='11' r='5' fill='rgba(255,255,255,.3)'/>","<path d='M0 11 L11 0 L22 11 L11 22Z' fill='none' stroke='rgba(255,255,255,.35)' stroke-width='2'/>","<path d='M11 4 L13 9 L18 11 L13 13 L11 18 L9 13 L4 11 L9 9Z' fill='rgba(255,255,255,.32)'/>","<rect x='6' y='6' width='10' height='10' fill='none' stroke='rgba(255,255,255,.35)' stroke-width='2'/>"][i]}</pattern>`});
+ s+=`</defs>`;
+ for(let i=0;i<10;i++){const yy=y0+8+i*(h-16)/9;s+=`<line x1="${x0-22}" y1="${yy}" x2="${x0}" y2="${yy}" stroke="#f6b73c" stroke-width="2.5" stroke-linecap="round"/><line x1="${x0+w}" y1="${yy}" x2="${x0+w+22}" y2="${yy}" stroke="#f6b73c" stroke-width="2.5" stroke-linecap="round"/>`}
+ s+=`<rect x="${x0-4}" y="${y0-4}" width="${w+8}" height="${h+8}" rx="10" fill="#f6b73c"/>`;
+ LANDS.forEach((L,i)=>{const x=x0+i*sw,dn=landDone(L),pr=landProgress(L)/L.steps.length;
+  s+=`<rect x="${x}" y="${y0}" width="${sw}" height="${h}" fill="${dn?`url(#pt${i})`:"#2a2358"}"/>`;
+  if(!dn){s+=`<rect x="${x}" y="${y0+h*(1-pr)}" width="${sw}" height="${h*pr}" fill="url(#pt${i})" opacity=".55"/>`;for(let k=1;k<6;k++)s+=`<line x1="${x+k*sw/6}" y1="${y0}" x2="${x+k*sw/6}" y2="${y0+h}" stroke="#4a3f8f" stroke-dasharray="3 5"/>`}
+  s+=`<text x="${x+sw/2}" y="${y0+h+22}" text-anchor="middle" font-family="Baloo 2, sans-serif" font-size="14" font-weight="800" fill="${dn?"#f1edff":"#bdb4e6"}">${STAGES[i][0]}</text>`;
+  s+=`<text x="${x+sw/2}" y="${y0+h/2+10}" text-anchor="middle" font-size="28">${dn?"✓":L.icon}</text>`});
+ s+=`<rect x="${x0}" y="${y0}" width="${w}" height="${h}" fill="none" stroke="#110d2b" stroke-width="3" rx="2"/></svg>`;
+ return s;
+}
+
+/* ============ HOME ============ */
+const PLAN=[["Day 1","Eritrea Hills: learn the 5 stages, read Selam’s story (listen too), play Story Detectives. ~18 min"],["Day 2","Word Market: homophones game, then make a character profile card. ~18 min"],["Day 3","Old City Bazaar: apostrophes + quantifiers game, then a 1-minute campfire story. ~18 min"],["Day 4","Desert Tent: speech marks + tenses game, then write a new ending for The Brave Baby. ~20 min"],["Day 5","Lila’s Secret Door: plan and write Lila’s story (coach marks it), then the Boss Battle. ~20 min + Boss"]];
+function home(){
+ const next=LANDS.find(L=>!landDone(L));
+ app.innerHTML=`
+ <header class="hero">
+  <div class="eyebrow">Unit 4 · Other People, Other Places</div>
+  <h1>Magic Carpet <span>Story Quest</span></h1>
+  <p>Fly to a new land each day. Every land weaves one stripe of your story carpet.</p>
+ </header>
+ <div class="carpet-box">${carpetSVG()}
+  <div class="legend"><span>Five stripes = the <b>five stages</b> of a story</span><span class="threads" id="threads">🧵 ${S.threads} golden threads</span></div>
+ </div>
+ ${next?`<div class="today"><span class="big">${next.icon}</span><div><div class="land-meta" style="font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--saffron);font-weight:700">Today’s flight · Day ${next.day}</div><h3>${next.name}</h3><p>${next.blurb}</p></div><button class="btn" data-go="${next.id}">Fly there →</button></div>`
+ :`<div class="today"><span class="big">🏆</span><div><h3>Your carpet is complete!</h3><p>Try the Boss Battle again to beat your best score.</p></div><button class="btn" data-go="boss">Boss Battle →</button></div>`}
+ <h2 class="section-h">The five lands</h2>
+ <p class="sub">One land a day, about 15–20 minutes. Golden thread for every answer right the first time.</p>
+ <div class="lands">${LANDS.map(L=>`<button class="land ${landDone(L)?"done":""}" data-go="${L.id}"><span class="ic">${L.icon}</span><span><span class="meta">Day ${L.day} · Stripe ${L.stage+1}: ${STAGES[L.stage][0]}</span><h3>${L.name}</h3><p>${L.blurb}</p></span><span class="st">${landDone(L)?"Woven ✓":landProgress(L)+"/"+L.steps.length+" steps"}</span></button>`).join("")}</div>
+ <h2 class="section-h">Any time</h2>
+ <div class="extras">
+  <button class="land" data-go="boss"><span class="ic">🐉</span><span><span class="meta">Test practice</span><h3>Boss Battle</h3><p>15 mixed questions from all lands.</p></span><span class="st">${S.best.boss!=null?"Best "+bestBoss()+"/10":""}</span></button>
+  <button class="land" data-go="campfire"><span class="ic">🔥</span><span><span class="meta">Speaking</span><h3>Campfire Stories</h3><p>4 one-minute storytelling challenges.</p></span><span class="st">${Object.keys(S.speak).length}/4</span></button>
+ </div>
+ <h2 class="section-h">5-day flight plan</h2>
+ <div class="plan">${PLAN.map(d=>`<div class="day"><b>${d[0]}</b><span>${d[1]}</span></div>`).join("")}</div>
+ <h2 class="section-h">Góc phụ huynh</h2>
+ ${parentBox()}`;
+ wire();
+}
+function bestBoss(){const L=S.log.filter(r=>r.id==="u4-boss");return L.length?Math.max(...L.map(r=>r.score/r.max*10)).toFixed(1):"0"}
+function wire(){app.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));app.querySelectorAll("[data-back]").forEach(b=>b.onclick=()=>go(b.dataset.back));const cp=$("#copyCodes");if(cp)cp.onclick=()=>copyText($("#codes").textContent,cp)}
+function threads(n){S.threads+=n;save();const t=$("#threads");if(t)t.textContent="🧵 "+S.threads+" golden threads"}
+
+const SKILL_VN={"cau-truc-truyen":"Cấu trúc truyện 5 phần","suy-luan":"Suy luận (inference)","nhan-vat-boi-canh":"Nhân vật & bối cảnh","doc-hieu":"Đọc hiểu","dong-am":"Từ đồng âm (homophones)","chinh-ta":"Chính tả","so-huu":"Dấu ’ sở hữu","luong-tu":"Từ chỉ số lượng (quantifiers)","loi-thoai":"Lời thoại trực tiếp (speech marks)","thi-dong-tu":"Thì động từ","viet-truyen":"Viết truyện","simile":"So sánh (simile)","noi":"Nói (Speaking)"};
+function parentBox(){
+ const per={};S.log.forEach(r=>Object.entries(r.per).forEach(([k,v])=>{per[k]=per[k]||[0,0];per[k][0]+=v[0];per[k][1]+=v[1]}));
+ const rows=Object.entries(per).map(([k,v])=>[k,v,Math.round(100*v[0]/Math.max(1,v[1]))]).sort((a,b)=>a[2]-b[2]);
+ const codes=S.log.slice(-15).map(r=>r.code).join("\n");
+ return `<div class="vnbox">
+ <h3>Cách dùng (Sếp đọc 1 phút)</h3>
+ <ul>
+  <li>Mỗi ngày bấm ô <b>“Today’s flight”</b>, làm lần lượt các bước trong vùng đất đó (15–20 phút). Xong hết bước thì một sọc thảm được dệt màu.</li>
+  <li>Bước <b>Learn</b>: Sếp đọc cùng con, nhất là ô vàng tiếng Việt. Bước <b>Read</b>: bấm 🔊 cho con nghe trước, rồi con tự đọc to.</li>
+  <li>Sai không bị phạt: con được thử lại. Chỉ câu <b>đúng ngay lần đầu</b> mới được sợi chỉ vàng và được tính vào bảng dưới.</li>
+  <li>Phần viết (ngày 2, 4, 5): con tự gõ hoặc viết tay vào vở rồi Sếp gõ lại. Coach chấm tự động, Sếp đọc lại cùng con theo kiểu “2 sao 1 điều ước”. Đừng viết hộ con.</li>
+  <li>Ngày 3 (Campfire): Sếp nghe con kể 1 phút rồi chấm sao 5 tiêu chí.</li>
+ </ul>
+ <h3 style="margin-top:12px">Hai lỗi cần soi kỹ tuần này</h3>
+ <ul>
+  <li><b>Dấu ’ sở hữu:</b> trong BTVN con viết “The citys’s street’s”, “apple’s”. Quy tắc: chỉ <i>người/vật sở hữu</i> mới có ’s; danh từ số nhiều bình thường <b>không</b> có dấu ’. Ngày 3 luyện kỹ phần này.</li>
+  <li><b>know / no / now:</b> con chọn đúng khi khoanh, nhưng tự viết lại thành “I don’t <b>now</b> where…”. Ngày 2 có câu bắt con gõ lại cả câu.</li>
+ </ul>
+ <h3 style="margin-top:12px">Hoạt động 5 phút với đồ trong nhà</h3>
+ <ul>
+  <li><b>Thẻ sở hữu:</b> con viết giấy nhớ dán lên đồ: “Mum’s phone”, “Dad’s keys”, “the cat’s bowl”, “the children’s shoes”.</li>
+  <li><b>Kể chuyện 5 ngón tay:</b> mỗi ngón là 1 phần (Opening → Ending), con kể lại một bộ phim vừa xem.</li>
+ </ul>
+ ${rows.length?`<div class="tbl"><table><tr><th>Kỹ năng</th><th>Đúng ngay lần đầu</th><th>Mức</th></tr>${rows.map(([k,v,p])=>`<tr><td>${SKILL_VN[k]||k}</td><td>${v[0]}/${v[1]} (${p}%)</td><td>${p<60?"🔴":p<85?"🟡":"🟢"}</td></tr>`).join("")}</table></div>
+ <p style="font-size:14px;margin:10px 0 4px">Mã kết quả (dán vào <b>ket-qua/ma-ipad.txt</b> rồi nhắn Claude “cập nhật kết quả”):</p>
+ <div class="code" id="codes">${esc(codes)}</div><div class="row" style="margin-top:8px"><button class="btn alt" id="copyCodes">Sao chép mã</button></div>`
+ :`<p style="font-size:15px;color:#7a5a3a">Chưa có kết quả. Sau khi con chơi, bảng điểm mạnh/yếu theo kỹ năng sẽ hiện ở đây.</p>`}
+ </div>`;
+}
+function copyText(t,btn){const sel=()=>{const r=document.createRange();r.selectNodeContents($("#codes"));const s=getSelection();s.removeAllRanges();s.addRange(r);btn.textContent="Đã bôi đen, bấm Copy"};try{navigator.clipboard.writeText(t).then(()=>btn.textContent="Đã sao chép ✓",sel)}catch(e){sel()}}
+
+/* ============ ROUTER ============ */
+function topBar(title,back){return `<div class="topbar"><button class="back" data-back="${back||"home"}">← ${back&&back!=="home"?"Back":"Map"}</button><span class="crumb">${esc(title)}</span></div>`}
+let current="home";
+function go(where){
+ try{window.speechSynthesis&&speechSynthesis.cancel()}catch(e){}
+ clearInterval(timerId);
+ current=where;window.scrollTo({top:0});
+ if(where==="home")return home();
+ const L=LANDS.find(l=>l.id===where);if(L)return land(L);
+ if(where.startsWith("learn-"))return learn(where);
+ if(where==="read-selam")return readStory();
+ if(QUIZ[where])return startQuiz(where);
+ if(where==="boss")return boss();
+ if(where==="profile")return profile();
+ if(where==="campfire")return campfire();
+ if(where==="ending")return writer("ending");
+ if(where==="lila")return writer("lila");
+ home();
+}
+function landOf(k){return LANDS.find(L=>L.steps.some(s=>s.k===k||s.go===k))}
+function backFor(k){const L=landOf(k);return L?L.id:"home"}
+
+function land(L){
+ app.innerHTML=topBar(`Day ${L.day} · ${L.name}`)+`
+ <div class="today" style="margin-top:0;border-color:${STAGE_COL[L.stage]}"><span class="big">${L.icon}</span><div><div style="font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--saffron);font-weight:700">Stripe ${L.stage+1}: ${STAGES[L.stage][0]}</div><h3>${L.name}</h3><p>${L.blurb}</p></div></div>
+ <h2 class="section-h">Your steps</h2>
+ <div class="steps">${L.steps.map((s,i)=>`<button class="step ${S.done[s.k]?"done":""}" data-go="${s.go}"><span class="n">${S.done[s.k]?"✓":i+1}</span><span><h3>${s.t}</h3><p>${s.d}</p></span><span class="st">${S.best[stepId(s.k)]!=null?"Best "+S.best[stepId(s.k)]+"%":""}</span></button>`).join("")}</div>
+ ${landDone(L)?`<p class="sub" style="margin-top:16px;color:var(--teal)">Stripe woven! Fly back to the map to see your carpet.</p>`:""}`;
+ wire();
+}
+function stepId(k){return {"q-d1":"u4-d1","q-d2":"u4-d2","q-d3":"u4-d3","q-d4":"u4-d4","boss":"u4-boss","lila":"u4-story","ending":"u4-ending"}[k]||k}
+
+/* ============ LEARN ============ */
+const LEARN={
+"learn-d1":`
+ <div class="card"><h3>The 5-stage story 🧵</h3>
+  <p>Many stories follow five stages. Each stage is one stripe of your carpet.</p>
+  <div class="stage-list">${STAGES.map((s,i)=>`<div class="stage"><i style="background:${STAGE_COL[i]}">${i+1}</i><span><b>${s[0]}</b>: ${s[1]} <small style="color:#7a5a3a">(Student Book: ${s[2]})</small></span></div>`).join("")}</div>
+  <div class="vn">🇻🇳 Mở đầu (giới thiệu nhân vật, bối cảnh) → Diễn biến → Vấn đề/cao trào → Giải quyết → Kết thúc. Bảng tuần 1 gọi là Opening/Build-up/Problem/Resolution/Ending; sách Collins gọi là Introduction/Problem-Build-up/Climax-Conflict/Resolution/Conclusion. Cùng một ý.</div>
+ </div>
+ <div class="card"><h3>Characters, setting, inference 🔍</h3>
+  <table><tr><th>Word</th><th>Meaning</th></tr>
+  <tr><td><b>traditional story</b></td><td>A story passed down through generations.</td></tr>
+  <tr><td><b>character</b></td><td>A person or animal in a story.</td></tr>
+  <tr><td><b>setting</b></td><td>Where and when a story takes place.</td></tr>
+  <tr><td><b>inference</b></td><td>Using clues to work out something that is not directly stated.</td></tr></table>
+  <p style="margin-top:10px"><b>Detective formula:</b> <span class="sp">clue in the text</span> + <span class="sp">what I already know</span> = <b>inference</b></p>
+  <p>Example: “Abunuwasi was as cunning as a jackal.” I know jackals are sneaky and clever, so I infer that Abunuwasi is a clever trickster.</p>
+  <div class="vn">🇻🇳 Suy luận = dùng manh mối trong bài để đoán điều bài không nói thẳng. Khi trả lời, con luôn kèm “I know because the text says…”.</div>
+ </div>`,
+"learn-d2":`
+ <div class="card"><h3>Homophones 🎵</h3>
+  <p>Words that <b>sound the same</b> but have <b>different meanings or spellings</b>.</p>
+  <div class="tbl"><table><tr><th>Word</th><th>Meaning</th><th>Memory trick</th></tr>
+  <tr><td><b>to</b> / <b>two</b> / <b>too</b></td><td>towards / 2 / also, very</td><td>too has <b>too</b> many o’s!</td></tr>
+  <tr><td><b>their</b> / <b>there</b></td><td>belongs to them / a place</td><td>t<b>here</b> has “here” inside: places!</td></tr>
+  <tr><td><b>know</b> / <b>no</b> / now</td><td>biết / không / bây giờ</td><td>I <b>k</b>now = I have <b>k</b>nowledge.</td></tr>
+  <tr><td><b>knew</b> / <b>new</b></td><td>past of know / mới</td><td>knew = know in the past.</td></tr>
+  <tr><td><b>hear</b> / <b>here</b></td><td>listen / this place</td><td>You h<b>ear</b> with your <b>ear</b>.</td></tr>
+  <tr><td><b>flour</b> / <b>flower</b></td><td>bột / bông hoa</td><td>A flo<b>w</b>er grows in the <b>w</b>ild.</td></tr>
+  <tr><td><b>scene</b> / <b>seen</b></td><td>a view / past of see</td><td>I have s<b>ee</b>n it with my <b>e</b>y<b>e</b>s.</td></tr>
+  <tr><td><b>sea</b> / <b>see</b></td><td>biển / nhìn</td><td>You s<b>ee</b> with two <b>e</b>yes.</td></tr></table></div>
+  <div class="vn">🇻🇳 Lỗi của con: khoanh đúng “know” nhưng tự viết thành “I don’t <b>now</b> where…”. Khi kiểm bài, con đọc to và hỏi: “Từ này nghĩa là <i>biết</i> hay <i>bây giờ</i>?”</div>
+ </div>
+ <div class="card"><h3>Character profiles ✍️</h3>
+  <p>A character profile describes a character: looks, personality, what they like, what they say. Use <b>descriptive language</b> and give a <b>clue</b> for each idea.</p>
+  <p>Example: <i>Selam is clever and calm. I know she is clever because she tricks Tesfay with a song. Her mind is as quick as a desert fox.</i></p>
+ </div>`,
+"learn-d3":`
+ <div class="card"><h3>Apostrophes for possession 🧺</h3>
+  <p>An apostrophe shows <b>who owns something</b>. Put it on the <b>owner</b>, never on the thing.</p>
+  <div class="tbl"><table><tr><th>Owner</th><th>Rule</th><th>Example</th></tr>
+  <tr><td>One owner</td><td>add <b>’s</b></td><td>the farmer<span class="mk">’s</span> fields · the girl<span class="mk">’s</span> bicycle · the city<span class="mk">’s</span> streets</td></tr>
+  <tr><td>Many owners ending in s</td><td>add <b>’</b> after the s</td><td>the goats<span class="mk">’</span> food · the girls<span class="mk">’</span> bedroom</td></tr>
+  <tr><td>Many owners NOT ending in s</td><td>add <b>’s</b></td><td>the children<span class="mk">’s</span> toys · the men<span class="mk">’s</span> boots</td></tr></table></div>
+  <p><b>Never</b> use an apostrophe just to make a plural: <span class="ok-ex">three apples</span> ✓ <span class="no-ex">three apple’s</span></p>
+  <p><span class="ok-ex">The city’s streets were narrow.</span> ✓ &nbsp; <span class="no-ex">The citys’s street’s were narrow.</span></p>
+  <p>Apostrophes also show <b>missing letters</b>: don’t = do not, can’t = cannot.</p>
+  <div class="vn">🇻🇳 Hỏi con: “Ai là chủ?” → dấu ’ đặt sau chủ. Thứ được sở hữu (streets, apples) chỉ là số nhiều, không có dấu ’.</div>
+ </div>
+ <div class="card"><h3>Quantifiers 🔢</h3>
+  <p>Quantifiers tell us <b>how much</b> or <b>how many</b>.</p>
+  <div class="tbl"><table><tr><th>Word</th><th>Meaning</th><th>Example</th></tr>
+  <tr><td><b>all</b></td><td>every one</td><td>All of the wells dried up.</td></tr>
+  <tr><td><b>some</b></td><td>a few, not all</td><td>Some families walked for hours.</td></tr>
+  <tr><td><b>both</b></td><td>the two together</td><td>Both of Selam’s oxen grew thin.</td></tr>
+  <tr><td><b>either</b></td><td>one of two</td><td>You can have either the red purse or the blue one.</td></tr>
+  <tr><td><b>neither</b></td><td>not one and not the other</td><td>Neither of them could stay awake.</td></tr>
+  <tr><td><b>none / nobody</b></td><td>not any</td><td>Nobody had that much money.</td></tr></table></div>
+ </div>`,
+"learn-d4":`
+ <div class="card"><h3>Direct speech: 4 golden rules 💬</h3>
+  <p><span class="mk">“</span>Come back!<span class="mk">”</span> said the cat.</p>
+  <ol>
+   <li>Put <b>speech marks</b> around the exact words spoken.</li>
+   <li>Speech starts with a <b>capital letter</b>.</li>
+   <li>Put the <b>, ! or ?</b> <b>inside</b> the closing speech marks.<br>
+   <span class="ok-ex">“Good day, my friend<span class="mk">,</span>” said Abunuwasi.</span> (comma, because “said…” comes next)<br>
+   <span class="ok-ex">“Where is this man<span class="mk">?</span>” asked the chief.</span></li>
+   <li><b>New speaker, new line.</b></li>
+  </ol>
+  <p>Instead of <i>said</i>: cried, whispered, shouted, gasped, grumbled, laughed, replied, asked.</p>
+  <div class="vn">🇻🇳 Lời nói trực tiếp = đúng nguyên văn lời nhân vật, đặt trong ngoặc kép. Dấu phẩy/chấm than/chấm hỏi nằm <b>bên trong</b> ngoặc. Đổi người nói thì xuống dòng.</div>
+ </div>
+ <div class="card"><h3>Past, present and future ⏳</h3>
+  <p>Story-tellers usually use the <b>past tense</b>: The chief <u>was</u> brave and fierce, so many people <u>were</u> afraid of him.</p>
+  <p>But direct speech is often in the <b>present</b>: “Wasso <u>is</u> braver than me.”</p>
+  <p>Or the <b>future</b>: “I <u>will</u> never give up!”</p>
+  <div class="tbl"><table><tr><th>Verb</th><th>Past</th><th>Verb</th><th>Past</th></tr>
+  <tr><td>cry</td><td>cried</td><td>fall</td><td>fell</td></tr>
+  <tr><td>dance</td><td>danced</td><td>see</td><td>saw</td></tr>
+  <tr><td>smile</td><td>smiled</td><td>find</td><td>found</td></tr>
+  <tr><td>shout</td><td>shouted</td><td>sing</td><td>sang</td></tr></table></div>
+ </div>`
+};
+function learn(k){
+ app.innerHTML=topBar("Learn",backFor(k))+LEARN[k]+`<div class="row"><button class="btn" id="gotIt">I’ve got it ✓</button></div>`;
+ wire();$("#gotIt").onclick=()=>{markDone(k);threads(2);yay();go(backFor(k))};
+}
+
+/* ============ READ ============ */
+function storyHTML(withTags){return `<div class="story ${withTags?"":"hide-tags"}" id="storyBox"><h3>${SELAM.title}</h3><div class="by">${SELAM.by}</div>
+ ${SELAM.paras.map(([st,t])=>`<p><span class="tag" style="background:${STAGE_COL[st]}">${STAGES[st][0]}</span>${esc(t).replace(/&quot;/g,'"')}</p>`).join("")}</div>`}
+function readStory(){
+ app.innerHTML=topBar("Read & listen","d1")+`
+ <div class="row" style="margin-bottom:12px"><button class="btn alt" id="listen">🔊 Listen</button><button class="btn alt" id="tags">Show the 5 stages</button></div>
+ ${storyHTML(false)}
+ <div class="tip" style="margin-top:14px">While you read, look for: <b>Where?</b> (setting) · <b>Who?</b> (characters) · <b>What are they like?</b> (clues)</div>
+ <div class="row" style="margin-top:14px"><button class="btn" id="readDone">I’ve read it ✓</button></div>`;
+ wire();
+ $("#listen").onclick=e=>speak(SELAM.title+". "+SELAM.paras.map(p=>p[1]).join(" "),e.currentTarget);
+ $("#tags").onclick=e=>{const b=$("#storyBox");b.classList.toggle("hide-tags");e.currentTarget.textContent=b.classList.contains("hide-tags")?"Show the 5 stages":"Hide the stages"};
+ $("#readDone").onclick=()=>{markDone("read-selam");threads(2);yay();go("d1")};
+}
+
+/* ============ QUIZ ENGINE ============ */
+let Q=null;
+function norm(s,strict){s=String(s).replace(/[“”„]/g,'"').replace(/[‘’`]/g,"'").replace(/\s+/g," ").replace(/\s+([,.!?])/g,"$1").trim();return strict?s:s.toLowerCase().replace(/[.!?]$/,"")}
+function startQuiz(id,custom){
+ const src=custom||QUIZ[id];
+ Q={id,src,qs:src.qs.map(q=>q.type==="mc"?Object.assign({},q,{order:shuffle(q.choices.map((c,i)=>i))}):q),i:0,score:0,per:{},tries:0,picked:[]};
+ renderQ();
+}
+function renderQ(){
+ const q=Q.qs[Q.i],n=Q.qs.length;Q.tries=0;Q.picked=[];
+ const back=Q.id==="boss"?"home":backFor(Q.id);
+ let body="";
+ if(q.type==="mc")body=`<div class="choices">${q.order.map(ci=>`<button class="choice" data-ci="${ci}">${esc(q.choices[ci])}</button>`).join("")}</div>`;
+ if(q.type==="order"){Q.pool=shuffle(q.items.map((t,i)=>i));body=`<div class="answer-row ${q.stack?"stack":""}" id="ans"></div><div class="chips ${q.stack?"stack":""}" id="pool"></div><div class="row" style="margin-top:12px"><button class="btn" id="chk" disabled>Check</button><button class="btn alt" id="clr">Clear</button></div>`}
+ if(q.type==="type")body=`<input class="tin" id="tin" autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="false" placeholder="Type here…"><div class="row" style="margin-top:12px"><button class="btn" id="chk">Check</button></div>`;
+ app.innerHTML=topBar(Q.src.title,back)+`
+ ${Q.i===0&&Q.src.intro?`<p class="sub">${Q.src.intro}</p>`:""}
+ ${Q.src.story?`<details style="margin-bottom:12px"><summary class="btn alt" style="display:inline-block;list-style:none">📜 Open the story</summary><div style="margin-top:10px">${storyHTML(false)}</div></details>`:""}
+ <div class="qwrap"><div class="qhead"><span>Question ${Q.i+1} of ${n}</span><span>🧵 ${Q.score} first-try</span></div>
+ <div class="prog"><i style="width:${Q.i/n*100}%"></i></div>
+ <p class="q">${esc(q.q).replace(/\n/g,"<br>")}</p>
+ ${q.say||q.type==="mc"&&q.skill==="dong-am"?`<p style="margin:-6px 0 12px"><button class="say" id="say">🔊 Listen</button></p>`:""}
+ ${body}<div id="fb"></div></div>`;
+ wire();
+ const sy=$("#say");if(sy)sy.onclick=()=>speak(q.say||q.q.replace(/_+/,q.choices[0]));
+ if(q.type==="mc")app.querySelectorAll(".choice").forEach(b=>b.onclick=()=>answerMC(b,+b.dataset.ci));
+ if(q.type==="order")drawOrder();
+ if(q.type==="type"){const t=$("#tin");t.focus();t.onkeydown=e=>{if(e.key==="Enter")checkType()};$("#chk").onclick=checkType}
+}
+function drawOrder(){
+ const q=Q.qs[Q.i];
+ $("#ans").innerHTML=Q.picked.map((ix,k)=>`<button class="chip" data-k="${k}">${q.stack?(k+1)+". ":""}${esc(q.items[ix])}</button>`).join("");
+ $("#pool").innerHTML=Q.pool.filter(ix=>!Q.picked.includes(ix)).map(ix=>`<button class="chip" data-ix="${ix}">${esc(q.items[ix])}</button>`).join("");
+ app.querySelectorAll("#pool .chip").forEach(b=>b.onclick=()=>{Q.picked.push(+b.dataset.ix);drawOrder()});
+ app.querySelectorAll("#ans .chip").forEach(b=>b.onclick=()=>{Q.picked.splice(+b.dataset.k,1);drawOrder()});
+ $("#chk").disabled=Q.picked.length!==q.items.length;
+ $("#chk").onclick=()=>{const ok=Q.picked.every((v,i)=>v===i);if(ok)return right();Q.tries++;oops();
+  const firstWrong=Q.picked.findIndex((v,i)=>v!==i);
+  if(Q.tries>=2){Q.picked=q.items.map((t,i)=>i);drawOrder();return reveal("Here is the right order. Read it once out loud.")}
+  feedback(false,`Not quite. Number ${firstWrong+1} is in the wrong place. ${q.tip}`)};
+ $("#clr").onclick=()=>{Q.picked=[];drawOrder()};
+}
+function answerMC(btn,ci){
+ const q=Q.qs[Q.i];if(btn.classList.contains("wrong"))return;
+ if(ci===0){btn.classList.add("right");return right()}
+ btn.classList.add("wrong");Q.tries++;oops();
+ if(Q.tries>=2){app.querySelector(`.choice[data-ci="0"]`).classList.add("right");return reveal(q.tip)}
+ feedback(false,"Try again! 💡 "+q.tip);
+}
+function checkType(){
+ const q=Q.qs[Q.i],v=$("#tin").value;if(!v.trim())return;
+ const ok=q.answers.some(a=>norm(a,q.strict)===norm(v,q.strict));
+ if(ok)return right();
+ Q.tries++;oops();
+ let hint=q.tip;
+ if(q.strict&&q.answers.some(a=>norm(a,false)===norm(v,false)))hint="Almost! Check your capital letters, apostrophes and the full stop. "+q.tip;
+ if(Q.tries>=2)return reveal(`Answer: <b>${esc(q.answers[0])}</b>. Type it once more to remember it, then press Next.`,true);
+ feedback(false,"Try again! 💡 "+hint);
+}
+function feedback(good,html){$("#fb").innerHTML=`<div class="tip ${good?"good":""}">${html}</div>`}
+function right(){
+ const q=Q.qs[Q.i];const first=Q.tries===0;
+ Q.per[q.skill]=Q.per[q.skill]||[0,0];Q.per[q.skill][1]++;if(first){Q.per[q.skill][0]++;Q.score++;threads(1)}
+ yay();
+ feedback(true,(first?"⭐ Brilliant! First try! ":"✓ Yes! ")+esc(q.tip).replace(/&lt;b&gt;|&lt;\/b&gt;/g,""));
+ nextBtn();
+}
+function reveal(html,keepTyping){
+ const q=Q.qs[Q.i];Q.per[q.skill]=Q.per[q.skill]||[0,0];Q.per[q.skill][1]++;
+ feedback(false,"💡 "+html);
+ app.querySelectorAll(".choice").forEach(b=>b.disabled=true);
+ nextBtn();
+}
+function nextBtn(){
+ app.querySelectorAll(".choice").forEach(b=>b.disabled=true);
+ const c=$("#chk");if(c)c.disabled=true;
+ $("#fb").insertAdjacentHTML("beforeend",`<div class="row" style="margin-top:12px"><button class="btn" id="nx">${Q.i+1<Q.qs.length?"Next →":"See my result"}</button></div>`);
+ $("#nx").onclick=()=>{Q.i++;Q.i<Q.qs.length?renderQ():finishQuiz()};$("#nx").focus();
+}
+function finishQuiz(){
+ const n=Q.qs.length,sc=Q.score,pct=Math.round(100*sc/n);
+ const id=Q.id==="boss"?"u4-boss":stepId(Q.id);
+ const c=logResult(id,sc,n,Q.per);
+ if(pct>=60&&Q.id!=="boss")markDone(Q.id);
+ if(Q.id==="boss")markDone("boss");
+ if(pct>=60)burst();
+ const weak=Object.entries(Q.per).filter(([k,v])=>v[0]<v[1]).map(([k])=>SKILL_VN[k]||k);
+ const back=Q.id==="boss"?"home":backFor(Q.id);
+ app.innerHTML=topBar(Q.src.title,back)+`<div class="qwrap result">
+  <div class="big">${Q.id==="boss"?(sc/n*10).toFixed(1)+"/10":sc+"/"+n}</div>
+  <h2>${pct>=90?"Superstar storyteller! 🌟":pct>=70?"Great flying! 🧞":pct>=60?"Stripe woven! Keep going 💪":"Good try! Let’s fly this one again 🔁"}</h2>
+  <p class="sub">${pct>=60?(Q.id==="boss"?"":"This step is done. Your carpet stripe is growing."):"Score 60% or more to finish this step. Read the Learn card again first."}</p>
+  ${weak.length?`<p class="sub">Practise again: ${weak.join(" · ")}</p>`:""}
+  <div class="row" style="justify-content:center"><button class="btn" data-go="${back}">Back</button><button class="btn alt" id="again">Play again</button></div>
+  <details style="width:100%"><summary class="sub" style="cursor:pointer">Mã kết quả cho bố mẹ</summary><div class="code">${esc(c)}</div></details>
+ </div>`;
+ wire();$("#again").onclick=()=>Q.id==="boss"?boss():startQuiz(Q.id);
+}
+function boss(){
+ const pick=[];["q-d1","q-d2","q-d3","q-d4"].forEach(k=>shuffle(QUIZ[k].qs).slice(0,4).forEach(q=>pick.push(q)));
+ const extra=shuffle(["q-d1","q-d2","q-d3","q-d4"].flatMap(k=>QUIZ[k].qs).filter(q=>!pick.includes(q)))[0];
+ const qs=shuffle(pick).slice(0,14).concat([extra]);
+ startQuiz("boss",{title:"🐉 Boss Battle",intro:"15 questions from all five lands. Answer first time to beat the dragon! Target: 8/10.",qs});
+}
+
+/* ============ PROFILE ============ */
+const CHARS=["Selam","Tesfay","Abunuwasi","the merchant","the chief","Wasso","the wise old woman","Lila","My own character"];
+const PERSON=["clever","cunning","brave","calm","kind","generous","greedy","fierce","proud","patient","curious","stubborn","wise","cheerful","courageous","sneaky"];
+function profile(){
+ const d=S.drafts.profile||{};
+ app.innerHTML=topBar("Character profile","d2")+`
+ <p class="sub">Pick a character from our stories (or invent one!). Fill the boxes in full sentences, then press <b>Make my card</b>.</p>
+ <div class="grid2">
+  <label class="fl">Character<select class="field" id="pf-who">${CHARS.map(c=>`<option ${d.who===c?"selected":""}>${c}</option>`).join("")}</select></label>
+  <label class="fl">Name (if it’s your own character)<input class="field" id="pf-name" value="${esc(d.name||"")}" placeholder="e.g. Amani"></label>
+ </div>
+ <div class="helpers" style="margin-block:12px"><details><summary>Personality words</summary><div class="wordbank">${PERSON.map(w=>`<button data-w="${w}">${w}</button>`).join("")}</div></details></div>
+ <div class="grid2">
+  <label class="fl">🏜️ Setting: where do they live?<textarea id="pf-set" placeholder="Selam lives high in the hills of Eritrea, where…">${esc(d.set||"")}</textarea></label>
+  <label class="fl">👀 Looks: what do they look like?<textarea id="pf-look" placeholder="She is small, with…">${esc(d.look||"")}</textarea></label>
+  <label class="fl">💭 Personality: two describing words<textarea id="pf-pers" placeholder="Selam is clever and calm.">${esc(d.pers||"")}</textarea></label>
+  <label class="fl">🔍 Clue: “I know because…”<textarea id="pf-clue" placeholder="I know she is clever because she…">${esc(d.clue||"")}</textarea></label>
+  <label class="fl">✨ A simile: as ___ as a ___<textarea id="pf-sim" placeholder="Her mind is as quick as a desert fox.">${esc(d.sim||"")}</textarea></label>
+  <label class="fl">💬 Something they say (use speech marks!)<textarea id="pf-say" placeholder="“We are singing to the spring,” said Selam calmly.">${esc(d.say||"")}</textarea></label>
+ </div>
+ <div class="row" style="margin-top:14px"><button class="btn" id="mk">Make my card</button></div>
+ <div id="out" style="margin-top:16px"></div>`;
+ wire();
+ let last=null;app.querySelectorAll("textarea").forEach(t=>t.onfocus=()=>last=t);
+ app.querySelectorAll("[data-w]").forEach(b=>b.onclick=()=>{const t=last||$("#pf-pers");t.value+=(t.value&&!/\s$/.test(t.value)?" ":"")+b.dataset.w;t.focus()});
+ const F=["who","name","set","look","pers","clue","sim","say"];
+ const read=()=>{const o={};F.forEach(f=>o[f]=$("#pf-"+f).value);return o};
+ app.querySelectorAll("textarea,input,select").forEach(el=>el.oninput=()=>{S.drafts.profile=read();save()});
+ $("#mk").onclick=()=>{
+  const o=read();S.drafts.profile=o;save();
+  const name=o.who==="My own character"?(o.name||"My character"):o.who.replace(/^the /,"The ");
+  const all=[o.set,o.look,o.pers,o.clue,o.sim,o.say].join(" ");
+  const persOK=PERSON.filter(w=>new RegExp("\\b"+w+"\\b","i").test(o.pers)).length>=2||o.pers.trim().split(/\s+/).length>=4;
+  const checks=[
+   [!!o.set.trim()&&!!o.look.trim(),"Setting and looks are filled in"],
+   [persOK,"Two describing words for personality"],
+   [/\bbecause\b/i.test(o.clue),"Clue sentence uses “because”"],
+   [/\bas\s+\w+\s+as\s+(a|an|the)?\s*\w+/i.test(o.sim),"Simile uses as ___ as a ___"],
+   [/["“][^"”]+[,!?.]["”]/.test(o.say),"Speech marks with , ! or ? inside"],
+   [capErrors(all).length===0,"Every sentence starts with a capital letter"]
+  ];
+  const sc=checks.filter(c=>c[0]).length;
+  const homo=homoErrors(all),apos=aposErrors(all);
+  logResult("u4-profile",sc,6,{"nhan-vat-boi-canh":[checks[0][0]&&checks[1][0]?1:0,1],"suy-luan":[checks[2][0]?1:0,1],"simile":[checks[3][0]?1:0,1],"loi-thoai":[checks[4][0]?1:0,1]});
+  if(sc>=4){markDone("profile");burst();threads(3);yay()}else oops();
+  $("#out").innerHTML=`<div class="profile"><h3>${esc(name)}</h3><div style="color:#7a5a3a">Character profile by Peter</div>
+   <dl><dt>Setting</dt><dd>${esc(o.set)}</dd><dt>Looks</dt><dd>${esc(o.look)}</dd><dt>Personality</dt><dd>${esc(o.pers)}</dd><dt>Clue</dt><dd>${esc(o.clue)}</dd><dt>Simile</dt><dd>${esc(o.sim)}</dd><dt>Says</dt><dd>${esc(o.say)}</dd></dl></div>
+   <h3 style="margin:16px 0 8px">Coach check: ${sc}/6 ${sc>=5?"🌟":sc>=4?"👍":"🔁"}</h3>
+   <div class="check">${checks.map(c=>`<div><span>${c[0]?"✅":"⬜"}</span><span>${c[1]}</span><span></span></div>`).join("")}</div>
+   ${homo.length||apos.length?`<ul class="fixes">${homo.concat(apos).map(f=>`<li>${f}</li>`).join("")}</ul>`:""}
+   <p class="sub" style="margin-top:10px">${sc>=4?"Card made! This step is done.":"Fix the empty boxes ⬜ and press Make my card again."}</p>`;
+ };
+}
+
+/* ============ COACH (writing checks) ============ */
+const WOW=["ancient","mysterious","glittering","enormous","tiny","nervous","nervously","curious","curiously","brave","bravely","cunning","greedy","fierce","gleaming","dusty","rusty","creaky","creaked","whispered","gasped","trembled","trembling","crept","sparkling","sparkled","colourful","colorful","fragrant","bustling","crowded","shadowy","gigantic","delighted","terrified","astonished","furious","suddenly","carefully","quietly","slowly","excitedly","magnificent","golden","silky","dazzling","shimmering","crumbling","swirling","clutched","peeked","peered","glowing","glowed","secret","hidden","precious","ornate","narrow","winding","flickering","echoed","exclaimed","shouted","grumbled","giggled","silver","velvet","jewelled","enchanted","magical","gently","anxiously","proudly","courageous","fearless","worried","relieved","grateful","amazed","breathtaking","spicy","patterned","heavy","creepy","dim","gloomy","sparkly","twinkling","rumbled","whooshed","soared","zoomed","darted","tiptoed","scurried","hurried"];
+const SAID=["whispered","shouted","cried","gasped","exclaimed","grumbled","replied","asked","laughed","muttered","yelled","giggled","sighed","called","answered","screamed"];
+function stripSpeech(t){return t.replace(/["“][^"”]*["”]/g," ")}
+function capErrors(t){const e=[];const s=t.trim();if(/^["“]?[a-z]/.test(s))e.push("Start your first sentence with a capital letter.");
+ const m=s.match(/[.]["”]?\s+[a-z]\w*/g)||[];const m2=s.match(/[!?]\s+(?!said|asked|cried|shouted|whispered|replied|called|gasped|exclaimed|grumbled|laughed|yelled|muttered)[a-z]\w*/g)||[];
+ m.concat(m2).forEach(x=>e.push(`Capital letter after a full stop: “${x.trim()}”`));
+ if(/(^|\s)i(\s|['’])/.test(s))e.push("‘I’ is always a capital letter.");return e.slice(0,4)}
+const HOMO=[[/\b(don'?t|didn'?t|do not|did not|i|you|we|they|she|he)\s+now\b/gi,"“now” → <b>know</b> (biết). now = bây giờ."],[/\b(do not|did not|don'?t|didn'?t)\s+no\b/gi,"“no” → <b>know</b>."],[/\btheir\s+(is|are|was|were)\b/gi,"“their is/was” → <b>there</b> is/was."],[/\bthere\s+(own|mum|mother|dad|father|house|home|bag|bags|map|key|friends?|hands?|eyes|toys|food|shop|stall|jars|money|carpet)\b/gi,"“there + thing” → <b>their</b> (của họ)."],[/\bto\s+(much|many|big|small|late|early|loud|hot|cold|heavy|tired|scared|dark)\b/gi,"“to much / to big” → <b>too</b>."],[/\b(went|go|going|walked|ran|came|back)\s+too\s+(the|a|her|his|my|school|market|sleep)\b/gi,"“went too the” → <b>to</b> the."],[/\bknew\s+(bag|toy|house|friend|shoes|dress|key|map|door|book|life|home)\b/gi,"“knew + thing” → <b>new</b>."],[/\b(could|would|should)\s+of\b/gi,"“would of” → <b>would have</b>."],[/\bhear\s+(is|are|was|were)\b/gi,"“hear is” → <b>here</b> is."]];
+function homoErrors(t){const out=[];HOMO.forEach(([re,msg])=>{const m=t.match(re);if(m)out.push(`${msg} You wrote: “${esc(m[0])}”`)});return out}
+function aposErrors(t){const out=[];
+ const a=t.match(/\b(two|three|four|five|six|many|some|all|lots of|these|those|both)\s+\w+['’]s\b/gi);if(a)a.forEach(x=>out.push(`Plural, no apostrophe: “${esc(x)}” → remove the ’`));
+ const b=t.match(/\b\w+['’]s\s+\w+['’]s\b/gi);if(b)b.forEach(x=>out.push(`Only the OWNER gets ’s: “${esc(x)}”. The thing owned is a plural, no apostrophe.`));
+ const c=t.match(/\b\w+s['’]s\b/gi);if(c)c.filter(x=>!/ss['’]s$/i.test(x)).forEach(x=>out.push(`“${esc(x)}” looks wrong. One owner: city’s. Many owners: goats’.`));
+ const d=t.match(/\b\w+['’]s\s+(are|were|looked|look|have|had)\b/gi);if(d)d.filter(x=>!/^(it|he|she|that|there|what|who|let)['’]s/i.test(x)).forEach(x=>out.push(`Check “${esc(x)}”: is this a plural? Plurals have no apostrophe.`));
+ return out.slice(0,4)}
+function speechInfo(t){const q=(t.match(/["“”]/g)||[]).length;const pairs=Math.floor(q/2);const errs=[];
+ const m=t.match(/[A-Za-z]["”]\s+(said|asked|cried|shouted|whispered|replied|called|gasped|exclaimed|grumbled|laughed|yelled|muttered)\b/gi);if(m)m.forEach(x=>errs.push(`Add , ! or ? before the closing speech mark: “${esc(x)}”`));
+ const p=t.match(/[.]["”]\s+(said|asked|cried|shouted|whispered|replied)\b/gi);if(p)p.forEach(x=>errs.push(`Use a comma, not a full stop, when “said…” comes next: “${esc(x)}”`));
+ const lc=t.match(/(^|[\s(])["“][a-z]\w*/g);if(lc)lc.slice(0,2).forEach(x=>errs.push(`Speech starts with a capital letter: “${esc(x.trim())}”`));
+ if(q%2===1)errs.push("One speech mark is missing its partner.");
+ return {pairs,errs:errs.slice(0,4)}}
+function tenseHints(t){const m=stripSpeech(t).match(/\b(is|are|am|says|walks|goes|looks|sees|runs|opens|finds|wants)\b/gi);return m?[`The story is in the past tense. Outside speech marks, check: ${[...new Set(m.map(x=>x.toLowerCase()))].slice(0,4).map(x=>"“"+x+"”").join(", ")}`]:[]}
+function coach(text,mode){
+ const t=text.trim(),words=t?t.split(/\s+/).length:0;
+ const paras=t.split(/\n+/).filter(p=>p.trim().split(/\s+/).length>=6).length;
+ const wow=[...new Set((t.toLowerCase().match(/[a-z]+/g)||[]).filter(w=>WOW.includes(w)))];
+ const similes=(t.match(/\bas\s+\w+\s+as\s+(a|an|the)\b|\blike\s+(a|an)\s+\w+/gi)||[]).length;
+ const said=[...new Set((t.toLowerCase().match(/[a-z]+/g)||[]).filter(w=>SAID.includes(w)))];
+ const sp=speechInfo(t),cap=capErrors(t),homo=homoErrors(t),apos=aposErrors(t),tense=tenseHints(t);
+ const endOK=/[.!?]["”]?$/.test(t);
+ const turn=/\b(suddenly|but|however|unfortunately|all of a sudden|without warning|just then|oh no)\b/i.test(t);
+ const fix=/\b(so|finally|at last|luckily|in the end|from that day|after that|fortunately)\b/i.test(t);
+ const L=mode==="lila"?[25,50,80,110,150]:[12,25,40,55,70];
+ const lenPts=L.filter(x=>words>=x).length;
+ let rows=[];
+ if(mode==="lila"){const st=Math.min(5,(paras>=4?3:paras>=3?2:paras>=2?1:0)+(turn?1:0)+(fix?1:0));
+  rows.push(["🧵","Story structure",st,paras>=4?`${paras} paragraphs ✓`:`${paras} paragraph(s). Aim for 4–5: one for each stage. Press Enter to start a new paragraph.`]);}
+ else{const st=Math.min(5,(fix?2:0)+(sentCount(t)>=4?3:sentCount(t)>=3?2:1));rows.push(["🧵","A clear ending",st,sentCount(t)>=4?"4+ sentences ✓":"Write at least 4 sentences."])}
+ const spPts=Math.max(0,Math.min(5,(sp.pairs>=2?3:sp.pairs===1?2:0)+(sp.pairs?2:0)-sp.errs.length));
+ rows.push(["💬","Direct speech",spPts,sp.pairs>=2?`${sp.pairs} pieces of speech ✓`:sp.pairs===1?"Add one more piece of speech.":"Add at least 2 pieces of speech with speech marks."]);
+ const vPts=Math.min(5,(wow.length>=8?4:wow.length>=6?3:wow.length>=4?2:wow.length>=2?1:0)+(similes||said.length?1:0));
+ rows.push(["✨","Interesting vocabulary",vPts,wow.length?`WOW words: ${wow.slice(0,8).join(", ")}${similes?" + a simile":""}`:"Use describing words: mysterious, rusty, bustling…"]);
+ const gErr=cap.length+homo.length+apos.length+(endOK?0:1)+(tense.length?1:0)+(sp.errs.length?1:0);
+ rows.push(["✔️","Grammar & punctuation",Math.max(0,5-gErr),gErr?`${gErr} thing(s) to fix below`:"No mistakes found ✓"]);
+ rows.push(["📏","Length & ideas",lenPts,`${words} words${lenPts<5?` (aim for ${L[4]}+)`:" ✓"}`]);
+ const fixes=[...cap,...homo,...apos,...sp.errs,...tense];if(!endOK&&t)fixes.push("Finish with a full stop, ! or ?");
+ const score=rows.reduce((a,r)=>a+r[2],0);
+ return {score,rows,fixes,sp,homo,apos,words}
+}
+function sentCount(t){return (t.match(/[.!?]["”]?(\s|$)/g)||[]).length}
+
+/* ============ WRITERS ============ */
+const LILA_OPEN="The sun was high above the busy market as Lila stepped inside. Silk fabrics fluttered from the stalls, the air smelled of spices, and traders called out about their treasures. Lila held a small, rolled-up map tightly in her hand. She had travelled a long way to find something very special. As she turned a corner, she spotted an old wooden door half hidden behind a colourful carpet. On the step lay a rusty key…";
+const BANK={"WOW words":["mysterious","ancient","rusty","creaky","glittering","bustling","shadowy","enchanted","precious","flickering","swirling","dusty","narrow","winding","glowing","magnificent"],"Instead of said":SAID,"Story turns":["Suddenly,","All of a sudden,","Without warning,","Just then,","Unfortunately,","Luckily,","At last,","Finally,","In the end,","From that day on,"],"Quantifiers":["some","all","both","either","neither","none","every","nobody"]};
+function writer(mode){
+ const isL=mode==="lila";
+ const d=S.drafts[mode]||{};
+ const back=isL?"d5":"d4";
+ app.innerHTML=topBar(isL?"Lila’s story":"A new ending",back)+`
+ ${isL?`<div class="story" style="font-size:17px"><h3 style="font-size:24px">Lila and the Secret Door</h3><div class="by">The story so far (from your Friday homework)</div><p>${LILA_OPEN}</p><div class="row"><button class="say" id="say">🔊 Listen</button></div></div>
+ <h2 class="section-h" style="font-size:22px">1. Plan what happens next</h2>
+ <div class="grid2">
+  <label class="fl">🚪 What might Lila do next? (Build-up)<textarea id="w-p1" placeholder="She picks up the key and…">${esc(d.p1||"")}</textarea></label>
+  <label class="fl">⚡ What could the problem be? (Problem)<textarea id="w-p2" placeholder="Behind the door…">${esc(d.p2||"")}</textarea></label>
+  <label class="fl">💡 How might she solve it? (Resolution)<textarea id="w-p3" placeholder="Lila remembers the map…">${esc(d.p3||"")}</textarea></label>
+  <label class="fl">🏁 How could the story end? (Ending)<textarea id="w-p4" placeholder="In the end…">${esc(d.p4||"")}</textarea></label>
+ </div>
+ <p class="sub" style="margin-top:8px">⭐ Challenge: can you add a surprising twist, a clever solution or an unexpected ending?</p>
+ <h2 class="section-h" style="font-size:22px">2. Write your story</h2>
+ <div class="tip" style="margin-bottom:10px">Your story must include: ✅ a problem, a solution and an ending · ✅ at least 2 pieces of direct speech · ✅ interesting words · ✅ paragraphs (press Enter twice between them)</div>`
+ :`<div class="card"><h3>The Brave Baby: a new ending</h3><p>What happens after Wasso and the chief wake up? Write <b>at least 4 sentences</b>.</p><ul><li>Include some <b>direct speech</b>.</li><li>Use the <b>past tense</b> for sentences without speech (The chief <u>woke</u> up…).</li><li>Use the <b>present or future</b> tense inside speech (“I <u>will</u> dance for you every day,” said the chief.)</li></ul></div>`}
+ <div class="helpers" style="margin-bottom:10px">${Object.entries(BANK).map(([k,ws])=>`<details><summary>${k}</summary><div class="wordbank">${ws.map(w=>`<button data-w="${esc(w)}">${esc(w)}</button>`).join("")}</div></details>`).join("")}</div>
+ <textarea class="big" id="w-text" placeholder="${isL?"Lila picked up the rusty key…":"When the sun rose, the chief opened his eyes…"}" autocorrect="off" spellcheck="false">${esc(d.text||"")}</textarea>
+ <div class="counter" id="wc"></div>
+ <div class="row" style="margin-top:10px"><button class="btn" id="mark">Coach, mark my writing</button></div>
+ <div id="out" style="margin-top:16px"></div>`;
+ wire();
+ const ta=$("#w-text");
+ const sy=$("#say");if(sy)sy.onclick=e=>speak(LILA_OPEN,e.currentTarget);
+ const persist=()=>{const o={text:ta.value};if(isL)["p1","p2","p3","p4"].forEach(p=>o[p]=$("#w-"+p).value);S.drafts[mode]=o;save();$("#wc").textContent=(ta.value.trim()?ta.value.trim().split(/\s+/).length:0)+" words"};
+ app.querySelectorAll("textarea").forEach(t=>t.oninput=persist);persist();
+ app.querySelectorAll("[data-w]").forEach(b=>b.onclick=()=>{const s=ta.selectionStart??ta.value.length;const w=b.dataset.w;const pre=ta.value.slice(0,s);ta.value=pre+(pre&&!/\s$/.test(pre)?" ":"")+w+" "+ta.value.slice(s);ta.focus();persist()});
+ $("#mark").onclick=()=>{
+  const r=coach(ta.value,mode);if(r.words<5){$("#out").innerHTML=`<div class="tip">Write a few sentences first, then press the button.</div>`;return}
+  const max=25,id=isL?"u4-story":"u4-ending";
+  logResult(id,r.score,max,{"viet-truyen":[r.score>=18?1:0,1],"loi-thoai":[r.sp.pairs>=(isL?2:1)&&!r.sp.errs.length?1:0,1],"dong-am":[r.homo.length?0:1,1],"so-huu":[r.apos.length?0:1,1],...(isL?{}:{"thi-dong-tu":[tenseHints(ta.value).length?0:1,1]})});
+  const pass=r.score>=(isL?15:14);
+  if(pass){markDone(mode);burst();threads(5);yay()}
+  $("#out").innerHTML=`<div class="qwrap">
+   <h3 style="font-size:26px">Coach’s mark: <span style="color:var(--saffron)">${r.score}/25</span> ${r.score>=20?"🌟":r.score>=15?"👍":"💪"}</h3>
+   <p class="sub">${r.score>=20?"Wow! That is test-ready writing.":r.score>=15?"Great work! Fix the points below to reach 20+.":"Good start! Work on the points below, then mark it again."}</p>
+   <div class="check">${r.rows.map(x=>`<div><span>${x[0]}</span><span><b>${x[1]}</b><br><small style="color:var(--muted)">${x[3]}</small></span><span class="pts">${x[2]}/5</span></div>`).join("")}</div>
+   ${r.fixes.length?`<h3 style="font-size:19px;margin-top:14px">Fix these 🔧</h3><ul class="fixes">${r.fixes.map(f=>`<li>${f}</li>`).join("")}</ul>`:""}
+   <div class="tip" style="margin-top:12px">⭐⭐ + 🌱 Ask a grown-up to read it with you: find <b>2 stars</b> (two things you did well) and <b>1 wish</b> (one thing to make better).</div>
+   <p class="sub" style="margin-top:8px;font-size:13px">The coach is a computer, so it can miss things. A grown-up reading it is the real check.</p></div>`;
+ };
+}
+
+/* ============ CAMPFIRE (speaking) ============ */
+const TALKS=[
+ {t:"Retell Selam’s story",p:"Tell “Selam and the Silver Spring” in 1 minute. Use all 5 stages.",h:["Once upon a time, high in the hills of Eritrea…","That summer…","One morning, a greedy trader…","Clever Selam…","In the end…"]},
+ {t:"Be the chief!",p:"Tell The Brave Baby as if YOU are the chief. Stand, talk and walk like him.",h:["I am the bravest, fiercest chief in the land.","One day an old woman told me…","I shouted, but the baby…","So I danced…","Now I know that…"]},
+ {t:"A dramatic opening",p:"Change the opening of Abunuwasi’s House. Make it exciting, like a story told around a campfire at night.",h:["Listen closely, my friends…","Have you ever met someone as cunning as a jackal?","Long, long ago, in a dusty town in Kenya…"]},
+ {t:"Behind the door",p:"You are Lila. Tell us what you found behind the old wooden door.",h:["I turned the rusty key and…","Suddenly, …","I couldn’t believe my eyes!","“…!” I whispered."]}
+];
+const CRIT=["Clear, loud voice","Story in the right order","Expression & character voices","Interesting words","Looks at the listener"];
+let timerId=null;
+function campfire(){
+ app.innerHTML=topBar("Campfire Stories 🔥",current==="campfire"&&S.done["learn-d3"]?"d3":"home")+`
+ <p class="sub">Long ago, people told stories out loud around the fire. That’s how traditional stories were passed down! Pick a challenge, think for 30 seconds, then talk for 1 minute.</p>
+ <div class="steps">${TALKS.map((x,i)=>`<button class="step ${S.speak[i]!=null?"done":""}" data-t="${i}"><span class="n">${S.speak[i]!=null?"✓":i+1}</span><span><h3>${x.t}</h3><p>${x.p}</p></span><span class="st">${S.speak[i]!=null?S.speak[i]+"/25":""}</span></button>`).join("")}</div>`;
+ wire();app.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>talk(+b.dataset.t));
+}
+function talk(i){
+ const x=TALKS[i];let secs=60,stars=[0,0,0,0,0];
+ app.innerHTML=topBar(x.t,"campfire")+`
+ <div class="card"><h3>${x.t}</h3><p>${x.p}</p><p><b>Helpful starters:</b></p><ul>${x.h.map(h=>`<li>${esc(h)}</li>`).join("")}</ul>
+ ${i===0?`<details><summary style="cursor:pointer;color:#5b2a86;font-weight:700">Peek at the story</summary>${storyHTML(true)}</details>`:""}</div>
+ <div class="qwrap" style="display:grid;gap:12px;justify-items:center"><div class="timer" id="tm">1:00</div><div class="row"><button class="btn" id="start">Start 1 minute</button><button class="btn alt" id="reset">Reset</button></div></div>
+ <h2 class="section-h" style="font-size:22px">Grown-up: give stars ⭐</h2>
+ <div class="rate">${CRIT.map((c,k)=>`<div><span>${c}</span><span class="s" data-k="${k}">${[1,2,3,4,5].map(n=>`<button data-n="${n}" aria-label="${n} stars">⭐</button>`).join("")}</span></div>`).join("")}</div>
+ <div class="row" style="margin-top:12px"><button class="btn teal" id="saveT" disabled>Save my campfire score</button></div><div id="out"></div>`;
+ wire();
+ const draw=()=>{$("#tm").textContent=`${Math.floor(secs/60)}:${String(secs%60).padStart(2,"0")}`};
+ $("#start").onclick=()=>{clearInterval(timerId);tone([440]);timerId=setInterval(()=>{secs--;draw();if(secs<=0){clearInterval(timerId);tone([880,660,880],.15)}},1000)};
+ $("#reset").onclick=()=>{clearInterval(timerId);secs=60;draw()};
+ app.querySelectorAll(".s").forEach(g=>g.querySelectorAll("button").forEach(b=>b.onclick=()=>{const k=+g.dataset.k,n=+b.dataset.n;stars[k]=n;g.querySelectorAll("button").forEach(bb=>bb.classList.toggle("on",+bb.dataset.n<=n));$("#saveT").disabled=stars.some(s=>!s)}));
+ $("#saveT").onclick=()=>{const sc=stars.reduce((a,b)=>a+b,0);S.speak[i]=sc;save();logResult("u4-speak-"+(i+1),sc,25,{"noi":[sc>=18?1:0,1]});if(i===0||Object.keys(S.speak).length>=1)markDone("campfire");burst();threads(3);yay();
+  $("#out").innerHTML=`<div class="tip good" style="margin-top:12px">Saved: ${sc}/25 🔥 ${sc>=21?"Amazing storyteller!":sc>=17?"Great telling!":"Good try! Tell it once more tomorrow."}</div><div class="row" style="margin-top:10px"><button class="btn" data-go="campfire">More campfire stories</button><button class="btn alt" data-go="d3">Back to Day 3</button></div>`;wire()};
+}
+
+/* ============ BOOT ============ */
+function start(){ (location.hash&&location.hash.length>1)?go(location.hash.slice(1)):home() }
+window.claude?.hot?.snapshot?.(()=>({}));
+window.claude?.hot?.ready?window.claude.hot.ready(start):start();
+</script>
+
+<a href="../" aria-label="Back to Peter's World" style="position:fixed;left:calc(10px + env(safe-area-inset-left,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:2147483000;width:48px;height:48px;border-radius:50%;background:#fff;border:3px solid #5fd3b0;display:grid;place-items:center;font-size:22px;text-decoration:none;box-shadow:0 3px 0 rgba(0,0,0,.18)">🏠</a>
+</body></html>

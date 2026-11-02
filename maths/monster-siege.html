@@ -1,0 +1,1164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Monster Siege: Times Table Tank Battle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#E4E0F2; --paper:#FFFFFF; --ink:#1E1A33; --muted:#5A5475; --line:#1E1A33;
+  --tank:#3BAA3F; --tank-dark:#23752A; --red:#E5483B; --sun:#FFC93C; --green:#37A047; --amber:#F2A33A; --grey:#CFCBDD;
+  --lair:#2B1E4A; --shadow:#1E1A33;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#141026; --paper:#221B3D; --ink:#F1EEFF; --muted:#B0A8D0; --line:#07050F; --grey:#3B3460; --shadow:#030208;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#141026; --paper:#221B3D; --ink:#F1EEFF; --muted:#B0A8D0; --line:#07050F; --grey:#3B3460; --shadow:#030208;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;height:100%;background:var(--bg);color:var(--ink);
+  font-family:"Baloo 2","Trebuchet MS","Segoe UI",system-ui,sans-serif;font-size:18px;line-height:1.45;
+  -webkit-tap-highlight-color:transparent}
+body.playing{overflow:hidden}
+.screen{display:none}
+.screen.on{display:block}
+.page{max-width:720px;margin:0 auto;padding:18px 16px 40px}
+h1,h2,h3{margin:0;line-height:1.1}
+p{margin:0}
+
+.btn{font:inherit;font-weight:800;font-size:20px;color:var(--ink);background:var(--paper);
+  border:3px solid var(--line);border-radius:16px;padding:12px 18px;cursor:pointer;
+  box-shadow:0 5px 0 var(--shadow);transition:transform .08s, box-shadow .08s;touch-action:manipulation}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--shadow)}
+.btn:focus-visible,.chip:focus-visible,.key:focus-visible{outline:4px solid var(--sun);outline-offset:3px}
+.btn.primary{background:var(--tank);color:#fff}
+.btn.warn{background:var(--sun);color:#1E1A33}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:0 5px 0 var(--shadow)}
+.btn.small{font-size:16px;padding:6px 12px;border-radius:12px;box-shadow:0 3px 0 var(--shadow)}
+
+.hero{position:relative;background:linear-gradient(#2B1E4A 0%, #5A3E86 58%, #5E7F3A 58% 100%);border:3px solid var(--line);
+  border-radius:24px;overflow:hidden;padding:22px 18px 16px;color:#fff;box-shadow:0 6px 0 var(--shadow)}
+.hero h1{font-size:clamp(36px,9vw,58px);font-weight:800;letter-spacing:-.5px;color:#FFC93C;-webkit-text-stroke:2px #1E1A33;paint-order:stroke fill}
+.hero p{font-size:19px;font-weight:600;max-width:32ch;margin-top:4px}
+.hero svg{display:block;width:100%;max-width:460px;margin:12px auto 0}
+.panel{background:var(--paper);border:3px solid var(--line);border-radius:20px;padding:16px;margin-top:18px}
+.panel h2{font-size:24px;margin-bottom:10px}
+.chips{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+@media (max-width:420px){.chips{grid-template-columns:repeat(4,1fr)}}
+.chip{font:inherit;font-weight:800;font-size:22px;border:3px solid var(--line);border-radius:14px;
+  background:var(--bg);color:var(--ink);padding:6px 0;cursor:pointer;touch-action:manipulation}
+.chip[aria-pressed="true"]{background:var(--sun);color:#1E1A33}
+.presets{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.actions{display:grid;gap:12px;margin-top:18px}
+.note{color:var(--muted);font-size:16px;margin-top:8px}
+.how{margin:0;padding-left:1.2em;display:grid;gap:4px}
+
+/* game */
+#game.on{display:flex;flex-direction:column;height:100%;max-width:760px;margin:0 auto;padding:8px 8px 6px;gap:6px}
+.hud{display:flex;align-items:center;gap:6px}
+.pill{background:var(--paper);border:3px solid var(--line);border-radius:999px;padding:1px 10px;font-weight:700;font-size:16px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.pill b{font-weight:800}
+.hud .grow{flex:1}
+.hearts{letter-spacing:1px;font-size:15px}
+.iconbtn{font:inherit;font-size:19px;width:42px;height:42px;border:3px solid var(--line);border-radius:12px;background:var(--paper);color:var(--ink);cursor:pointer;flex:none}
+.field{flex:1;min-height:0;position:relative;border:3px solid var(--line);border-radius:20px;overflow:hidden;background:#2B1E4A}
+#cv{display:block;width:100%;height:100%;touch-action:manipulation}
+.overlay{position:absolute;inset:0;display:none;place-items:center;background:rgba(20,14,40,.72);padding:16px}
+.overlay.on{display:grid}
+.card{background:var(--paper);border:3px solid var(--line);border-radius:20px;padding:18px;text-align:center;max-width:380px;width:100%;box-shadow:0 6px 0 var(--shadow)}
+.card h2{font-size:32px;color:var(--tank)}
+.card .big{font-size:40px;line-height:1.2;margin:6px 0}
+.card p{margin-top:6px}
+.card .btn{margin-top:14px;width:100%}
+.answer{background:var(--paper);border:3px solid var(--line);border-radius:16px;display:flex;align-items:center;justify-content:center;gap:10px;padding:2px 10px;min-height:58px}
+#ans{font-size:clamp(30px,8vw,44px);font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
+#ans .box{display:inline-block;min-width:2.2em;border:3px solid var(--line);border-radius:12px;background:var(--sun);color:#1E1A33;padding:0 .2em;text-align:center}
+#ans .box.empty::after{content:"_";opacity:.5}
+#ans.bad .box{background:var(--red);color:#fff}
+#ans.good .box{background:var(--green);color:#fff}
+#qtime{font-size:15px;color:var(--muted);font-weight:700;font-variant-numeric:tabular-nums;min-width:3.2em;text-align:right}
+#fb{font-weight:800;font-size:17px;min-height:1.4em;text-align:center}
+#fb.good{color:var(--green)}
+#fb.bad{color:var(--red)}
+.keypad{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.key{font:inherit;font-weight:800;font-size:26px;height:52px;border:3px solid var(--line);border-radius:14px;background:var(--paper);color:var(--ink);
+  box-shadow:0 4px 0 var(--shadow);cursor:pointer;touch-action:manipulation;padding:0}
+.key:active{transform:translateY(3px);box-shadow:0 1px 0 var(--shadow)}
+.key.fire{background:var(--red);color:#fff;font-size:20px}
+.key.del{background:var(--grey);font-size:22px}
+@media (min-height:760px){.key{height:60px}}
+.hint{font-size:13px;color:var(--muted);text-align:center}
+.hint .kb{display:none}
+@media (hover:hover) and (pointer:fine){.hint .kb{display:inline}}
+
+/* report */
+.result{text-align:center;padding:20px 16px}
+.stars{font-size:58px;line-height:1;letter-spacing:6px;color:var(--grey)}
+.stars .lit{color:var(--sun);-webkit-text-stroke:2px var(--line)}
+.result h1{font-size:34px;margin-top:6px}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:16px}
+@media (min-width:560px){.stats{grid-template-columns:repeat(4,1fr)}}
+.stat{border:3px solid var(--line);border-radius:16px;padding:8px 4px;background:var(--bg)}
+.stat b{display:block;font-size:28px;line-height:1.1;font-variant-numeric:tabular-nums}
+.stat span{font-size:15px;color:var(--muted)}
+.list{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+.list li{border-left:6px solid var(--grey);padding:4px 10px;background:var(--bg);border-radius:0 10px 10px 0}
+.list li.r{border-color:var(--red)}
+.list li.y{border-color:var(--amber)}
+.list li.g{border-color:var(--green)}
+.fact{font-weight:800;font-variant-numeric:tabular-nums}
+.tip{background:var(--bg);border:2px dashed var(--muted);border-radius:14px;padding:10px 12px;margin-top:10px}
+.tip b{font-weight:800}
+.bars{display:grid;gap:6px}
+.bar{display:grid;grid-template-columns:62px 1fr 46px;align-items:center;gap:8px;font-weight:700;font-size:16px}
+.track{height:18px;border:2px solid var(--line);border-radius:999px;overflow:hidden;background:var(--bg)}
+.track i{display:block;height:100%}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.heat{display:grid;grid-template-columns:repeat(13,minmax(26px,1fr));gap:3px;min-width:380px;font-variant-numeric:tabular-nums}
+.heat div{aspect-ratio:1;display:grid;place-items:center;font-size:13px;font-weight:700;border-radius:6px}
+.heat .h{background:transparent;font-size:15px;font-weight:800}
+.heat .c0{background:var(--grey);color:var(--muted)}
+.heat .c1{background:var(--red);color:#fff}
+.heat .c2{background:var(--amber);color:#1E1A33}
+.heat .c3{background:var(--green);color:#fff}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:15px;margin-top:10px}
+.legend span::before{content:"";display:inline-block;width:14px;height:14px;border-radius:4px;margin-right:6px;vertical-align:-2px;background:var(--c)}
+.row{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.row .btn{flex:1 1 200px}
+.sessions{font-size:16px}
+.sessions li{display:flex;justify-content:space-between;gap:8px}
+.back{margin-bottom:12px}
+@media (prefers-reduced-motion: reduce){.btn,.key{transition:none}}
+</style>
+</head>
+<body>
+
+<section id="menu" class="screen on">
+  <div class="page">
+    <div class="hero">
+      <h1>Monster Siege</h1>
+      <p>Monsters have surrounded your tank. Solve their times tables to blast them, and win a new gun every level!</p>
+      <svg viewBox="0 0 460 150" aria-hidden="true">
+        <g stroke="#1E1A33" stroke-width="4" stroke-linejoin="round">
+          <path d="M60 40 q-26 -30 -8 -34 q10 10 18 24z" fill="#FFF6D6"/>
+          <path d="M100 40 q26 -30 8 -34 q-10 10 -18 24z" fill="#FFF6D6"/>
+          <circle cx="80" cy="58" r="34" fill="#8E5BD6"/>
+          <circle cx="68" cy="52" r="9" fill="#fff"/><circle cx="92" cy="52" r="9" fill="#fff"/>
+          <path d="M64 72 q16 12 32 0" fill="#1E1A33"/>
+          <circle cx="380" cy="52" r="30" fill="#F08A2E"/>
+          <circle cx="380" cy="48" r="13" fill="#fff"/>
+          <path d="M366 68 q14 10 28 0" fill="#1E1A33"/>
+          <rect x="160" y="112" width="140" height="30" rx="14" fill="#2E3440"/>
+          <rect x="170" y="90" width="120" height="30" rx="10" fill="#3BAA3F"/>
+          <g fill="#23752A"><rect x="200" y="30" width="9" height="62" rx="3"/><rect x="214" y="24" width="9" height="68" rx="3"/><rect x="228" y="20" width="9" height="72" rx="3"/><rect x="242" y="24" width="9" height="68" rx="3"/><rect x="256" y="30" width="9" height="62" rx="3"/></g>
+          <circle cx="232" cy="100" r="24" fill="#5CC95F"/>
+        </g>
+        <text x="232" y="108" font-family="Baloo 2, sans-serif" font-weight="800" font-size="22" fill="#FFC93C" text-anchor="middle">×</text>
+      </svg>
+    </div>
+
+    <div class="panel">
+      <h2>Choose your times tables</h2>
+      <div class="chips" id="chips"></div>
+      <div class="presets">
+        <button class="btn small" data-set="all">All</button>
+        <button class="btn small" data-set="easy">Easy: 1, 2, 5, 10</button>
+        <button class="btn small" data-set="mid">Medium: 3, 4, 6, 11</button>
+        <button class="btn small" data-set="hard">Hard: 7, 8, 9, 12</button>
+      </div>
+      <div class="actions">
+        <button class="btn primary" id="startAdv">Start the siege (5 levels)</button>
+        <button class="btn warn" id="startTrain">Weak-spot training</button>
+        <button class="btn" id="openParent">Progress report</button>
+      </div>
+      <p class="note" id="menuNote"></p>
+    </div>
+
+    <div class="panel">
+      <h2>How to play</h2>
+      <ol class="how">
+        <li>Each monster carries a times table question. The one in the yellow crosshair is your target. Tap another monster to switch.</li>
+        <li>Type the answer on the keypad and press FIRE. No hints and no time limit, but the clock is running.</li>
+        <li>A wrong answer lets the monster attack your shield. You get one more try.</li>
+        <li>Clear a level to unlock another gun: 1 gun on level 1, all 5 guns for the boss on level 5.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section id="game" class="screen" aria-label="Battle">
+  <div class="hud">
+    <button class="iconbtn" id="quit" aria-label="End battle">✕</button>
+    <div class="pill" id="lvl">Level 1</div>
+    <div class="pill">⏱ <b id="clock">0:00</b></div>
+    <div class="grow"></div>
+    <div class="pill hearts" id="hearts" aria-label="Shield"></div>
+    <div class="pill"><b id="score">0</b></div>
+    <button class="iconbtn" id="mute" aria-label="Mute">🔊</button>
+  </div>
+  <div class="field" id="wrap">
+    <canvas id="cv" aria-label="Battlefield. Tap a monster to target it."></canvas>
+    <div class="overlay" id="overlay"><div class="card" id="card"></div></div>
+  </div>
+  <div class="answer"><div id="ans" aria-live="polite"></div><div id="qtime"></div></div>
+  <div id="fb" aria-live="polite"></div>
+  <div class="keypad" id="keypad">
+    <button class="key" data-k="1">1</button><button class="key" data-k="2">2</button><button class="key" data-k="3">3</button>
+    <button class="key" data-k="4">4</button><button class="key" data-k="5">5</button><button class="key del" data-k="del" aria-label="Delete">⌫</button>
+    <button class="key" data-k="6">6</button><button class="key" data-k="7">7</button><button class="key" data-k="8">8</button>
+    <button class="key" data-k="9">9</button><button class="key" data-k="0">0</button><button class="key fire" data-k="fire">FIRE</button>
+  </div>
+  <p class="hint"><span class="kb">Keyboard: type numbers, Enter to fire, Backspace to delete, Tab to switch target.</span></p>
+</section>
+
+<section id="report" class="screen"><div class="page" id="reportBody"></div></section>
+<section id="parent" class="screen"><div class="page" id="parentBody"></div></section>
+
+<script>
+(function(){
+"use strict";
+const $ = s => document.querySelector(s);
+const SLOW = 6000, MAX_SHIELD = 5;
+const STORE_KEY = "monster-siege-progress-v1";
+const LEVEL_SIZE = [5, 6, 6, 7];
+const BOSS_HP = 6;
+const reduceMotion = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+const DIFF = {1:0,10:1,2:1,5:2,11:2,3:3,4:3,6:4,9:4,12:5,7:5,8:5};
+const MON = [
+  {name:"slime", color:"#8E5BD6", dark:"#5E3A99"},
+  {name:"bat",   color:"#E0579B", dark:"#9C2F66"},
+  {name:"horn",  color:"#F08A2E", dark:"#A95512"},
+  {name:"spike", color:"#2BB3B1", dark:"#1A7573"}
+];
+const TIPS = {
+  1:"Anything times 1 stays the same: 1 × 9 = 9.",
+  2:"Times 2 means double it: 2 × 8 = 8 + 8 = 16.",
+  3:"Times 3 = double it, then add one more: 3 × 7 = 14 + 7 = 21.",
+  4:"Times 4 = double, then double again: 4 × 6 → 12 → 24.",
+  5:"Times 5 always ends in 0 or 5, and it's half of times 10: 5 × 8 = 80 ÷ 2 = 40.",
+  6:"Times 6 = times 5, plus one more: 6 × 7 = 35 + 7 = 42.",
+  7:"Times 7 = times 5 plus times 2: 7 × 6 = 30 + 12 = 42. Magic count \"5, 6, 7, 8\": 56 = 7 × 8.",
+  8:"Times 8 = double three times: 8 × 6 → 12 → 24 → 48.",
+  9:"Times 9 = times 10, minus one: 9 × 7 = 70 − 7 = 63. The digits always add up to 9 (6 + 3 = 9).",
+  10:"Times 10: just put a 0 on the end: 10 × 7 = 70.",
+  11:"From 1 to 9, just repeat the digit: 11 × 4 = 44. Remember 11 × 10 = 110, 11 × 11 = 121, 11 × 12 = 132.",
+  12:"Times 12 = times 10 plus times 2: 12 × 7 = 70 + 14 = 84."
+};
+
+/* ---------- storage ---------- */
+function blank(){ return {v:1, updatedAt:0, facts:{}, sessions:[]}; }
+function loadLocal(){
+  try{ const s = localStorage.getItem(STORE_KEY); if(s){ const p = JSON.parse(s); if(p && p.facts) return p; } }catch(e){}
+  return blank();
+}
+let progress = loadLocal();
+let cloudRef = null, cloudChain = Promise.resolve();
+function saveProgress(){
+  progress.updatedAt = Date.now();
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(progress)); }catch(e){}
+  if(cloudRef){ const data = JSON.parse(JSON.stringify(progress)); cloudChain = cloudChain.then(() => cloudRef.set(data)).catch(() => {}); }
+}
+(async function initCloud(){
+  try{
+    if(!window.claude || typeof window.claude.use !== "function") return;
+    const [db, user] = await Promise.all([window.claude.use("db"), window.claude.use("user")]);
+    if(!db || !user) return;
+    const uid = await user.id();
+    if(!uid) return;
+    const ref = db.doc("data/users/" + uid + "/siege");
+    const snap = await ref.get();
+    const remote = snap.exists ? snap.data() : null;
+    if(remote && remote.facts && (remote.updatedAt||0) > (progress.updatedAt||0)){
+      progress = JSON.parse(JSON.stringify(remote));
+      try{ localStorage.setItem(STORE_KEY, JSON.stringify(progress)); }catch(e){}
+      refreshMenu();
+    }
+    cloudRef = ref;
+    if((progress.updatedAt||0) > ((remote && remote.updatedAt)||0)) saveProgress();
+  }catch(e){}
+})();
+
+function record(a,b,ok,ms){
+  const k = a + "x" + b;
+  const f = progress.facts[k] || (progress.facts[k] = {n:0, c:0, ms:0, h:[]});
+  f.n++;
+  if(ok){ f.c++; f.ms += Math.round(ms); }
+  f.h.push(ok ? Math.round(Math.min(ms, 99999)) : -1);
+  if(f.h.length > 5) f.h.shift();
+}
+function mastery(k){
+  const f = progress.facts[k];
+  if(!f || !f.h.length) return 0;
+  if(f.h[f.h.length-1] < 0) return 1;
+  const rec = f.h.slice(-3);
+  if(rec.some(x => x < 0)) return 2;
+  const avg = rec.reduce((s,x)=>s+x,0) / rec.length;
+  return avg > SLOW ? 2 : 3;
+}
+function tableScores(){
+  const out = [];
+  for(let t=1;t<=12;t++){
+    const keys = new Set();
+    for(let x=1;x<=12;x++){ keys.add(t+"x"+x); keys.add(x+"x"+t); }
+    let s=0, n=0;
+    keys.forEach(k => { const m = mastery(k); if(m){ n++; s += m===3 ? 1 : m===2 ? .5 : 0; } });
+    out.push({t, n, score: n ? s/n : null});
+  }
+  return out;
+}
+function weakList(){
+  const list = [];
+  for(const k in progress.facts){
+    const m = mastery(k);
+    if(m === 1) list.push({k, w:3});
+    else if(m === 2) list.push({k, w:2});
+  }
+  return list;
+}
+
+const rand = (a,b) => a + Math.floor(Math.random()*(b-a+1));
+function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+function fmtClock(sec){ sec = Math.floor(sec); return Math.floor(sec/60) + ":" + String(sec%60).padStart(2,"0"); }
+function fmtS(ms){ return (ms/1000).toFixed(1) + "s"; }
+
+/* ---------- menu ---------- */
+let selected = new Set([1,2,3,4,5,6,7,8,9,10,11,12]);
+const chipsEl = $("#chips");
+for(let t=1;t<=12;t++){
+  const b = document.createElement("button");
+  b.className = "chip"; b.textContent = t; b.dataset.t = t;
+  b.setAttribute("aria-label", t + " times table");
+  b.addEventListener("click", () => { selected.has(t) ? selected.delete(t) : selected.add(t); refreshMenu(); });
+  chipsEl.appendChild(b);
+}
+const PRESETS = {all:[1,2,3,4,5,6,7,8,9,10,11,12], easy:[1,2,5,10], mid:[3,4,6,11], hard:[7,8,9,12]};
+document.querySelectorAll("[data-set]").forEach(b => b.addEventListener("click", () => { selected = new Set(PRESETS[b.dataset.set]); refreshMenu(); }));
+function refreshMenu(){
+  chipsEl.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-pressed", selected.has(+c.dataset.t)));
+  $("#startAdv").disabled = selected.size === 0;
+  const weak = weakList();
+  const tb = $("#startTrain");
+  tb.disabled = weak.length === 0;
+  tb.textContent = weak.length ? "Weak-spot training (" + weak.length + " facts)" : "Weak-spot training";
+  const n = progress.sessions.length;
+  $("#menuNote").textContent = selected.size === 0 ? "Pick at least one times table to start."
+    : !n ? "The first siege finds out which facts need work. Weak-spot training unlocks after it."
+    : weak.length ? n + " battles played. " + weak.length + " facts need more practice."
+    : n + " battles played. No weak facts right now. Great job!";
+}
+$("#startAdv").addEventListener("click", () => startGame("adventure"));
+$("#startTrain").addEventListener("click", () => startGame("training"));
+$("#openParent").addEventListener("click", () => { renderParent(); show("parent"); });
+
+/* ---------- state ---------- */
+const G = {
+  screen:"menu", mode:"adventure", level:1, guns:1, run:0,
+  clock:0, levelClock:0, phase:"idle", paused:false, busy:false,
+  queue:[], slots:[null,null,null], target:null, input:"",
+  shield:MAX_SHIELD, score:0, combo:0, bestCombo:0, kills:0, levelsCleared:0,
+  results:[], levelRes:[], shells:[], fireballs:[], parts:[], floats:[], banner:null, shake:0,
+  tank:{x:0, y:0, angle:-Math.PI/2, recoil:0, hurt:0}, bands:[], used:new Set()
+};
+function later(fn, ms){ const run = G.run; setTimeout(() => { if(G.run === run && G.screen === "game") fn(); }, ms); }
+
+function show(id){
+  document.querySelectorAll(".screen").forEach(s => s.classList.toggle("on", s.id === id));
+  document.body.classList.toggle("playing", id === "game");
+  G.screen = id;
+  if(id === "game") requestAnimationFrame(resize);
+  else window.scrollTo(0,0);
+  if(id === "menu") refreshMenu();
+}
+
+/* ---------- facts ---------- */
+function buildBands(){
+  const seen = new Set(), facts = [];
+  selected.forEach(t => {
+    for(let x=1;x<=12;x++){
+      const k = Math.min(t,x) + "-" + Math.max(t,x);
+      if(seen.has(k)) continue; seen.add(k);
+      const d = DIFF[t] + DIFF[x] + (t === 1 || x === 1 ? -1 : 0) + Math.random()*.9;
+      facts.push({t, x, d});
+    }
+  });
+  facts.sort((p,q) => p.d - q.d);
+  const bands = [[],[],[],[]];
+  facts.forEach((f,i) => bands[Math.min(3, Math.floor(i / facts.length * 4))].push(f));
+  G.bands = bands;
+  G.used = new Set();
+}
+function orient(f){ return Math.random() < .5 ? {a:f.t, b:f.x} : {a:f.x, b:f.t}; }
+function drawFrom(bandIdxs){
+  let pool = [];
+  bandIdxs.forEach(i => pool = pool.concat(G.bands[i] || []));
+  let fresh = pool.filter(f => !G.used.has(f.t + "-" + f.x));
+  if(!fresh.length){ const all = G.bands.flat(); fresh = all.filter(f => !G.used.has(f.t + "-" + f.x)); }
+  if(!fresh.length){ G.used.clear(); fresh = pool.length ? pool : G.bands.flat(); }
+  const f = fresh[rand(0, fresh.length-1)];
+  G.used.add(f.t + "-" + f.x);
+  return orient(f);
+}
+function levelQueue(L){
+  const q = [];
+  if(L <= 4){
+    const n = LEVEL_SIZE[L-1];
+    for(let i=0;i<n;i++){
+      const lower = []; for(let j=0;j<L-1;j++) lower.push(j);
+      q.push(drawFrom(i < Math.ceil(n*.6) || !lower.length ? [L-1] : lower));
+    }
+    return shuffle(q);
+  }
+  // boss: weakest facts from history mixed with the hardest band
+  const weak = shuffle(weakList()).sort((p,q2) => q2.w - p.w).slice(0, 3).map(w => { const [a,b] = w.k.split("x").map(Number); return {a,b}; })
+    .filter(f => selected.has(f.a) || selected.has(f.b));
+  weak.forEach(f => q.push(f));
+  while(q.length < BOSS_HP) q.push(drawFrom([3, 2]));
+  return shuffle(q);
+}
+function trainingQueue(){
+  let pool = weakList();
+  const keys = new Set(pool.map(p => p.k));
+  pool.slice().forEach(p => { const [a,b] = p.k.split("x"); const rk = b+"x"+a; if(!keys.has(rk)){ pool.push({k:rk, w:1}); keys.add(rk); } });
+  pool = shuffle(pool).sort((p,q) => q.w - p.w).slice(0, 10);
+  return shuffle(pool.map(p => { const [a,b] = p.k.split("x").map(Number); return {a,b}; }));
+}
+
+/* ---------- flow ---------- */
+function startGame(mode){
+  audio();
+  G.run++;
+  G.mode = mode;
+  G.clock = 0; G.score = 0; G.combo = 0; G.bestCombo = 0; G.kills = 0; G.levelsCleared = 0;
+  G.results = []; G.shells = []; G.fireballs = []; G.parts = []; G.floats = []; G.banner = null;
+  G.shield = MAX_SHIELD; G.paused = false;
+  buildBands();
+  show("game");
+  requestAnimationFrame(() => { resize(); startLevel(mode === "training" ? 0 : 1); });
+}
+function startLevel(L){
+  G.level = L;
+  G.guns = L === 0 ? 5 : L;
+  G.levelClock = 0; G.levelRes = [];
+  G.queue = L === 0 ? trainingQueue() : levelQueue(L);
+  G.slots = [null,null,null]; G.target = null; G.input = ""; G.busy = false;
+  G.bossMode = L === 5;
+  G.bossHp = BOSS_HP;
+  $("#overlay").classList.remove("on");
+  G.phase = "play";
+  $("#lvl").textContent = L === 0 ? "Training" : L === 5 ? "Level 5: Boss" : "Level " + L;
+  G.banner = {text: L === 0 ? "TRAINING!" : L === 5 ? "BOSS BATTLE!" : "LEVEL " + L, life:1.6};
+  if(G.bossMode){ later(() => spawn(1), 500); }
+  else { [0,1,2].forEach((s,i) => later(() => spawn(s), 300 + i*350)); }
+  renderHud(); renderAnswer();
+}
+function spawn(slot){
+  if(G.phase !== "play" || G.slots[slot]) return;
+  const f = G.queue.shift();
+  if(!f) return;
+  const boss = G.bossMode;
+  const typeMax = G.level === 0 ? 3 : Math.min(3, G.level - 1);
+  const type = rand(0, typeMax);
+  const m = {a:f.a, b:f.b, retried:!!f.retried, slot, boss, type, x:0, y:0,
+    spawn:0, dying:0, dead:false, retreat:0, attempts:0, flash:0, seed:Math.random()*10, result:null, targetTime:G.clock};
+  G.slots[slot] = m;
+  if(!G.target || !alive(G.target)) setTarget(m);
+  sfx.spawn();
+}
+function alive(m){ return m && !m.dead && !m.dying && !m.retreat; }
+function setTarget(m){
+  if(!alive(m)) return;
+  G.target = m;
+  m.targetTime = G.clock;
+  G.input = "";
+  renderAnswer();
+}
+function pickNextTarget(){
+  const next = G.slots.find(alive);
+  G.target = null;
+  if(next) setTarget(next); else renderAnswer();
+}
+function freeSlot(m){
+  if(G.slots[m.slot] === m) G.slots[m.slot] = null;
+  if(G.target === m) pickNextTarget();
+  if(G.queue.length){ later(() => { spawn(m.slot); }, 450); }
+  else if(!G.slots.some(Boolean)) later(levelComplete, 700);
+}
+
+function submit(){
+  if(G.phase !== "play" || G.busy || G.paused) return;
+  const m = G.target;
+  if(!alive(m) || !G.input) return;
+  const val = parseInt(G.input, 10);
+  const ans = m.a * m.b;
+  const ok = val === ans;
+  const ms = (G.clock - m.targetTime) * 1000;
+  m.attempts++;
+  if(m.attempts === 1){
+    m.result = {a:m.a, b:m.b, ok, ms, typed:val, fixed:false, retry:m.retried, level:G.level};
+    G.results.push(m.result); G.levelRes.push(m.result);
+    record(m.a, m.b, ok, ms);
+  }
+  const fb = $("#fb");
+  if(ok){
+    if(m.attempts > 1) m.result.fixed = true;
+    G.busy = true;
+    G.combo++; G.bestCombo = Math.max(G.bestCombo, G.combo);
+    const mult = 1 + Math.floor(G.combo/3)*.5;
+    const pts = Math.round((m.attempts === 1 ? 100 + Math.max(0, 100 - ms/80) : 40) * mult) + G.guns*10;
+    G.score += pts;
+    G.floats.push({x:m.x, y:m.y - 20, text:"+" + pts, life:1.2});
+    const praise = m.attempts > 1 ? ["Got it!","Nice fix!","That's it!"] : ["Direct hit!","Boom!","Great shot!","Awesome!","Sharpshooter!"];
+    fb.textContent = (G.combo >= 3 ? "Combo " + G.combo + "! " : "") + praise[rand(0, praise.length-1)];
+    fb.className = "good";
+    renderAnswer("good");
+    fireAt(m);
+  }else{
+    G.combo = 0;
+    renderAnswer("bad");
+    G.busy = true;
+    monsterAttack(m);
+    if(m.attempts >= 2){
+      fb.textContent = "The answer is " + m.a + " × " + m.b + " = " + ans + ". This monster will be back!";
+      fb.className = "bad";
+      later(() => {
+        m.retreat = .001;
+        if(!m.retried && !m.boss) G.queue.push({a:m.a, b:m.b, retried:true});
+        if(m.boss) G.queue.push({a:m.a, b:m.b, retried:true});
+        G.busy = false;
+        if(m.boss){ nextBossQuestion(m); }
+        else if(G.target === m) pickNextTarget();
+      }, 1700);
+    }else{
+      fb.textContent = "Not quite! The monster strikes back. Try again.";
+      fb.className = "bad";
+      later(() => { G.input = ""; G.busy = false; renderAnswer(); }, 700);
+    }
+  }
+  renderHud();
+}
+function nextBossQuestion(m){
+  const f = G.queue.shift() || drawFrom([3]);
+  m.a = f.a; m.b = f.b; m.retried = !!f.retried; m.attempts = 0; m.result = null; m.retreat = 0;
+  m.flash = .6;
+  setTarget(m);
+  $("#fb").textContent = ""; $("#fb").className = "";
+}
+function onKill(m){
+  G.kills++;
+  if(m.boss){
+    G.bossHp--;
+    m.flash = 1;
+    bigBoom(m.x, m.y, m.r*.6, 1.2);
+    if(G.bossHp <= 0){
+      m.dying = .001;
+      for(let i=0;i<6;i++) later(() => bigBoom(m.x + (Math.random()-.5)*m.r*2, m.y + (Math.random()-.5)*m.r*1.6, m.r*.5, 1.6), i*160);
+      G.banner = {text:"BOSS DEFEATED!", life:2};
+      later(() => { m.dead = true; G.slots[m.slot] = null; G.target = null; G.busy = false; levelComplete(); }, 1400);
+    }else{
+      later(() => { G.busy = false; nextBossQuestion(m); }, 450);
+    }
+    return;
+  }
+  m.dying = .001;
+  bigBoom(m.x, m.y, m.r, 1 + G.guns*.18);
+  if(G.target === m) pickNextTarget();
+  later(() => { G.busy = false; renderAnswer(); }, 250);
+  later(() => { m.dead = true; freeSlot(m); }, 380);
+}
+function levelComplete(){
+  if(G.phase !== "play") return;
+  G.phase = "overlay";
+  G.levelsCleared = Math.max(G.levelsCleared, G.level);
+  const R = G.levelRes, ok = R.filter(r => r.ok).length;
+  const acc = R.length ? Math.round(ok / R.length * 100) : 100;
+  let h = "";
+  if(G.level === 0 || G.level === 5){
+    h += "<h2>" + (G.level === 5 ? "Victory!" : "Training done!") + "</h2>";
+    h += "<div class='big'>🏆</div>";
+    h += "<p>Total time <b>" + fmtClock(G.clock) + "</b>. First-try hits: <b>" + acc + "%</b> this level.</p>";
+    h += "<button class='btn primary' id='ovBtn'>See my report</button>";
+    $("#card").innerHTML = h;
+    $("#overlay").classList.add("on");
+    sfx.win();
+    $("#ovBtn").onclick = () => endGame(true);
+    return;
+  }
+  const nextGuns = G.level + 1;
+  h += "<h2>Level " + G.level + " cleared!</h2>";
+  h += "<p>Level time <b>" + fmtClock(G.levelClock) + "</b>. First-try hits <b>" + ok + "/" + R.length + "</b>.</p>";
+  h += "<div class='big' aria-hidden='true'>" + "🔫".repeat(nextGuns) + "</div>";
+  h += "<p><b>New gun unlocked!</b> Your tank now has " + nextGuns + " guns.</p>";
+  h += "<button class='btn primary' id='ovBtn'>" + (nextGuns === 5 ? "Face the Boss!" : "Start level " + nextGuns) + "</button>";
+  $("#card").innerHTML = h;
+  $("#overlay").classList.add("on");
+  sfx.win();
+  $("#ovBtn").onclick = () => startLevel(G.level + 1);
+  $("#ovBtn").focus();
+}
+
+/* ---------- combat ---------- */
+function gunOffsets(n, w){ const sp = w * .085, out = []; for(let i=0;i<n;i++) out.push((i - (n-1)/2) * sp); return out; }
+function fireAt(m){
+  const T = G.tank;
+  const ang = Math.atan2(m.y - T.y, m.x - T.x);
+  T.angle = ang;
+  const dir = {x:Math.cos(ang), y:Math.sin(ang)}, perp = {x:-Math.sin(ang), y:Math.cos(ang)};
+  const len = tw * .58;
+  m.pendingKill = true;
+  gunOffsets(G.guns, tw).forEach((o, i) => {
+    const sx = T.x + dir.x*len + perp.x*o, sy = T.y + dir.y*len + perp.y*o;
+    const tx = m.x + (Math.random()-.5)*m.r*.5, ty = m.y + (Math.random()-.5)*m.r*.5;
+    const d = Math.hypot(tx - sx, ty - sy), sp = Math.max(900, H*2.4);
+    G.shells.push({x:sx, y:sy, vx:(tx-sx)/d*sp, vy:(ty-sy)/d*sp, left:d/sp + i*.02, m, delay:i*.05});
+    burst(sx, sy, "#FFE9A8", 4, .35);
+  });
+  T.recoil = 1;
+  sfx.shot(G.guns);
+}
+function monsterAttack(m){
+  const T = G.tank;
+  m.lunge = 1;
+  const sx = m.x, sy = m.y + m.r*.5;
+  const d = Math.hypot(T.x - sx, T.y - sy), sp = Math.max(450, H*1.1);
+  G.fireballs.push({x:sx, y:sy, vx:(T.x - sx)/d*sp, vy:(T.y - sy)/d*sp, left:d/sp, dmg: m.boss ? 2 : 1, color: m.boss ? "#B04BFF" : MON[m.type].color});
+  sfx.roar(m.boss);
+}
+function tankHit(dmg){
+  G.shield = Math.max(0, G.shield - dmg);
+  G.tank.hurt = 1;
+  if(!reduceMotion) G.shake = 10;
+  burst(G.tank.x, G.tank.y - th*.2, "#FF7A2F", 14, .8);
+  sfx.hit();
+  if(G.shield <= 0){
+    G.banner = {text:"🔧 REPAIRING…", life:1.4};
+    later(() => { G.shield = MAX_SHIELD; G.banner = {text:"SHIELD RESTORED!", life:1.2}; renderHud(); }, 1300);
+  }
+  renderHud();
+}
+function burst(x, y, color, n, scale){
+  for(let i=0;i<n;i++){
+    const a = Math.random()*Math.PI*2, sp = (60 + Math.random()*260) * (scale||1);
+    G.parts.push({x, y, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp, r:3+Math.random()*6*(scale||1), life:1, decay:1.2+Math.random(), color});
+  }
+}
+function bigBoom(x, y, r, sc){
+  burst(x, y, "#FFC93C", Math.round(18*sc), sc); burst(x, y, "#FF7A2F", Math.round(14*sc), .9*sc); burst(x, y, "#6B6385", Math.round(8*sc), .6*sc);
+  for(let i=0;i<Math.round(6*sc);i++){ const a = Math.random()*Math.PI*2, sp = 150 + Math.random()*260*sc; G.parts.push({x, y, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp, r:4, life:1, decay:.9, color:"#3A2A5E", chunk:true}); }
+  G.parts.push({x, y, vx:0, vy:0, r:r*.5, life:1, decay:2.2, color:"#FFF3B0", ring:true, grow:r*1.4});
+  if(!reduceMotion) G.shake = Math.max(G.shake, 5 + sc*3);
+  sfx.boom(sc);
+}
+
+/* ---------- input ---------- */
+function press(k){
+  audio();
+  if(G.screen !== "game" || G.phase !== "play") return;
+  if(k === "fire"){ submit(); return; }
+  if(G.busy) return;
+  if(k === "del"){ G.input = G.input.slice(0, -1); }
+  else if(/^[0-9]$/.test(k) && G.input.length < 3){ G.input = (G.input === "0" ? "" : G.input) + k; }
+  renderAnswer();
+  sfx.key();
+}
+$("#keypad").addEventListener("click", ev => { const b = ev.target.closest(".key"); if(b) press(b.dataset.k); });
+document.addEventListener("keydown", ev => {
+  if(G.screen !== "game") return;
+  if(G.phase === "overlay" && ev.key === "Enter"){ const b = $("#ovBtn"); if(b){ b.click(); ev.preventDefault(); } return; }
+  if(/^[0-9]$/.test(ev.key)){ press(ev.key); ev.preventDefault(); }
+  else if(ev.key === "Backspace"){ press("del"); ev.preventDefault(); }
+  else if(ev.key === "Enter"){ press("fire"); ev.preventDefault(); }
+  else if(ev.key === "Tab" || ev.key === "ArrowRight" || ev.key === "ArrowLeft"){
+    const list = G.slots.filter(alive);
+    if(list.length > 1 && !G.busy){
+      const i = list.indexOf(G.target), step = ev.key === "ArrowLeft" || ev.shiftKey ? -1 : 1;
+      setTarget(list[(i + step + list.length) % list.length]); sfx.key();
+    }
+    ev.preventDefault();
+  }
+});
+$("#quit").addEventListener("click", () => {
+  if(G.results.length >= 3) endGame(false);
+  else { G.run++; G.phase = "idle"; show("menu"); }
+});
+document.addEventListener("visibilitychange", () => { G.paused = document.hidden; });
+
+/* ---------- HUD ---------- */
+function renderHud(){
+  $("#hearts").textContent = "❤".repeat(G.shield) + "♡".repeat(MAX_SHIELD - G.shield);
+  $("#hearts").setAttribute("aria-label", "Shield " + G.shield + " of " + MAX_SHIELD);
+  $("#score").textContent = G.score;
+}
+function renderAnswer(cls){
+  const el = $("#ans"), m = G.target;
+  el.className = cls || "";
+  if(!alive(m)){ el.innerHTML = "<span style='font-size:.6em;color:var(--muted)'>" + (G.phase === "play" ? "Tap a monster to target it" : "") + "</span>"; return; }
+  el.innerHTML = m.a + " × " + m.b + " = <span class='box" + (G.input ? "" : " empty") + "'>" + G.input + "</span>";
+}
+
+/* ---------- sound ---------- */
+let actx = null, muted = false;
+function audio(){
+  if(!actx){ try{ actx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){ actx = null; } }
+  if(actx && actx.state === "suspended") actx.resume();
+  return actx;
+}
+function tone(f, dur, type, vol, f2, delay){
+  const a = audio(); if(!a || muted) return;
+  const t0 = a.currentTime + (delay||0);
+  const o = a.createOscillator(), g = a.createGain();
+  o.type = type || "square"; o.frequency.setValueAtTime(f, t0);
+  if(f2) o.frequency.exponentialRampToValueAtTime(f2, t0 + dur);
+  g.gain.setValueAtTime(vol || .08, t0); g.gain.exponentialRampToValueAtTime(.0001, t0 + dur);
+  o.connect(g).connect(a.destination); o.start(t0); o.stop(t0 + dur + .02);
+}
+function noise(dur, vol, freq, delay){
+  const a = audio(); if(!a || muted) return;
+  const len = Math.floor(a.sampleRate * dur), buf = a.createBuffer(1, len, a.sampleRate), d = buf.getChannelData(0);
+  for(let i=0;i<len;i++) d[i] = (Math.random()*2-1) * (1 - i/len);
+  const s = a.createBufferSource(), f = a.createBiquadFilter(), g = a.createGain();
+  s.buffer = buf; f.type = "lowpass"; f.frequency.value = freq; g.gain.value = vol;
+  s.connect(f).connect(g).connect(a.destination); s.start(a.currentTime + (delay||0));
+}
+const sfx = {
+  key(){ tone(900, .03, "square", .02); },
+  shot(n){ for(let i=0;i<n;i++) noise(.12, .22, 2200, i*.05); tone(180, .12, "square", .05, 80); },
+  boom(sc){ noise(.5 + sc*.1, .45, 500 + sc*80); tone(110, .5, "sine", .25, 35); },
+  roar(big){ tone(big ? 90 : 160, .4, "sawtooth", .06, big ? 50 : 70); noise(.3, .12, 800); },
+  hit(){ tone(240, .25, "square", .06, 90); },
+  spawn(){ tone(300, .12, "triangle", .04, 520); },
+  win(){ [523,659,784,1047].forEach((f,i) => tone(f, .18, "triangle", .08, null, i*.12)); }
+};
+$("#mute").addEventListener("click", () => { muted = !muted; $("#mute").textContent = muted ? "🔇" : "🔊"; $("#mute").setAttribute("aria-label", muted ? "Unmute" : "Mute"); });
+
+/* ---------- canvas ---------- */
+const cv = $("#cv"), ctx = cv.getContext("2d"), wrap = $("#wrap");
+let W = 300, H = 400, tw = 80, th = 72, starsBg = [];
+function resize(){
+  const r = wrap.getBoundingClientRect();
+  if(!r.width || !r.height) return;
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = Math.round(r.width * dpr); cv.height = Math.round(r.height * dpr);
+  W = r.width; H = r.height;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  tw = Math.min(W * .24, H * .22, 130); th = tw * .9;
+  G.tank.x = W/2; G.tank.y = H - th*.62 - 6;
+  starsBg = [];
+  let seed = 3; const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+  for(let i=0;i<40;i++) starsBg.push({x:rnd()*W, y:rnd()*H*.55, r:.6 + rnd()*1.6, p:rnd()*6});
+}
+window.addEventListener("resize", () => { if(G.screen === "game") resize(); });
+function slotPos(s, boss){
+  if(boss) return {x:W/2, y:H*.3, r:Math.min(W*.2, H*.17, 110)};
+  const xs = [.2, .5, .8], ys = [.28, .2, .28];
+  return {x:W*xs[s], y:H*ys[s], r:Math.min(W*.1, H*.085, 50)};
+}
+cv.addEventListener("pointerdown", ev => {
+  audio();
+  if(G.phase !== "play" || G.busy) return;
+  const rc = cv.getBoundingClientRect(), px = ev.clientX - rc.left, py = ev.clientY - rc.top;
+  let best = null, bd = 1e9;
+  G.slots.forEach(m => { if(!alive(m)) return; const d = Math.hypot(px - m.x, py - (m.y + m.r*.6)); if(d < m.r*2.2 && d < bd){ bd = d; best = m; } });
+  if(best && best !== G.target){ setTarget(best); sfx.key(); }
+});
+
+function rr(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+const INK = "#1E1A33";
+function font(px){ return "800 " + Math.round(px) + "px 'Baloo 2','Trebuchet MS',sans-serif"; }
+
+function update(dt){
+  if(G.phase === "play"){ G.clock += dt; G.levelClock += dt; }
+  const now = performance.now()/1000;
+  G.slots.forEach(m => {
+    if(!m) return;
+    const p = slotPos(m.slot, m.boss);
+    m.r = p.r;
+    m.spawn = Math.min(1, m.spawn + dt*2.5);
+    m.lunge = Math.max(0, (m.lunge||0) - dt*2.5);
+    m.x = p.x + Math.sin(now*1.3 + m.seed)*p.r*.12;
+    m.y = p.y + Math.sin(now*2 + m.seed)*p.r*.08 + (m.lunge ? Math.sin(m.lunge*Math.PI)*p.r*.4 : 0) - (1 - m.spawn)*p.r*3;
+    if(m.retreat){ m.retreat += dt*1.4; m.y -= m.retreat*m.retreat*H*.8; if(m.retreat >= 1.2 && !m.boss){ m.dead = true; freeSlot(m); } }
+    if(m.dying) m.dying = Math.min(1, m.dying + dt*3);
+    m.flash = Math.max(0, m.flash - dt*2.5);
+  });
+  const T = G.tank;
+  if(alive(G.target) || (G.target && G.target.boss && !G.target.dying)){
+    const want = Math.atan2(G.target.y - T.y, G.target.x - T.x);
+    let d = want - T.angle; while(d > Math.PI) d -= Math.PI*2; while(d < -Math.PI) d += Math.PI*2;
+    T.angle += d * Math.min(1, dt*10);
+  }
+  T.recoil = Math.max(0, T.recoil - dt*4);
+  T.hurt = Math.max(0, T.hurt - dt*2);
+  if(G.shield <= 2 && Math.random() < dt*8) G.parts.push({x:T.x + (Math.random()-.5)*tw*.4, y:T.y - th*.2, vx:(Math.random()-.5)*20, vy:-50, r:5 + Math.random()*5, life:1, decay:.8, color:"rgba(90,90,100,.7)"});
+  G.shells.forEach(s => {
+    if(s.delay > 0){ s.delay -= dt; return; }
+    s.x += s.vx*dt; s.y += s.vy*dt; s.left -= dt;
+    if(s.left <= 0){
+      s.done = true;
+      burst(s.x, s.y, "#FFC93C", 6, .5);
+      if(s.m.pendingKill){ s.m.pendingKill = false; onKill(s.m); }
+      else if(s.m.boss) s.m.flash = .8;
+    }
+  });
+  G.shells = G.shells.filter(s => !s.done);
+  G.fireballs.forEach(f => {
+    f.x += f.vx*dt; f.y += f.vy*dt; f.left -= dt;
+    if(Math.random() < .7) G.parts.push({x:f.x, y:f.y, vx:(Math.random()-.5)*40, vy:(Math.random()-.5)*40, r:4 + Math.random()*4, life:.7, decay:2.2, color:f.color});
+    if(f.left <= 0){ f.done = true; tankHit(f.dmg); }
+  });
+  G.fireballs = G.fireballs.filter(f => !f.done);
+  G.parts.forEach(p => { p.x += p.vx*dt; p.y += p.vy*dt; p.vx *= .92; p.vy *= .92; if(p.chunk) p.vy += 300*dt; p.life -= dt*p.decay; });
+  G.parts = G.parts.filter(p => p.life > 0);
+  G.floats.forEach(f => { f.y -= 55*dt; f.life -= dt; });
+  G.floats = G.floats.filter(f => f.life > 0);
+  if(G.banner){ G.banner.life -= dt; if(G.banner.life <= 0) G.banner = null; }
+  G.shake = Math.max(0, G.shake - dt*30);
+  // clock & per-question timer
+  $("#clock").textContent = fmtClock(G.clock);
+  const m = G.target;
+  $("#qtime").textContent = m && G.phase === "play" && !m.dying ? ((G.clock - m.targetTime)).toFixed(1) + "s" : "";
+}
+
+function drawBackground(){
+  const g = ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,"#1E1538"); g.addColorStop(.55,"#4A3470"); g.addColorStop(.56,"#4E6B32"); g.addColorStop(1,"#6E8F43");
+  ctx.fillStyle = g; ctx.fillRect(-20,-20,W+40,H+40);
+  const t = performance.now()/1000;
+  starsBg.forEach(s => { ctx.globalAlpha = .4 + .4*Math.sin(t*2 + s.p); ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2); ctx.fill(); });
+  ctx.globalAlpha = 1;
+  // moon
+  ctx.fillStyle = "#F4E9B8"; ctx.beginPath(); ctx.arc(W*.88, H*.08, Math.min(W,H)*.04, 0, Math.PI*2); ctx.fill();
+  // distant castle ridge
+  ctx.fillStyle = "#2B1E4A";
+  ctx.beginPath(); ctx.moveTo(0, H*.56);
+  for(let i=0;i<=10;i++){ const x = W*i/10; ctx.lineTo(x, H*(.5 + (i%3===0 ? -.04 : i%2 ? .01 : -.015))); }
+  ctx.lineTo(W, H*.56); ctx.closePath(); ctx.fill();
+}
+function drawMonster(m){
+  const t = performance.now()/1000 + m.seed;
+  const def = MON[m.type], r = m.r;
+  const color = m.boss ? "#B8322A" : def.color, dark = m.boss ? "#7A1C16" : def.dark;
+  let sc = m.spawn < 1 ? .4 + .6*m.spawn : 1;
+  if(m.dying) sc *= 1 - m.dying*.9;
+  const alpha = m.retreat ? Math.max(0, 1 - m.retreat*.8) : 1;
+  ctx.save(); ctx.globalAlpha = alpha; ctx.translate(m.x, m.y); ctx.scale(sc, sc);
+  const lw = Math.max(2.5, r/14);
+  ctx.lineWidth = lw; ctx.strokeStyle = INK; ctx.lineJoin = "round";
+  // wings
+  if(m.type === 1 || m.boss){
+    const flap = Math.sin(t*8)*.35;
+    for(const s of [-1,1]){
+      ctx.save(); ctx.scale(s,1); ctx.rotate(flap*s*-1 + 0);
+      ctx.fillStyle = dark; ctx.beginPath();
+      ctx.moveTo(r*.6,-r*.2); ctx.lineTo(r*1.7,-r*.9); ctx.lineTo(r*1.45,-r*.15); ctx.lineTo(r*1.8,r*.25); ctx.lineTo(r*.75,r*.4); ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.restore();
+    }
+  }
+  // spikes
+  if(m.type === 3 && !m.boss){
+    ctx.fillStyle = dark;
+    for(let i=0;i<10;i++){ const a = i/10*Math.PI*2 + t*.4; ctx.beginPath(); ctx.moveTo(Math.cos(a-.2)*r*.9, Math.sin(a-.2)*r*.9); ctx.lineTo(Math.cos(a)*r*1.35, Math.sin(a)*r*1.35); ctx.lineTo(Math.cos(a+.2)*r*.9, Math.sin(a+.2)*r*.9); ctx.closePath(); ctx.fill(); ctx.stroke(); }
+  }
+  // horns
+  if(m.type === 2 || m.boss){
+    ctx.fillStyle = "#FFF6D6";
+    for(const s of [-1,1]){ ctx.beginPath(); ctx.moveTo(s*r*.35, -r*.75); ctx.quadraticCurveTo(s*r*.9, -r*1.2, s*r*.75, -r*1.55); ctx.quadraticCurveTo(s*r*.55, -r*1.1, s*r*.1, -r*.9); ctx.closePath(); ctx.fill(); ctx.stroke(); }
+  }
+  // body blob
+  ctx.fillStyle = color; ctx.beginPath();
+  for(let i=0;i<=28;i++){ const a = i/28*Math.PI*2, rad = r*(1 + .05*Math.sin(a*3 + t*3)); const px = Math.cos(a)*rad, py = Math.sin(a)*rad*(m.type===0 ? .92 : 1); i ? ctx.lineTo(px,py) : ctx.moveTo(px,py); }
+  ctx.closePath(); ctx.fill(); ctx.stroke();
+  // slime drips
+  if(m.type === 0 && !m.boss){ ctx.fillStyle = color; for(const dx of [-.5,.1,.55]){ const len = r*(.25 + .12*Math.sin(t*2 + dx*5)); ctx.beginPath(); ctx.ellipse(dx*r, r*.82 + len*.5, r*.1, len*.6, 0, 0, Math.PI*2); ctx.fill(); } }
+  // belly
+  ctx.fillStyle = "rgba(255,255,255,.18)"; ctx.beginPath(); ctx.ellipse(0, r*.35, r*.55, r*.4, 0, 0, Math.PI*2); ctx.fill();
+  if(m.flash > 0){ ctx.fillStyle = "rgba(255,255,255," + m.flash*.8 + ")"; ctx.beginPath(); ctx.arc(0,0,r,0,Math.PI*2); ctx.fill(); }
+  // eyes look at tank
+  const T = G.tank, lx = T.x - m.x, ly = T.y - m.y, ld = Math.hypot(lx,ly) || 1;
+  const eyes = m.type === 3 && !m.boss ? [[0, -.15, .3]] : m.boss ? [[-.3,-.25,.18],[0,-.35,.14],[.3,-.25,.18]] : [[-.32,-.2,.2],[.32,-.2,.2]];
+  eyes.forEach(([ex,ey,er]) => {
+    ctx.fillStyle = m.boss ? "#FFE36B" : "#fff"; ctx.beginPath(); ctx.arc(ex*r, ey*r, er*r, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = INK; ctx.beginPath(); ctx.arc(ex*r + lx/ld*er*r*.4, ey*r + ly/ld*er*r*.4, er*r*.45, 0, Math.PI*2); ctx.fill();
+  });
+  // brows
+  ctx.lineWidth = lw*1.3;
+  if(eyes.length === 1){ ctx.beginPath(); ctx.moveTo(-r*.35, -r*.55); ctx.lineTo(0, -r*.42); ctx.lineTo(r*.35, -r*.55); ctx.stroke(); }
+  else for(const s of [-1,1]){ ctx.beginPath(); ctx.moveTo(s*r*.55, -r*.52); ctx.lineTo(s*r*.12, -r*.36); ctx.stroke(); }
+  ctx.lineWidth = lw;
+  // mouth with teeth
+  const mo = m.lunge ? 1.4 : 1;
+  ctx.fillStyle = "#3A0F1A"; ctx.beginPath(); ctx.ellipse(0, r*.38, r*.42, r*.2*mo, 0, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = "#fff";
+  for(let i=-2;i<=2;i++){ ctx.beginPath(); ctx.moveTo(i*r*.15 - r*.06, r*.22*1); ctx.lineTo(i*r*.15 + r*.06, r*.22); ctx.lineTo(i*r*.15, r*.34); ctx.closePath(); ctx.fill(); }
+  if(m.boss){ // crown
+    ctx.fillStyle = "#FFC93C"; ctx.beginPath(); ctx.moveTo(-r*.35,-r*.85); ctx.lineTo(-r*.35,-r*1.15); ctx.lineTo(-r*.18,-r*.98); ctx.lineTo(0,-r*1.25); ctx.lineTo(r*.18,-r*.98); ctx.lineTo(r*.35,-r*1.15); ctx.lineTo(r*.35,-r*.85); ctx.closePath(); ctx.fill(); ctx.stroke();
+  }
+  ctx.restore();
+
+  if(m.dying || m.retreat) return;
+  // target crosshair
+  const targeted = G.target === m;
+  if(targeted){
+    ctx.save(); ctx.translate(m.x, m.y); ctx.rotate(performance.now()/900);
+    ctx.strokeStyle = "#FFC93C"; ctx.lineWidth = 3; ctx.setLineDash([10, 8]);
+    ctx.beginPath(); ctx.arc(0, 0, r*1.35, 0, Math.PI*2); ctx.stroke(); ctx.setLineDash([]);
+    for(let i=0;i<4;i++){ ctx.rotate(Math.PI/2); ctx.beginPath(); ctx.moveTo(r*1.2, 0); ctx.lineTo(r*1.55, 0); ctx.stroke(); }
+    ctx.restore();
+  }
+  // boss HP
+  if(m.boss){
+    const bw = r*1.8, bh = 12, bx = m.x - bw/2, by = m.y - r*1.55 - 20;
+    ctx.fillStyle = "#1E1A33"; rr(bx-3, by-3, bw+6, bh+6, 8); ctx.fill();
+    ctx.fillStyle = "#4A2A2A"; rr(bx, by, bw, bh, 6); ctx.fill();
+    ctx.fillStyle = "#E5483B"; rr(bx, by, bw*G.bossHp/BOSS_HP, bh, 6); ctx.fill();
+  }
+  // question bubble
+  const txt = m.a + " × " + m.b;
+  const fs = clamp(r*(m.boss ? .38 : .62), 17, 34);
+  ctx.font = font(fs);
+  const tw2 = ctx.measureText(txt).width + fs*.8, bh = fs*1.35;
+  const bx = m.x - tw2/2, by = m.y + r*1.08 + (m.type===0 ? r*.25 : 0);
+  ctx.fillStyle = targeted ? "#FFC93C" : "#FFF6D6"; ctx.strokeStyle = INK; ctx.lineWidth = 3;
+  rr(bx, by, tw2, bh, bh*.35); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = INK; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.fillText(txt, m.x, by + bh*.55);
+}
+function drawTank(){
+  const T = G.tank, w = tw, h = th, lw = Math.max(2.5, w/30);
+  ctx.save(); ctx.translate(T.x, T.y);
+  ctx.lineWidth = lw; ctx.strokeStyle = INK; ctx.lineJoin = "round";
+  ctx.fillStyle = "rgba(0,0,0,.25)"; ctx.beginPath(); ctx.ellipse(0, h*.5, w*.55, h*.13, 0, 0, Math.PI*2); ctx.fill();
+  if(G.guns >= 4){ const p = .5 + .5*Math.sin(performance.now()/160); ctx.save(); ctx.globalAlpha = .15 + .12*p; ctx.fillStyle = G.guns >= 5 ? "#FF7A2F" : "#FFC93C"; ctx.beginPath(); ctx.arc(0,0,w*.7,0,Math.PI*2); ctx.fill(); ctx.restore(); }
+  for(const s of [-1,1]){ ctx.fillStyle = "#2E3440"; rr(s > 0 ? w*.26 : -w*.5, -h*.5, w*.24, h, w*.08); ctx.fill(); ctx.stroke(); }
+  ctx.fillStyle = "#3BAA3F"; rr(-w*.34, -h*.42, w*.68, h*.84, w*.1); ctx.fill(); ctx.stroke();
+  if(T.hurt > 0){ ctx.fillStyle = "rgba(229,72,59," + T.hurt*.7 + ")"; rr(-w*.34, -h*.42, w*.68, h*.84, w*.1); ctx.fill(); }
+  // turret
+  ctx.rotate(T.angle + Math.PI/2);
+  const n = G.guns, bw = n >= 4 ? w*.07 : w*.09, len = w*.58 - T.recoil*w*.1;
+  gunOffsets(n, w).forEach((o, i) => {
+    const extra = n > 1 ? (1 - Math.abs(i - (n-1)/2)/((n-1)/2 || 1))*w*.06 : 0;
+    ctx.fillStyle = "#23752A"; rr(o - bw/2, -(len + extra), bw, len + extra, 3); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = INK; rr(o - bw*.65, -(len + extra), bw*1.3, w*.06, 2); ctx.fill();
+  });
+  ctx.fillStyle = "#5CC95F"; ctx.beginPath(); ctx.arc(0, 0, w*.25, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = "#FFC93C"; ctx.beginPath();
+  for(let i=0;i<10;i++){ const a = -Math.PI/2 + i*Math.PI/5, rad = i%2 ? w*.05 : w*.11; ctx.lineTo(Math.cos(a)*rad, Math.sin(a)*rad); }
+  ctx.closePath(); ctx.fill();
+  ctx.restore();
+}
+function draw(){
+  ctx.save();
+  if(G.shake > 0) ctx.translate((Math.random()-.5)*G.shake, (Math.random()-.5)*G.shake);
+  drawBackground();
+  G.slots.forEach(m => { if(m && !m.dead) drawMonster(m); });
+  G.fireballs.forEach(f => {
+    ctx.fillStyle = f.color; ctx.strokeStyle = INK; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(f.x, f.y, 9, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = "#FFF3B0"; ctx.beginPath(); ctx.arc(f.x, f.y, 4, 0, Math.PI*2); ctx.fill();
+  });
+  const power = G.guns;
+  G.shells.forEach(s => {
+    if(s.delay > 0) return;
+    ctx.strokeStyle = power >= 5 ? "rgba(140,220,255,.9)" : power >= 3 ? "rgba(255,150,60,.85)" : "rgba(255,230,150,.8)";
+    ctx.lineWidth = 3 + power*.6; ctx.lineCap = "round";
+    ctx.beginPath(); ctx.moveTo(s.x, s.y); ctx.lineTo(s.x - s.vx*.03, s.y - s.vy*.03); ctx.stroke();
+    ctx.fillStyle = power >= 5 ? "#E8F8FF" : "#2E3440"; ctx.beginPath(); ctx.arc(s.x, s.y, 4 + power*.6, 0, Math.PI*2); ctx.fill();
+  });
+  drawTank();
+  G.parts.forEach(p => {
+    ctx.globalAlpha = clamp(p.life,0,1);
+    if(p.ring){ ctx.strokeStyle = p.color; ctx.lineWidth = 6*p.life; ctx.beginPath(); ctx.arc(p.x,p.y,p.r + (1-p.life)*p.grow,0,Math.PI*2); ctx.stroke(); }
+    else if(p.chunk){ ctx.fillStyle = p.color; ctx.fillRect(p.x-4, p.y-4, 8, 8); }
+    else { ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x,p.y,p.r*(.5+p.life*.5),0,Math.PI*2); ctx.fill(); }
+  });
+  ctx.globalAlpha = 1;
+  ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
+  G.floats.forEach(f => {
+    ctx.globalAlpha = clamp(f.life,0,1); ctx.font = font(Math.max(20, tw*.3));
+    ctx.lineWidth = 5; ctx.strokeStyle = INK; ctx.strokeText(f.text, f.x, f.y);
+    ctx.fillStyle = "#FFC93C"; ctx.fillText(f.text, f.x, f.y);
+  });
+  if(G.banner){
+    const b = G.banner;
+    ctx.globalAlpha = clamp(b.life*2, 0, 1);
+    const fs = Math.min(W/10, 46);
+    ctx.font = font(fs); ctx.lineWidth = 7; ctx.strokeStyle = INK;
+    ctx.strokeText(b.text, W/2, H*.56); ctx.fillStyle = "#FFC93C"; ctx.fillText(b.text, W/2, H*.56);
+  }
+  ctx.globalAlpha = 1;
+  ctx.restore();
+}
+let last = performance.now();
+function frame(now){
+  const dt = Math.min(.05, (now - last)/1000); last = now;
+  if(G.screen === "game"){ if(!G.paused) update(dt); draw(); }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+/* ---------- report ---------- */
+function tablesOf(r){ return r.a === r.b ? [r.a] : [r.a, r.b]; }
+function endGame(finished){
+  G.run++;
+  G.phase = "idle";
+  const R = G.results;
+  const n = R.length, c = R.filter(r=>r.ok).length;
+  const okMs = R.filter(r=>r.ok).map(r=>r.ms);
+  const avg = okMs.length ? okMs.reduce((s,x)=>s+x,0)/okMs.length : 0;
+  progress.sessions.push({d:Date.now(), n, c, ms:Math.round(avg), mode:G.mode, time:Math.round(G.clock), lv:G.levelsCleared, done:!!finished});
+  if(progress.sessions.length > 40) progress.sessions.shift();
+  saveProgress();
+  renderReport(R, n, c, avg, finished);
+  show("report");
+}
+function renderReport(R, n, c, avg, finished){
+  const acc = n ? c/n : 0;
+  const starsN = acc >= .9 ? 3 : acc >= .7 ? 2 : 1;
+  const title = G.mode === "training" ? (starsN === 3 ? "Training complete!" : "Good training!")
+    : finished ? (starsN === 3 ? "Monster Slayer!" : "Siege survived!") : "Retreat to base";
+  const sub = starsN === 3 ? "Almost every answer hit on the first try. Amazing!"
+    : starsN === 2 ? "Most answers were right first time. A little more practice and you'll be unstoppable."
+    : "Every battle makes you stronger. Let's train the facts you missed!";
+
+  const wrong = R.filter(r => !r.ok);
+  const slow = R.filter(r => r.ok && r.ms > SLOW);
+  const fixed = wrong.filter(r => r.fixed);
+  const tStat = {};
+  R.forEach(r => tablesOf(r).forEach(t => { const s = tStat[t] || (tStat[t] = {n:0, ok:0, slow:0}); s.n++; if(r.ok){ s.ok++; if(r.ms > SLOW) s.slow++; } }));
+  const tRows = Object.keys(tStat).map(Number).sort((a,b)=>a-b).map(t => ({t, ...tStat[t], rate: tStat[t].ok / tStat[t].n}));
+  const strong = tRows.filter(x => x.n >= 2 && x.rate === 1 && x.slow === 0).map(x=>x.t);
+  const weakT = tRows.filter(x => x.rate < 1 || x.slow > 0).sort((a,b) => (a.rate - b.rate) || (b.slow - a.slow)).map(x=>x.t);
+
+  const neigh = r => [(r.a-1)*r.b, (r.a+1)*r.b, r.a*(r.b-1), r.a*(r.b+1)];
+  const rev = v => +String(v).split("").reverse().join("");
+  const adj = wrong.filter(r => neigh(r).includes(r.typed));
+  const flipped = wrong.filter(r => r.a*r.b >= 10 && r.typed === rev(r.a*r.b) && r.typed !== r.a*r.b);
+  const added = wrong.filter(r => r.typed === r.a + r.b);
+  const near = wrong.filter(r => Math.abs(r.typed - r.a*r.b) <= 3 && !neigh(r).includes(r.typed));
+  const swap = wrong.filter(r => r.a !== r.b && (mastery(r.b+"x"+r.a) === 3 || R.some(o => o.ok && o.a === r.b && o.b === r.a)));
+
+  const patterns = [];
+  if(adj.length) patterns.push("<b>Off by one step (" + adj.length + "×):</b> typed the answer to a neighbouring fact, e.g. " + adj[0].a + " × " + adj[0].b + " → " + adj[0].typed + ". Your child is counting up from a fact they know and slipping a step. Fix: lock in anchor facts like × 5 and × 10.");
+  if(flipped.length) patterns.push("<b>Digits swapped (" + flipped.length + "×):</b> e.g. typed " + flipped[0].typed + " instead of " + (flipped[0].a*flipped[0].b) + ". They probably know the fact but mix up the digit order when typing. Encourage saying the number out loud before typing.");
+  if(added.length) patterns.push("<b>Added instead of multiplied (" + added.length + "×):</b> e.g. " + added[0].a + " × " + added[0].b + " → " + added[0].typed + ". Check they understand that × means \"groups of\".");
+  if(near.length) patterns.push("<b>Close but not quite (" + near.length + "×):</b> answers only 1 to 3 away, a sign of counting on fingers. Practise these until they're remembered, not worked out.");
+  if(swap.length) patterns.push("<b>Not using the swap rule (" + swap.length + "×):</b> got " + swap[0].b + " × " + swap[0].a + " right but " + swap[0].a + " × " + swap[0].b + " wrong. Swapping the numbers doesn't change the answer, so there's only half a table to learn.");
+  if(fixed.length) patterns.push("<b>Fixed on the second try (" + fixed.length + "×):</b> they nearly know these, so a little more practice will make them stick.");
+  if(slow.length) patterns.push("<b>Right but slow (" + slow.length + " facts):</b> took more than " + SLOW/1000 + " seconds, so they're still working it out rather than remembering.");
+
+  const weakFacts = weakList();
+  let h = "<div class='panel result'>";
+  h += "<div class='stars' aria-label='" + starsN + " out of 3 stars'>" + [1,2,3].map(i => "<span class='" + (i<=starsN?"lit":"") + "'>★</span>").join("") + "</div>";
+  h += "<h1>" + title + "</h1><p style='margin-top:6px'>" + sub + "</p>";
+  h += "<div class='stats'>";
+  h += "<div class='stat'><b>" + c + "/" + n + "</b><span>first-try hits</span></div>";
+  h += "<div class='stat'><b>" + Math.round(acc*100) + "%</b><span>accuracy</span></div>";
+  h += "<div class='stat'><b>" + (avg ? (avg/1000).toFixed(1) + "s" : "–") + "</b><span>per right answer</span></div>";
+  h += "<div class='stat'><b>" + fmtClock(G.clock) + "</b><span>total time</span></div>";
+  h += "</div>";
+  h += "<p class='note'>Score " + G.score + ". Monsters defeated " + G.kills + ". Longest combo " + G.bestCombo + "." + (G.mode === "adventure" ? " Levels cleared " + G.levelsCleared + " of 5." : "") + "</p>";
+  h += "</div>";
+
+  h += "<div class='panel'><h2>Notes for parents</h2>";
+  if(strong.length) h += "<p><b>Solid:</b> the " + strong.join(", ") + " times tables (all right first time, and fast).</p>";
+  if(weakT.length) h += "<p style='margin-top:6px'><b>Needs practice:</b> facts with " + weakT.join(", ") + ".</p>";
+  if(!weakT.length && n) h += "<p>No mistakes and every answer was quick. Time to add harder tables.</p>";
+  if(patterns.length) h += "<ul class='list' style='margin-top:12px'>" + patterns.map(p => "<li class='y'>" + p + "</li>").join("") + "</ul>";
+  h += "</div>";
+
+  if(wrong.length || slow.length){
+    h += "<div class='panel'><h2>Facts to remember</h2><ul class='list'>";
+    wrong.forEach(r => { h += "<li class='r'><span class='fact'>" + r.a + " × " + r.b + " = " + (r.a*r.b) + "</span> <span class='note'>(typed " + r.typed + (r.fixed ? ", then fixed it" : "") + ")</span></li>"; });
+    slow.forEach(r => { h += "<li class='y'><span class='fact'>" + r.a + " × " + r.b + " = " + (r.a*r.b) + "</span> <span class='note'>(right, but took " + fmtS(r.ms) + ")</span></li>"; });
+    h += "</ul></div>";
+  }
+  if(tRows.length){
+    h += "<div class='panel'><h2>Results by times table</h2><div class='bars'>";
+    tRows.forEach(x => {
+      const col = x.rate === 1 && !x.slow ? "var(--green)" : x.rate >= .6 ? "var(--amber)" : "var(--red)";
+      h += "<div class='bar'><span>× " + x.t + "</span><div class='track'><i style='width:" + Math.round(x.rate*100) + "%;background:" + col + "'></i></div><span>" + x.ok + "/" + x.n + "</span></div>";
+    });
+    h += "</div></div>";
+  }
+  h += "<div class='panel'><h2>What's next</h2>";
+  h += weakFacts.length
+    ? "<p>Weak-spot training brings back the " + Math.min(10, weakFacts.length*2) + " facts that were wrong or slow, plus their swapped versions, with all 5 guns ready. Facts answered correctly and quickly turn green on the progress map.</p>"
+    : "<p>No weak facts right now. Add new tables or try the hard ones (7, 8, 9, 12) next time.</p>";
+  weakT.slice(0,2).forEach(t => { h += "<div class='tip'><b>Trick for × " + t + ":</b> " + TIPS[t] + "</div>"; });
+  h += "<div class='row'><button class='btn warn' id='rTrain'" + (weakFacts.length ? "" : " disabled") + ">Weak-spot training</button><button class='btn primary' id='rAgain'>New siege</button></div>";
+  h += "<div class='row'><button class='btn' id='rParent'>Progress map</button><button class='btn' id='rMenu'>Main menu</button></div>";
+  h += "</div>";
+  $("#reportBody").innerHTML = h;
+  $("#rTrain").onclick = () => startGame("training");
+  $("#rAgain").onclick = () => startGame("adventure");
+  $("#rParent").onclick = () => { renderParent(); show("parent"); };
+  $("#rMenu").onclick = () => show("menu");
+}
+
+function renderParent(){
+  let h = "<button class='btn small back' id='pBack'>← Back</button>";
+  h += "<div class='panel'><h2>Map of all 144 facts</h2>";
+  h += "<p class='note'>Rows are the first number, columns the second. Each square is coloured by the last 3 attempts.</p>";
+  h += "<div class='scroll' style='margin-top:10px'><div class='heat' role='table' aria-label='12 by 12 multiplication grid'><div class='h'>×</div>";
+  for(let b=1;b<=12;b++) h += "<div class='h'>" + b + "</div>";
+  for(let a=1;a<=12;a++){
+    h += "<div class='h'>" + a + "</div>";
+    for(let b=1;b<=12;b++){
+      const k = a+"x"+b, m = mastery(k), f = progress.facts[k];
+      const tip = f ? a + " × " + b + " = " + (a*b) + ": " + f.c + "/" + f.n + " correct" + (f.c ? ", average " + fmtS(f.ms/f.c) : "") : a + " × " + b + ": not tried yet";
+      h += "<div class='c" + m + "' title='" + tip + "'>" + (m ? a*b : "") + "</div>";
+    }
+  }
+  h += "</div></div>";
+  h += "<div class='legend'><span style='--c:var(--green)'>Known and fast</span><span style='--c:var(--amber)'>Known but slow or shaky</span><span style='--c:var(--red)'>Wrong last time</span><span style='--c:var(--grey)'>Not tried yet</span></div></div>";
+  const ts = tableScores();
+  h += "<div class='panel'><h2>How well each table is known</h2><div class='bars'>";
+  ts.forEach(x => {
+    const pct = x.score === null ? 0 : Math.round(x.score*100);
+    const col = x.score === null ? "var(--grey)" : x.score >= .85 ? "var(--green)" : x.score >= .5 ? "var(--amber)" : "var(--red)";
+    h += "<div class='bar'><span>× " + x.t + "</span><div class='track'><i style='width:" + pct + "%;background:" + col + "'></i></div><span>" + (x.score === null ? "–" : pct + "%") + "</span></div>";
+  });
+  h += "</div>";
+  ts.filter(x => x.score !== null && x.n >= 3 && x.score < .85).sort((a,b)=>a.score-b.score).slice(0,2)
+    .forEach(x => { h += "<div class='tip'><b>Trick for × " + x.t + ":</b> " + TIPS[x.t] + "</div>"; });
+  h += "</div>";
+  const S = progress.sessions.slice(-10).reverse();
+  h += "<div class='panel'><h2>Recent battles</h2>";
+  if(!S.length) h += "<p>No battles yet. Play one to start tracking progress.</p>";
+  else{
+    h += "<ul class='list sessions'>";
+    S.forEach(s => {
+      const d = new Date(s.d);
+      const ds = d.toLocaleDateString("en-GB", {day:"2-digit", month:"short"}) + " " + d.toLocaleTimeString("en-GB", {hour:"2-digit", minute:"2-digit"});
+      const acc = s.n ? Math.round(s.c/s.n*100) : 0;
+      const what = s.mode === "training" ? "training" : "siege, " + (s.lv || 0) + "/5 levels";
+      h += "<li class='" + (acc>=90?"g":acc>=70?"y":"r") + "'><span>" + ds + ", " + what + "</span><span><b>" + s.c + "/" + s.n + "</b> (" + acc + "%)" + (s.time ? ", " + fmtClock(s.time) : "") + "</span></li>";
+    });
+    h += "</ul>";
+  }
+  h += "<div class='row'><button class='btn small' id='pReset'>Erase all progress</button></div></div>";
+  $("#parentBody").innerHTML = h;
+  $("#pBack").onclick = () => show("menu");
+  const rb = $("#pReset");
+  rb.onclick = () => {
+    if(rb.dataset.confirm){ progress = blank(); saveProgress(); renderParent(); return; }
+    rb.dataset.confirm = "1"; rb.textContent = "Tap again to erase everything"; rb.classList.add("warn");
+  };
+}
+
+refreshMenu();
+})();
+</script>
+<a href="../" aria-label="Back to Peter's World" style="position:fixed;left:calc(10px + env(safe-area-inset-left,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:2147483000;width:48px;height:48px;border-radius:50%;background:#fff;border:3px solid #5fd3b0;display:grid;place-items:center;font-size:22px;text-decoration:none;box-shadow:0 3px 0 rgba(0,0,0,.18)">🏠</a>
+</body>
+</html>

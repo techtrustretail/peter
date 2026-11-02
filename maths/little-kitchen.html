@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Little Kitchen Math</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fff4e0;--wood:#c9854a;--wood-d:#9a5f2c;--ink:#4a2a12;--muted:#8a6647;
+  --green:#3fbf6f;--green-d:#27884b;--red:#ff6b5b;--card:#fffaf1;--pink:#ff7fa8;--pink-d:#d4557f;
+  --font:"Baloo 2","Nunito","Segoe UI",system-ui,sans-serif;color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#fff4e0;--ink:#4a2a12}}
+:root[data-theme="dark"]{--bg:#fff4e0;--ink:#4a2a12}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%;background:var(--bg)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;min-height:100%;font-family:var(--font);color:var(--ink);font-size:19px;
+ background:linear-gradient(90deg,rgba(255,255,255,.55) 2px,transparent 2px) 0 0/48px 48px,linear-gradient(rgba(255,255,255,.55) 2px,transparent 2px) 0 0/48px 48px,var(--bg);
+ -webkit-tap-highlight-color:transparent}
+#app{max-width:560px;margin:0 auto;padding:12px 16px 30px;min-height:100vh}
+button{font-family:inherit;cursor:pointer;border:0;color:inherit}
+button:focus-visible{outline:4px solid #3b82f6;outline-offset:3px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-size:22px;font-weight:800;padding:12px 24px;min-height:58px;border-radius:20px;background:var(--green);color:#fff;box-shadow:0 6px 0 var(--green-d);text-align:center;line-height:1.15}
+.btn:active{transform:translateY(4px);box-shadow:0 2px 0 var(--green-d)}
+.btn.wood{background:var(--wood);box-shadow:0 6px 0 var(--wood-d)}
+.btn.pink{background:var(--pink);box-shadow:0 6px 0 var(--pink-d)}
+.btn.wide{width:100%}
+.gap{height:12px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.pill{background:#fff;border-radius:999px;padding:6px 14px;font-weight:800;font-size:18px;box-shadow:0 3px 0 #e7c79c}
+.icon{width:48px;height:48px;border-radius:50%;background:#fff;box-shadow:0 3px 0 #e7c79c;font-size:22px;display:grid;place-items:center;flex:none}
+.progress{display:flex;gap:6px;justify-content:center;margin:10px 0}
+.progress i{width:14px;height:14px;border-radius:50%;background:#f0d4ad}
+.progress i.ok{background:var(--green)}.progress i.no{background:var(--red)}.progress i.now{background:var(--wood)}
+h1{font-size:clamp(42px,12vw,60px);line-height:.95;text-align:center;margin:14px 0 6px;color:#e2573b;text-shadow:0 4px 0 #ffd08a}
+.sub{text-align:center;color:var(--muted);font-weight:700;margin:0 0 10px}
+.order{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:24px;padding:10px 14px;box-shadow:0 4px 0 #efd3ad}
+.order .who{font-size:46px;line-height:1}
+.order .say{font-weight:700;line-height:1.25}
+.order .dish{font-size:40px;margin-left:auto}
+.tipbox{margin-top:10px;background:#e6f7ff;border-left:6px solid #4aa3ff;border-radius:14px;padding:8px 12px;font-weight:700;font-size:17px}
+.counter{position:relative;margin-top:14px;background:linear-gradient(#fff9ef,#ffeccc);border-radius:28px;padding:16px 10px 0;box-shadow:0 5px 0 #efd3ad;overflow:hidden}
+.counter::after{content:"";display:block;height:22px;background:var(--wood);margin:0 -10px;border-top:5px solid var(--wood-d)}
+.stage{display:flex;align-items:flex-end;justify-content:center;gap:18px;padding-bottom:6px}
+.eq{font-size:48px;font-weight:800;align-self:center;color:var(--muted)}
+.stack{display:flex;flex-direction:column-reverse;align-items:center;position:relative}
+.stack .lbl{font-size:34px;font-weight:800;margin-bottom:4px;min-height:44px}
+.cube{width:38px;height:38px;border-radius:8px;position:relative;margin-top:-1px;box-shadow:inset -5px -5px 0 rgba(0,0,0,.14),inset 4px 4px 0 rgba(255,255,255,.35);border:2px solid rgba(0,0,0,.18);transition:background .35s,transform .3s}
+.cube.pop{animation:drop .35s ease-out}
+@keyframes drop{from{transform:translateY(-60px);opacity:0}}
+.cube.lit{transform:scale(1.15)}
+.cube .n{position:absolute;right:-30px;top:5px;font-weight:800;font-size:20px;color:var(--muted)}
+.face{position:absolute;left:0;right:0;top:7px;height:22px}
+.face i{position:absolute;top:0;width:10px;height:12px;background:#fff;border-radius:50%;border:2px solid #2b1a0c}
+.face i::after{content:"";position:absolute;width:4px;height:5px;background:#2b1a0c;border-radius:50%;left:2px;top:3px}
+.face i:nth-child(1){left:6px}.face i:nth-child(2){right:6px}
+.face b{position:absolute;left:11px;top:14px;width:12px;height:6px;border-bottom:3px solid #2b1a0c;border-radius:0 0 10px 10px}
+.choices{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+.choice{font-size:44px;font-weight:800;padding:8px 0;border-radius:22px;background:#fff;box-shadow:0 6px 0 #e7c79c;min-height:84px}
+.choice:active{transform:translateY(4px);box-shadow:0 2px 0 #e7c79c}
+.choice.right{background:var(--green);color:#fff;box-shadow:0 6px 0 var(--green-d)}
+.choice.wrong{background:#ffd9d4;color:#c24b3d;animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.msg{text-align:center;font-weight:800;font-size:22px;min-height:34px;margin-top:10px}
+.center{text-align:center}
+.levels{display:flex;flex-direction:column;gap:12px}
+.lv{display:flex;align-items:center;gap:14px;background:var(--card);border-radius:24px;padding:12px 16px;box-shadow:0 5px 0 #efd3ad;text-align:left;width:100%}
+.lv:active{transform:translateY(3px);box-shadow:0 2px 0 #efd3ad}
+.lv .ic{font-size:42px;line-height:1}
+.lv .t{font-weight:800;font-size:22px;line-height:1.1}
+.lv .d{color:var(--muted);font-size:16px;font-weight:700;line-height:1.2}
+.lv .st{margin-left:auto;font-size:22px;white-space:nowrap}
+.lv.lock{opacity:.5;filter:grayscale(.7)}
+.lv.practice{background:#ffe8f0;box-shadow:0 5px 0 #f3bfd1}
+.menu{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;font-size:36px;text-align:center;margin:12px 0}
+.menu span{background:var(--card);border-radius:16px;padding:4px 0;box-shadow:0 3px 0 #efd3ad}
+.menu span.off{filter:grayscale(1);opacity:.3}
+.stars{font-size:44px;letter-spacing:4px;text-align:center}
+.card{background:var(--card);border-radius:24px;padding:16px;box-shadow:0 5px 0 #efd3ad;margin-top:14px}
+.card h2{font-size:24px;margin:0 0 10px}
+.sk{display:grid;grid-template-columns:1fr 110px 44px;gap:10px;align-items:center;font-weight:700;font-size:17px;margin-bottom:8px;line-height:1.15}
+.bar{height:16px;border-radius:999px;background:#f0dcc0;overflow:hidden}
+.bar b{display:block;height:100%;border-radius:999px}
+.good{background:#e3f8ea;border-left:6px solid var(--green);border-radius:14px;padding:10px 12px;font-weight:700;margin-top:10px}
+.weak{background:#ffe8f0;border-left:6px solid var(--pink);border-radius:14px;padding:10px 12px;font-weight:700;margin-top:10px}
+.weak small{display:block;font-weight:600;color:var(--muted);font-size:16px}
+.demo{display:flex;justify-content:center;align-items:flex-end;gap:10px;margin:6px 0 12px}
+.confetti{position:fixed;top:-20px;font-size:28px;pointer-events:none;z-index:9;animation:fall 1.6s linear forwards}
+@keyframes fall{to{transform:translateY(105vh) rotate(360deg)}}
+.banner{text-align:center;font-weight:800;font-size:20px;color:#e2573b;margin-top:6px}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<script>
+(function(){
+"use strict";
+const LANG='en';
+const $=document.getElementById('app');
+const rand=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const KEY='kitchen-'+LANG;
+
+const COL=[null,'#ff5a4e','#ff9a3c','#ffd23c','#7ccf4a','#3ec7c2','#4aa3ff','#8f7bff','#ff7fc0','#b98556','#f4f4f4'];
+
+const T={
+vi:{
+ title:'Bếp nhỏ<br>của em',sub:'Phép cộng trong phạm vi 10',
+ intro:'Mỗi số là một chồng khối nguyên liệu. Ghép hai chồng lại rồi đếm xem được bao nhiêu khối nhé!',
+ words:['không','một','hai','ba','bốn','năm','sáu','bảy','tám','chín','mười'],plus:'cộng',equals:'bằng',
+ guests:[['🐻','Bạn Gấu'],['🐰','Bạn Thỏ'],['🐱','Bạn Mèo'],['🐼','Bạn Gấu Trúc'],['🐸','Bạn Ếch'],['🐷','Bạn Heo'],['🐶','Bạn Cún'],['🦊','Bạn Cáo']],
+ dishes:[['🍕','bánh pizza'],['🍜','bát phở'],['🥗','đĩa salad'],['🍰','bánh kem'],['🍔','bánh hamburger'],['🥞','bánh kếp'],['🍙','cơm nắm'],['🍲','nồi lẩu'],['🍩','bánh vòng'],['🥪','bánh mì kẹp']],
+ praise:['Ngon quá!','Đầu bếp giỏi!','Tuyệt vời!','Đúng rồi!','Khách rất vui!'],
+ order:(g,d,a,b)=>`${g} muốn ăn ${d}! Cần <b>${a} + ${b}</b> khối nguyên liệu.`,
+ pot:'🍲 Cho vào nồi',howMany:'Nồi có bao nhiêu khối?',countYourself:'Em tự đếm các khối nhé!',
+ wrong:'Chưa đúng, cùng đếm lại từng khối nhé!',wrongSay:'Em đếm lại nhé',
+ levels:[
+  {n:'Bếp tập sự',d:'Cộng với 1 và cộng trong phạm vi 5',ic:'🥄'},
+  {n:'Bếp phụ',d:'Hai số giống nhau, cộng đến 9',ic:'🍳'},
+  {n:'Bếp trưởng',d:'Cộng tròn 10, tự đếm khối',ic:'👨‍🍳'}],
+ practice:{n:'Luyện món khó',d:'Luyện lại những dạng em còn sai',ic:'💪'},
+ locked:'Làm đúng 6/8 món ở màn trước để mở',
+ skills:{plus1:'Cộng với 1',within5:'Cộng trong phạm vi 5',double:'Hai số giống nhau',ten:'Cộng tròn 10',within10:'Cộng từ 6 đến 9'},
+ tips:{plus1:'Cộng 1 là lấy số liền sau: 6 + 1 = 7.',within5:'Bắt đầu từ số lớn rồi đếm thêm: 2 + 3 → 3, rồi 4, 5.',double:'Hai chồng cao bằng nhau: 2 + 2 = 4, 3 + 3 = 6, 4 + 4 = 8, 5 + 5 = 10.',ten:'Nhớ các cặp làm tròn 10: 1 + 9, 2 + 8, 3 + 7, 4 + 6, 5 + 5.',within10:'Bắt đầu từ số lớn hơn rồi đếm thêm số nhỏ: 6 + 3 → 7, 8, 9.'},
+ resultTitle:n=>n>=8?'Siêu đầu bếp!':n>=6?'Đầu bếp giỏi!':'Em đã cố gắng!',
+ firstTry:(n,t)=>`Em nấu đúng ngay lần đầu <b>${n}/${t}</b> món.`,
+ unlocked:l=>`🎉 Em đã mở khóa màn ${l}!`,
+ allDone:'🏆 Em đã hoàn thành tất cả các màn!',
+ needMore:'Làm đúng 6/8 món để mở màn tiếp theo nhé!',
+ report:'Tổng kết',strong:'Em làm tốt:',weakT:'Cần luyện thêm:',noWeak:'Em không sai dạng nào. Giỏi lắm!',
+ btnNext:'Chơi màn tiếp theo',btnAgain:'Chơi lại màn này',btnPractice:'💪 Luyện món khó',btnHome:'Về trang đầu',
+ practiceDone:'Luyện tập xong!',practiceNone:'Em chưa có dạng nào cần luyện. Hãy chơi các màn trước nhé!',
+ home:'Về trang đầu',soundOn:'Bật âm thanh',soundOff:'Tắt âm thanh',hintLabel:'Mẹo:',
+ voice:/^vi/i,final:'Siêu đầu bếp',well:'Giỏi lắm'
+},
+en:{
+ title:'Little<br>Kitchen',sub:'Addition within 10',
+ intro:'Every number is a stack of ingredient blocks. Put two stacks together and count how many blocks you get!',
+ words:['zero','one','two','three','four','five','six','seven','eight','nine','ten'],plus:'plus',equals:'equals',
+ guests:[['🐻','Bear'],['🐰','Bunny'],['🐱','Kitty'],['🐼','Panda'],['🐸','Froggy'],['🐷','Piggy'],['🐶','Puppy'],['🦊','Foxy']],
+ dishes:[['🍕','a pizza'],['🍜','a bowl of noodles'],['🥗','a salad'],['🍰','a cake'],['🍔','a burger'],['🥞','pancakes'],['🍙','a rice ball'],['🍲','a hot pot'],['🍩','a donut'],['🥪','a sandwich']],
+ praise:['Yummy!','Great chef!','Awesome!',"That's right!",'Happy customer!'],
+ order:(g,d,a,b)=>`${g} wants ${d}! We need <b>${a} + ${b}</b> blocks.`,
+ pot:'🍲 Put in the pot',howMany:'How many blocks in the pot?',countYourself:'Count the blocks yourself!',
+ wrong:"Not quite! Let's count the blocks together.",wrongSay:"Let's count again",
+ levels:[
+  {n:'Kitchen Helper',d:'Plus 1 and adding within 5',ic:'🥄'},
+  {n:'Junior Cook',d:'Doubles and adding up to 9',ic:'🍳'},
+  {n:'Head Chef',d:'Making 10, count by yourself',ic:'👨‍🍳'}],
+ practice:{n:'Practice Kitchen',d:'Practice the sums you missed',ic:'💪'},
+ locked:'Get 6/8 dishes right in the level before to unlock',
+ skills:{plus1:'Adding 1',within5:'Adding within 5',double:'Doubles',ten:'Making 10',within10:'Adding to 6–9'},
+ tips:{plus1:'Adding 1 means the next number: 6 + 1 = 7.',within5:'Start from the bigger number and count on: 2 + 3 → 3, then 4, 5.',double:'Two stacks the same height: 2 + 2 = 4, 3 + 3 = 6, 4 + 4 = 8, 5 + 5 = 10.',ten:'Remember the pairs that make 10: 1 + 9, 2 + 8, 3 + 7, 4 + 6, 5 + 5.',within10:'Start from the bigger number and count on the smaller one: 6 + 3 → 7, 8, 9.'},
+ resultTitle:n=>n>=8?'Super Chef!':n>=6?'Great Chef!':'Good try!',
+ firstTry:(n,t)=>`You got <b>${n}/${t}</b> dishes right on the first try.`,
+ unlocked:l=>`🎉 You unlocked level ${l}!`,
+ allDone:'🏆 You finished every level!',
+ needMore:'Get 6/8 dishes right to unlock the next level!',
+ report:'Your report',strong:'You are good at:',weakT:'Practice more:',noWeak:'No mistakes at all. Well done!',
+ btnNext:'Play next level',btnAgain:'Play this level again',btnPractice:'💪 Practice Kitchen',btnHome:'Home',
+ practiceDone:'Practice done!',practiceNone:'Nothing to practice yet. Play a level first!',
+ home:'Home',soundOn:'Sound on',soundOff:'Sound off',hintLabel:'Tip:',
+ voice:/^en/i,final:'Super chef!',well:'Well done!'
+}}[LANG];
+
+const SKILLS=['plus1','within5','double','ten','within10'];
+const PLANS=[
+ {plus1:3,within5:5,count:true},
+ {within5:2,double:3,within10:3,count:true},
+ {plus1:1,double:2,ten:3,within10:2,count:false}
+];
+const S={muted:false,round:null,prog:LS.get(KEY,{stars:[0,0,0],unlocked:1,weak:{}})};
+function saveProg(){LS.set(KEY,S.prog)}
+
+/* sound + voice */
+let AC=null;
+function beep(f,d){if(S.muted)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime;o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.2,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+(d||.15));o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+(d||.15)+.05)}catch(e){}}
+let voice=null;
+function loadVoice(){try{const v=speechSynthesis.getVoices();voice=(LANG==='en'&&v.find(x=>/^en[-_]US/i.test(x.lang)))||v.find(x=>T.voice.test(x.lang))||null}catch(e){}}
+if('speechSynthesis' in window){loadVoice();speechSynthesis.onvoiceschanged=loadVoice}
+function say(t){if(S.muted||!voice)return;try{const u=new SpeechSynthesisUtterance(t);u.voice=voice;u.lang=voice.lang;u.rate=.92;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
+function hush(){try{speechSynthesis.cancel()}catch(e){}}
+const W=T.words;
+
+/* question generation */
+function gen(skill){
+ let a,b;
+ if(skill==='plus1'){a=rand(2,9);b=1;if(Math.random()<.4)[a,b]=[b,a]}
+ else if(skill==='within5'){do{a=rand(1,4);b=rand(2,5-a)}while(a+b>5||b<2);if(Math.random()<.5)[a,b]=[b,a]}
+ else if(skill==='double'){a=b=rand(1,5)}
+ else if(skill==='ten'){a=rand(1,9);b=10-a}
+ else{do{a=rand(2,7);b=rand(2,7)}while(a===b||a+b<6||a+b>9)}
+ return{a,b,ans:a+b,skill};
+}
+function build(plan,count){
+ const list=[];Object.keys(plan).forEach(k=>{if(SKILLS.includes(k))for(let i=0;i<plan[k];i++)list.push(k)});
+ const seen=new Set(),qs=[];
+ shuffle(list).forEach((sk,i)=>{let q,g=0;do{q=gen(sk)}while(seen.has(q.a+'+'+q.b)&&++g<40);seen.add(q.a+'+'+q.b);q.guest=pick(T.guests);q.dish=T.dishes[i%T.dishes.length];qs.push(q)});
+ return qs;
+}
+
+/* blocks */
+function cubeHTML(color,face){return `<div class="cube" style="background:${color}">${face?'<div class="face"><i></i><i></i><b></b></div>':''}</div>`}
+function stackHTML(n,id){let s=`<div class="stack" ${id?`id="${id}"`:''}>`;for(let i=0;i<n;i++)s+=cubeHTML(COL[n],i===n-1);return s+`<div class="lbl">${n}</div></div>`}
+function muteBtn(){return `<button class="icon" data-a="mute" aria-label="${S.muted?T.soundOn:T.soundOff}">${S.muted?'🔇':'🔊'}</button>`}
+function starStr(n){return n>=3?'⭐⭐⭐':n===2?'⭐⭐☆':n===1?'⭐☆☆':'☆☆☆'}
+
+/* home with level map */
+function home(){
+ hush();
+ let demo='';[1,2,3,4,5].forEach(n=>demo+=stackHTML(n));
+ const p=S.prog;
+ const lv=T.levels.map((l,i)=>{const open=i<p.unlocked;return `<button class="lv ${open?'':'lock'}" ${open?`data-a="level" data-v="${i}"`:'disabled'}><span class="ic">${open?l.ic:'🔒'}</span><span><span class="t">${i+1}. ${l.n}</span><br><span class="d">${open?l.d:T.locked}</span></span><span class="st">${open?starStr(p.stars[i]):''}</span></button>`}).join('');
+ const hasWeak=Object.keys(p.weak||{}).length>0;
+ $.innerHTML=`<div class="top"><span></span>${muteBtn()}</div>
+ <h1>${T.title}</h1><p class="sub">${T.sub}</p>
+ <div class="demo">${demo}</div>
+ <div class="order" style="margin-bottom:14px"><div class="who">👩‍🍳</div><div class="say">${T.intro}</div></div>
+ <div class="levels">${lv}
+ <button class="lv practice" data-a="practice"><span class="ic">${T.practice.ic}</span><span><span class="t">${T.practice.n}</span><br><span class="d">${hasWeak?T.practice.d+': '+Object.keys(p.weak).map(k=>T.skills[k]).join(', '):T.practiceNone}</span></span></button></div>`;
+}
+
+/* round */
+function startLevel(i){S.round={type:'level',level:i,qs:build(PLANS[i]),count:PLANS[i].count,i:0,res:[]};question()}
+function startPractice(){
+ const w=Object.keys(S.prog.weak||{}).sort((a,b)=>S.prog.weak[b]-S.prog.weak[a]);
+ if(!w.length){home();return}
+ const plan={};for(let i=0;i<6;i++){const k=w[i%w.length];plan[k]=(plan[k]||0)+1}
+ S.round={type:'practice',qs:build(plan),count:true,i:0,res:[]};question();
+}
+function question(){
+ const r=S.round,q=r.qs[r.i];r.first=true;r.busy=false;r.locked=false;
+ const dots=r.qs.map((_,i)=>`<i class="${i<r.i?(r.res[i]?'ok':'no'):i===r.i?'now':''}"></i>`).join('');
+ const label=r.type==='practice'?T.practice.n:`${r.level+1}. ${T.levels[r.level].n}`;
+ $.innerHTML=`<div class="top"><button class="icon" data-a="home" aria-label="${T.home}">🏠</button><span class="pill">${label}</span>${muteBtn()}</div>
+ <div class="progress">${dots}</div>
+ <div class="order"><div class="who">${q.guest[0]}</div><div class="say">${T.order(q.guest[1],q.dish[1],q.a,q.b)}</div><div class="dish">${q.dish[0]}</div></div>
+ ${r.type==='practice'?`<div class="tipbox">${T.hintLabel} ${T.tips[q.skill]}</div>`:''}
+ <div class="counter"><div class="stage" id="stage" style="min-height:${q.ans*37+60}px">${stackHTML(q.a)}<div class="eq">+</div>${stackHTML(q.b)}</div></div>
+ <div id="act" style="margin-top:14px"><button class="btn wood wide" data-a="merge">${T.pot}</button></div>
+ <div class="msg" id="msg"></div>`;
+ say(`${W[q.a]} ${T.plus} ${W[q.b]}`);
+}
+async function merge(){
+ const r=S.round,q=r.qs[r.i];if(r.busy)return;r.busy=true;
+ document.getElementById('act').innerHTML='';
+ const stage=document.getElementById('stage');
+ stage.innerHTML=`<div class="stack" id="m"><div class="lbl" id="ml"></div></div>`;
+ const m=document.getElementById('m'),lbl=document.getElementById('ml');const cubes=[];
+ for(let i=0;i<q.ans;i++){
+  const d=document.createElement('div');d.className='cube pop';d.style.background=i<q.a?COL[q.a]:COL[q.b];
+  lbl.before(d);cubes.push(d);
+  if(r.count){d.innerHTML=`<span class="n">${i+1}</span>`;lbl.textContent=i+1;beep(400+i*60,.12);say(W[i+1]);await sleep(reduce?250:650)}
+  else await sleep(reduce?20:90);
+ }
+ r.cubes=cubes;
+ if(r.count){cubes.forEach(c=>{c.style.background=COL[q.ans];const n=c.querySelector('.n');if(n)n.remove()});
+  cubes[cubes.length-1].insertAdjacentHTML('beforeend','<div class="face"><i></i><i></i><b></b></div>')}
+ lbl.textContent='?';
+ const opts=new Set([q.ans]);shuffle([q.ans-1,q.ans+1,q.ans+2,q.ans-2]).forEach(n=>{if(opts.size<3&&n>=1&&n<=10)opts.add(n)});
+ document.getElementById('act').innerHTML=`<div class="center" style="font-weight:800">${r.count?T.howMany:T.countYourself}</div><div class="choices">${shuffle([...opts]).map(n=>`<button class="choice" data-a="pick" data-v="${n}">${n}</button>`).join('')}</div>`;
+}
+async function choose(btn){
+ const r=S.round,q=r.qs[r.i],v=+btn.dataset.v;if(r.locked)return;
+ const msg=document.getElementById('msg');
+ if(v===q.ans){
+  r.locked=true;btn.classList.add('right');document.getElementById('ml').textContent=q.ans;
+  r.cubes.forEach(c=>{c.style.background=COL[q.ans];const n=c.querySelector('.n');if(n)n.remove()});
+  if(!r.cubes[r.cubes.length-1].querySelector('.face'))r.cubes[r.cubes.length-1].insertAdjacentHTML('beforeend','<div class="face"><i></i><i></i><b></b></div>');
+  r.res.push(r.first);
+  beep(660,.1);setTimeout(()=>beep(880,.15),110);
+  msg.textContent=`${pick(T.praise)} ${q.a} + ${q.b} = ${q.ans} ${q.dish[0]}`;say(`${W[q.a]} ${T.plus} ${W[q.b]} ${T.equals} ${W[q.ans]}`);
+  confetti([q.dish[0],'⭐','✨']);
+  await sleep(reduce?1200:2200);r.i++;
+  if(r.i<r.qs.length)question();else finish();
+ }else{
+  r.first=false;btn.classList.add('wrong');btn.disabled=true;beep(220,.2);
+  msg.textContent=T.wrong;say(T.wrongSay);
+  for(let i=0;i<r.cubes.length;i++){const c=r.cubes[i];c.classList.add('lit');c.insertAdjacentHTML('beforeend',`<span class="n">${i+1}</span>`);await sleep(reduce?80:380);c.classList.remove('lit')}
+  await sleep(600);r.cubes.forEach(c=>{const n=c.querySelector('.n');if(n)n.remove()});
+ }
+}
+
+/* report */
+function finish(){
+ hush();
+ const r=S.round,tot=r.qs.length,n=r.res.filter(Boolean).length,p=S.prog;
+ const by={};r.qs.forEach((q,i)=>{by[q.skill]=by[q.skill]||{c:0,t:0};by[q.skill].t++;if(r.res[i])by[q.skill].c++});
+ const strong=[],weak=[];
+ Object.keys(by).forEach(k=>{if(by[k].c===by[k].t)strong.push(k);else weak.push(k)});
+ // update the list of skills to practise
+ p.weak=p.weak||{};
+ Object.keys(by).forEach(k=>{if(by[k].c<by[k].t)p.weak[k]=(p.weak[k]||0)+(by[k].t-by[k].c);else if(r.type==='practice'||by[k].t>=2)delete p.weak[k]});
+ let banner='',stars=n>=8||(r.type==='practice'&&n===tot)?3:n>=6?2:1;
+ if(r.type==='level'){
+  const L=r.level;p.stars[L]=Math.max(p.stars[L]||0,stars);
+  if(n>=6&&L+1>=p.unlocked&&L<2){p.unlocked=L+2;banner=T.unlocked(L+2)}
+  else if(n>=6&&L===2)banner=T.allDone;
+  else if(n<6)banner=T.needMore;
+ }
+ saveProg();
+ const bars=SKILLS.filter(k=>by[k]).map(k=>{const s=by[k],pc=s.c/s.t;return `<div class="sk"><span>${T.skills[k]}</span><div class="bar"><b style="width:${pc*100}%;background:${pc===1?'var(--green)':pc>=.5?'#ffc93c':'var(--red)'}"></b></div><span>${s.c}/${s.t}</span></div>`}).join('');
+ const strongHTML=strong.length?`<div class="good">✅ ${T.strong} ${strong.map(k=>T.skills[k].toLowerCase()).join(', ')}</div>`:'';
+ const weakHTML=weak.length?weak.map(k=>`<div class="weak">💪 ${T.weakT} ${T.skills[k].toLowerCase()}<small>${T.hintLabel} ${T.tips[k]}</small></div>`).join(''):`<div class="good">🌟 ${T.noWeak}</div>`;
+ const menu=r.qs.map((q,i)=>`<span class="${r.res[i]?'':'off'}">${q.dish[0]}</span>`).join('');
+ const canNext=r.type==='level'&&n>=6&&r.level<2;
+ const hasWeak=Object.keys(p.weak).length>0;
+ let btns='';
+ if(canNext)btns+=`<button class="btn wide" data-a="level" data-v="${r.level+1}">${T.btnNext}</button><div class="gap"></div>`;
+ if(hasWeak)btns+=`<button class="btn pink wide" data-a="practice">${T.btnPractice}</button><div class="gap"></div>`;
+ if(r.type==='level')btns+=`<button class="btn ${canNext||hasWeak?'wood':''} wide" data-a="level" data-v="${r.level}">${T.btnAgain}</button><div class="gap"></div>`;
+ btns+=`<button class="btn wood wide" data-a="home">${T.btnHome}</button>`;
+ $.innerHTML=`<div class="top"><span class="pill">${r.type==='practice'?T.practice.n:`${r.level+1}. ${T.levels[r.level].n}`}</span>${muteBtn()}</div>
+ <h1 style="font-size:44px">${r.type==='practice'?T.practiceDone:T.resultTitle(n)}</h1>
+ <div class="stars">${starStr(stars)}</div>
+ <p class="center" style="font-weight:700;margin:4px 0">${T.firstTry(n,tot)}</p>
+ ${banner?`<div class="banner">${banner}</div>`:''}
+ <div class="menu">${menu}</div>
+ <div class="card"><h2>${T.report}</h2>${bars}${strongHTML}${weakHTML}</div>
+ <div style="margin-top:18px">${btns}</div>`;
+ if(n>=6)confetti(['⭐','🎉','🍰','🍕']);
+ say(n>=8?T.final:T.well);
+}
+function confetti(items){if(reduce)return;for(let i=0;i<16;i++){const c=document.createElement('div');c.className='confetti';c.textContent=pick(items);c.style.left=Math.random()*100+'vw';c.style.animationDelay=Math.random()*.5+'s';document.body.appendChild(c);setTimeout(()=>c.remove(),2300)}}
+
+document.addEventListener('click',e=>{
+ const t=e.target.closest('[data-a]');if(!t)return;const a=t.dataset.a;
+ if(a==='mute'){S.muted=!S.muted;t.textContent=S.muted?'🔇':'🔊';if(S.muted)hush()}
+ if(a==='home')home();
+ if(a==='level'){window.scrollTo(0,0);startLevel(+t.dataset.v)}
+ if(a==='practice'){window.scrollTo(0,0);startPractice()}
+ if(a==='merge')merge();
+ if(a==='pick')choose(t);
+});
+home();
+})();
+</script>
+<a href="../" aria-label="Back to Peter's World" style="position:fixed;left:calc(10px + env(safe-area-inset-left,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:2147483000;width:48px;height:48px;border-radius:50%;background:#fff;border:3px solid #5fd3b0;display:grid;place-items:center;font-size:22px;text-decoration:none;box-shadow:0 3px 0 rgba(0,0,0,.18)">🏠</a>
+</body>
+</html>

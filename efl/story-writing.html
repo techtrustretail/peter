@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,-apple-system,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
+<title>Lila's Secret Bakery</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@400;600;700;800&family=Patrick+Hand&display=swap">
+<style>
+/* Layout: one column "workshop" — checklist strip on top, 5 real steps in order, finished story at the end */
+:root{
+  --bg:#EAF1F6;        /* pale lapis tile */
+  --paper:#FFFFFF;
+  --ink:#1D2944;       /* night-market indigo */
+  --muted:#5B6683;
+  --line:#CBD6E4;
+  --saffron:#E09A12;
+  --saffron-soft:#FCEFD2;
+  --teal:#137C7C;
+  --teal-soft:#D7EFEE;
+  --rose:#B83A62;
+  --rose-soft:#F8DDE6;
+  --good:#1E8A4C;
+  --good-soft:#DBF2E3;
+  --f-display:"Baloo 2","Trebuchet MS",system-ui,sans-serif;
+  --f-body:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-hand:"Patrick Hand","Comic Sans MS","Chalkboard SE",cursive;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#111829;--paper:#1A2338;--ink:#E8EDF7;--muted:#9AA6C2;--line:#2E3A57;
+  --saffron:#F2B23A;--saffron-soft:#3A2E14;--teal:#4CC3C0;--teal-soft:#14383A;
+  --rose:#EE7A9F;--rose-soft:#3D1D2A;--good:#5BD08A;--good-soft:#173826;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111829;--paper:#1A2338;--ink:#E8EDF7;--muted:#9AA6C2;--line:#2E3A57;
+  --saffron:#F2B23A;--saffron-soft:#3A2E14;--teal:#4CC3C0;--teal-soft:#14383A;
+  --rose:#EE7A9F;--rose-soft:#3D1D2A;--good:#5BD08A;--good-soft:#173826;color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55}
+.wrap{max-width:860px;margin:0 auto;padding-block:20px 60px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:22px}
+h1,h2,h3{font-family:var(--f-display);line-height:1.15;text-wrap:balance;margin:0}
+h1{font-size:clamp(30px,6vw,44px);font-weight:800}
+h2{font-size:24px;font-weight:800}
+h3{font-size:18px;font-weight:600}
+p{margin:0}
+.vi{color:var(--muted);font-size:14.5px}
+.eyebrow{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--teal)}
+
+header.hero{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:end}
+.door{width:86px;height:110px;border-radius:44px 44px 6px 6px;background:var(--saffron-soft);border:3px solid var(--saffron);position:relative}
+.door::after{content:"";position:absolute;right:16px;top:58px;width:10px;height:10px;border-radius:50%;background:var(--saffron)}
+.door span{position:absolute;inset:auto 0 10px;text-align:center;font-size:12px;font-weight:800;color:var(--saffron)}
+
+/* checklist */
+.checks{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.chk{background:var(--paper);border:2px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.chk b{font-family:var(--f-display);font-size:15px;line-height:1.2}
+.chk small{color:var(--muted);font-size:13px}
+.chk .st{font-weight:800;font-size:13px;color:var(--rose)}
+.chk.ok{border-color:var(--good);background:var(--good-soft)}
+.chk.ok .st{color:var(--good)}
+@media (max-width:700px){.checks{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* step tabs */
+nav.steps{display:flex;flex-wrap:wrap;gap:8px}
+nav.steps button{font:700 15px var(--f-body);border:2px solid var(--line);background:var(--paper);color:var(--ink);
+  border-radius:999px;padding:8px 14px;cursor:pointer}
+nav.steps button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible,textarea:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--saffron);outline-offset:2px}
+
+section.panel{background:var(--paper);border:2px solid var(--line);border-radius:18px;padding:20px;display:flex;flex-direction:column;gap:16px}
+.tip{background:var(--saffron-soft);border-radius:12px;padding:12px 14px;font-size:15px}
+.tip b{color:var(--ink)}
+
+/* paragraphs */
+.para{display:flex;flex-direction:column;gap:8px}
+.para-head{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;justify-content:space-between}
+.tag{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:999px}
+.t1{background:var(--teal-soft);color:var(--teal)} .t2{background:var(--rose-soft);color:var(--rose)}
+.t3{background:var(--saffron-soft);color:var(--saffron)} .t4{background:var(--good-soft);color:var(--good)}
+textarea{width:100%;min-height:130px;resize:vertical;font-family:var(--f-hand);font-size:21px;line-height:1.5;
+  color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:12px 14px}
+textarea.active{border-color:var(--teal)}
+.meta{font-size:13px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:600 14px var(--f-body);background:var(--teal-soft);color:var(--teal);border:0;border-radius:8px;padding:4px 10px}
+button.chip{cursor:pointer}
+button.chip.used{background:var(--good-soft);color:var(--good);text-decoration:line-through}
+
+/* verb game */
+.verbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.verb{border:2px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.verb .q{font-family:var(--f-hand);font-size:20px}
+.verb .q s{color:var(--rose)}
+.opts{display:flex;gap:6px;flex-wrap:wrap}
+.opts button,.btn{font:700 15px var(--f-body);border:2px solid var(--line);background:var(--paper);color:var(--ink);border-radius:10px;padding:6px 12px;cursor:pointer}
+.opts button.right{background:var(--good-soft);border-color:var(--good);color:var(--good)}
+.opts button.wrong{background:var(--rose-soft);border-color:var(--rose);color:var(--rose)}
+.btn.primary{background:var(--teal);border-color:var(--teal);color:var(--paper)}
+.btn:disabled{opacity:.5;cursor:default}
+.score{font-family:var(--f-display);font-size:20px}
+
+/* speech builder */
+.builder{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.builder label{display:flex;flex-direction:column;gap:4px;font-weight:700;font-size:14px;min-width:0}
+.builder .wide{grid-column:1/-1}
+select,input[type=text]{font:600 16px var(--f-body);color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:10px;padding:8px 10px;width:100%}
+@media (max-width:600px){.builder{grid-template-columns:1fr}}
+.preview{font-family:var(--f-hand);font-size:23px;background:var(--bg);border:2px dashed var(--teal);border-radius:12px;padding:12px 14px;min-height:56px}
+.preview .qm{color:var(--rose);font-weight:700}
+.ideas{display:flex;flex-direction:column;gap:8px}
+.idea{border-left:4px solid var(--saffron);padding:4px 12px}
+.rule{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (max-width:600px){.rule{grid-template-columns:1fr}}
+.rule div{background:var(--bg);border-radius:12px;padding:10px 12px;font-size:15px}
+.rule code{font-family:var(--f-hand);font-size:19px}
+
+/* wow words */
+.bank{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.bank{grid-template-columns:1fr}}
+.bank > div{display:flex;flex-direction:column;gap:8px;min-width:0}
+.target{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);padding:8px 0;border-bottom:2px solid var(--line);font-size:14px}
+
+/* final */
+.story{font-family:var(--f-hand);font-size:22px;line-height:1.6;background:var(--bg);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:14px;overflow-wrap:anywhere}
+.story h3{font-family:var(--f-display);font-size:24px}
+.story p{text-indent:1.5em}
+.self{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+@media (max-width:600px){.self{grid-template-columns:1fr}}
+.self label{display:flex;gap:8px;align-items:center;font-weight:700;background:var(--bg);border-radius:10px;padding:8px 10px}
+.stars{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:600px){.stars{grid-template-columns:1fr}}
+.stars label{display:flex;flex-direction:column;gap:4px;font-weight:700;font-size:14px}
+.stars input{font-family:var(--f-hand);font-size:18px}
+details.parent{background:var(--paper);border:2px solid var(--line);border-radius:14px;padding:12px 16px}
+details.parent summary{font-weight:800;cursor:pointer}
+details.parent ul{margin:8px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.toast{color:var(--good);font-weight:800}
+@media (prefers-reduced-motion:no-preference){.chk,.opts button{transition:background .2s,border-color .2s}}
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <div style="display:flex;flex-direction:column;gap:6px;min-width:0">
+      <span class="eyebrow">Friday Homework · The Story Continues…</span>
+      <h1>Lila's Secret Bakery</h1>
+      <p class="vi">Truyện của <b>Peter</b>. Đây là ý tưởng của con — con chỉ cần làm cho câu chuyện hoàn chỉnh theo 4 yêu cầu của cô.</p>
+    </div>
+    <div class="door" aria-hidden="true"><span>BAKERY</span></div>
+  </header>
+
+  <div>
+    <p class="eyebrow" style="margin-bottom:8px">Your story must include — tự động tick khi con làm xong</p>
+    <div class="checks">
+      <div class="chk" id="c1"><b>Problem → Solution → Ending</b><small>Có vấn đề, cách giải quyết, kết thúc</small><span class="st"></span></div>
+      <div class="chk" id="c2"><b>2 × direct speech</b><small>Ít nhất 2 câu nói trong “ ”</small><span class="st"></span></div>
+      <div class="chk" id="c3"><b>Interesting vocabulary</b><small>Từ hay tả nhân vật, nơi chốn, sự việc</small><span class="st"></span></div>
+      <div class="chk" id="c4"><b>Paragraphs</b><small>Chia thành các đoạn dễ đọc</small><span class="st"></span></div>
+    </div>
+  </div>
+
+  <nav class="steps" role="tablist" aria-label="Các bước">
+    <button role="tab" data-step="s1" aria-selected="true">1 · Paragraphs</button>
+    <button role="tab" data-step="s2">2 · Past tense</button>
+    <button role="tab" data-step="s3">3 · Speech “ ”</button>
+    <button role="tab" data-step="s4">4 · WOW words</button>
+    <button role="tab" data-step="s5">5 · Ending &amp; read</button>
+  </nav>
+
+  <!-- STEP 1 -->
+  <section class="panel" id="s1">
+    <div><h2>Step 1 · Put your story into paragraphs</h2>
+    <p class="vi">Mẹ đã chép bài viết tay của con vào 4 đoạn. Mỗi đoạn là một phần của câu chuyện. Đoạn 1 con mới có ý (sơ đồ “secret bakery”) — con hãy tự viết thành câu nhé.</p></div>
+    <div class="tip"><b>New paragraph</b> = new place, new time, or something new happens. Mỗi đoạn nên có 3–5 câu.</div>
+    <div id="paras"></div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="panel" id="s2" hidden>
+    <div><h2>Step 2 · Past tense detective</h2>
+    <p class="vi">Truyện kể chuyện đã xảy ra nên động từ phải ở <b>quá khứ</b>. Đây là những từ con viết. Chọn dạng đúng, rồi bấm “Sửa trong bài”.</p></div>
+    <p class="score" id="vscore"></p>
+    <div class="verbs" id="verbs"></div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="panel" id="s3" hidden>
+    <div><h2>Step 3 · Make the characters talk</h2>
+    <p class="vi">Cô cần ít nhất <b>2 câu nói trực tiếp</b>. Con nghĩ xem nhân vật nói gì — dùng lời của con.</p></div>
+    <div class="rule">
+      <div><b>Rule 1.</b> Lời nói nằm trong dấu “ ”, dấu câu cũng nằm <i>bên trong</i>.<br><code>“Where can we go?” asked Lila.</code></div>
+      <div><b>Rule 2.</b> Nếu lời nói kết thúc bằng dấu chấm, đổi thành dấu phẩy.<br><code>“Follow me,” meowed the cat.</code></div>
+    </div>
+    <div class="ideas">
+      <h3>Ideas from your story</h3>
+      <p class="idea">Con đã viết: <i style="font-family:var(--f-hand);font-size:19px">“whisper. How do we climb up to the roof?”</i> → đây chính là câu nói! Con thử đặt nó trong “ ” bằng máy bên dưới.</p>
+      <p class="idea">Khi cánh cửa đóng sầm lại, Lila nói gì? Cô ấy sợ hay bình tĩnh?</p>
+      <p class="idea">Chú mèo “give a hint” — nếu mèo biết nói, nó sẽ nói gì?</p>
+      <p class="idea">Người bạn mới ở cuối truyện nói câu đầu tiên là gì?</p>
+    </div>
+    <div class="builder">
+      <label class="wide" for="sp-words">What do they say? (lời nói)
+        <input type="text" id="sp-words" placeholder="Type the words here…" autocomplete="off"></label>
+      <label for="sp-who">Who speaks?
+        <select id="sp-who"><option>Lila</option><option>the cat</option><option>the baker</option><option>the girl</option><option>her new friend</option></select></label>
+      <label for="sp-verb">How do they say it?
+        <select id="sp-verb"><option>said</option><option>whispered</option><option>asked</option><option>cried</option><option>gasped</option><option>shouted</option><option>murmured</option><option>meowed</option><option>giggled</option><option>replied</option></select></label>
+      <label for="sp-to">Put it in paragraph
+        <select id="sp-to"><option value="0">1 · Beginning</option><option value="1" selected>2 · Problem</option><option value="2">3 · Solution</option><option value="3">4 · Ending</option></select></label>
+    </div>
+    <div class="preview" id="sp-prev" aria-live="polite"></div>
+    <div class="row"><button class="btn primary" id="sp-add">Thêm vào cuối đoạn</button><span class="toast" id="sp-toast"></span></div>
+  </section>
+
+  <!-- STEP 4 -->
+  <section class="panel" id="s4" hidden>
+    <div><h2>Step 4 · WOW words</h2>
+    <p class="vi">Bấm vào một đoạn bên dưới (khung xanh), đặt con trỏ chỗ muốn thêm, rồi bấm từ để chèn. Cần dùng ít nhất <b>6 từ</b>. Con có thể tự nghĩ từ của mình!</p></div>
+    <div class="target" id="target">Đang chèn vào: <b>—</b> · Đã dùng <b id="wcount">0</b> WOW words</div>
+    <div class="bank" id="bank"></div>
+    <div id="paras4"></div>
+  </section>
+
+  <!-- STEP 5 -->
+  <section class="panel" id="s5" hidden>
+    <div><h2>Step 5 · A strong ending</h2>
+    <p class="vi">Truyện của con kết thúc: “She had a friend.” Kết như vậy hơi nhanh. Trả lời 3 câu hỏi rồi viết thêm vào đoạn 4.</p></div>
+    <div class="ideas">
+      <p class="idea">Who is the friend? Có phải là chú mèo? Hay người làm bánh? Hay một bạn mới ở chợ?</p>
+      <p class="idea">How did Lila feel at the end? (relieved, proud, happy, tired…) Vì sao?</p>
+      <p class="idea">⭐ Challenge: a surprising twist! Ví dụ: cái bản đồ hay chiếc chìa khoá gỉ có bí mật gì không? Con tự nghĩ nhé.</p>
+    </div>
+    <div class="para"><div class="para-head"><span class="tag t4">4 · Ending</span><span class="meta" id="endmeta"></span></div>
+      <textarea id="end-edit" aria-label="Ending paragraph"></textarea></div>
+
+    <h2 style="margin-top:8px">Read your whole story</h2>
+    <div class="story" id="story"></div>
+    <div class="row"><button class="btn primary" id="copy">Copy truyện</button><span class="toast" id="copy-toast"></span></div>
+
+    <h3>Self-check (con tự kiểm)</h3>
+    <div class="self">
+      <label><input type="checkbox" id="k1"> Capital letters ✔</label>
+      <label><input type="checkbox" id="k2"> Full stops . ? ! ✔</label>
+      <label><input type="checkbox" id="k3"> Finger spaces ✔</label>
+      <label><input type="checkbox" id="k4"> Read it aloud once ✔</label>
+    </div>
+    <h3>2 stars and a wish (bố mẹ cùng con)</h3>
+    <div class="stars">
+      <label for="st1">⭐ Star 1<input type="text" id="st1" placeholder="Điều con làm tốt"></label>
+      <label for="st2">⭐ Star 2<input type="text" id="st2" placeholder="Điều con làm tốt"></label>
+      <label for="wish">🪄 Wish<input type="text" id="wish" placeholder="Lần sau con sẽ…"></label>
+    </div>
+  </section>
+
+  <details class="parent">
+    <summary>Dành cho bố mẹ — cách dùng (15–20 phút)</summary>
+    <ul>
+      <li>Ngồi cạnh con, đi lần lượt 5 bước. Bố mẹ <b>chỉ hỏi</b>, không gõ hộ câu — ý tưởng phải là của con.</li>
+      <li>Bước 1: con tự viết đoạn mở đầu từ sơ đồ “secret bakery” của con (bánh mì, mùi thơm, lò kim loại, chú làm bánh, con mèo ở góc bụi, cửa đóng sập).</li>
+      <li>Bước 2: 16 động từ con viết ở hiện tại → tập đổi sang quá khứ (đây là lỗi lớn nhất của bài).</li>
+      <li>Xong ở máy, con <b>chép lại tay</b> vào tờ bài tập phần 4 “Continue the story”, mỗi đoạn lùi đầu dòng.</li>
+      <li>Bài được lưu trong trình duyệt của máy này. Bấm “Bắt đầu lại” nếu muốn xoá. <button class="btn" id="reset" style="margin-left:6px">Bắt đầu lại</button> <span class="toast" id="reset-toast"></span></li>
+    </ul>
+  </details>
+</div>
+
+<script>
+(function(){
+const LABELS=["1 · Beginning","2 · Problem","3 · Solution","4 · Ending"];
+const HINTS=[
+ "Lila mở cửa bằng chìa khoá gỉ… Con thấy gì? Ngửi thấy gì? Ai ở đó? Chuyện gì xảy ra với cánh cửa?",
+ "Lila bị mắc kẹt. Cô ấy làm gì? Hỏi ai?",
+ "Con mèo giúp thế nào? Họ thoát ra ra sao?",
+ "Sau khi thoát ra, chuyện gì xảy ra? Lila cảm thấy thế nào?"
+];
+const NOTES=["secret bakery","countless bread","scent","metal oven","bakery man","cat in the dusty corner","step in","the door shut down","hesitated for a while"];
+// Peter's handwritten draft, copied from the notebook (verbs kept as he wrote them)
+const ORIGINAL=[
+ "",
+ "Lila asked the cat where to escape. The cat meow and give a hint: top floor. When she still hesitate for a while, whisper. How do we climb up to the roof?",
+ "The cat stare at the door. The girl open the door, then the cat look up and see a ladder hang up to the roof. She tug the cat into her backpack and climb to the roof while the ladder still stand still. They escape. Lila bring the cat out of the backpack while the streets are crowded. The cat leaded Lila to the nearby market so they could jump from the roof to land on the ground.",
+ "When they jumped, Lila took the cat and buying some food. As she begin to go home, she had a friend."
+];
+const VERBS=[
+ ["meow","meowed",["meowed","meowing","meows"]],
+ ["give","gave",["gived","gave","given"]],
+ ["hesitate","hesitated",["hesitated","hesitating","hesitates"]],
+ ["whisper","whispered",["whispering","whispered","whispers"]],
+ ["stare","stared",["stared","stareed","staring"]],
+ ["open","opened",["opens","opened","openned"]],
+ ["look","looked",["looked","looking","lookt"]],
+ ["see","saw",["seed","seen","saw"]],
+ ["hang","hung",["hanged","hung","hang"]],
+ ["tug","tugged",["tuged","tugged","tugs"]],
+ ["climb","climbed",["climbed","clumb","climbing"],"and climb"],
+ ["stand","stood",["standed","stood","stand"]],
+ ["escape","escaped",["escaped","escaping","escapt"],"They escape"],
+ ["bring","brought",["bringed","brang","brought"]],
+ ["are","were",["was","were","be"]],
+ ["leaded","led",["leaded","led","leading"]],
+ ["buying","bought",["buyed","bought","buying"]],
+ ["begin","began",["began","begun","beginned"]]
+];
+const BANK={
+ "Characters · nhân vật":["brave","curious","nervous","clever","fluffy","ginger","wise","plump","flour-covered","friendly","trembling"],
+ "Setting · nơi chốn":["mysterious","cosy","dusty","gloomy","golden loaves","sweet-smelling","warm","steaming","creaky","rickety","crowded","bustling"],
+ "Events · sự việc":["Suddenly,","slammed shut","BANG!","tiptoed","scrambled","leapt","dashed","without warning","At last,","Luckily,","peered"]
+};
+const ALLWOW=Object.values(BANK).flat();
+
+const KEY="lila-bakery-v1";
+let state={paras:ORIGINAL.slice(),fixed:{},self:{},stars:{}};
+try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&Array.isArray(s.paras))state=Object.assign(state,s);}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+
+const $=s=>document.querySelector(s);
+let active=null; // index of paragraph for WOW insertion
+const areas=[]; // all textareas bound to paragraph index
+
+function paraBlock(i,host,withHints){
+  const d=document.createElement("div");d.className="para";
+  d.innerHTML=`<div class="para-head"><span class="tag t${i+1}">${LABELS[i]}</span><span class="meta" data-meta="${i}"></span></div>`;
+  if(withHints){const h=document.createElement("p");h.className="vi";h.textContent=HINTS[i];d.appendChild(h);}
+  if(withHints&&i===0){
+    const c=document.createElement("div");c.className="chips";
+    c.innerHTML='<span class="meta" style="align-self:center">Ý của con:</span>'+NOTES.map(n=>`<span class="chip">${n}</span>`).join("");
+    d.appendChild(c);
+  }
+  const t=document.createElement("textarea");t.id=host.id+"-p"+i;t.value=state.paras[i];t.setAttribute("aria-label",LABELS[i]);
+  if(i===0)t.placeholder="Lila turned the rusty key… (con tự viết)";
+  t.dataset.i=i;bind(t);d.appendChild(t);host.appendChild(d);
+}
+function bind(t){
+  areas.push(t);
+  t.addEventListener("input",()=>{state.paras[+t.dataset.i]=t.value;syncOthers(t);update();save();});
+  t.addEventListener("focus",()=>{active=+t.dataset.i;areas.forEach(a=>a.classList.toggle("active",a===t));
+    $("#target b").textContent=LABELS[active];});
+}
+function syncOthers(src){areas.forEach(a=>{if(a!==src&&+a.dataset.i===+src.dataset.i)a.value=src.value;});}
+function setPara(i,v){state.paras[i]=v;areas.forEach(a=>{if(+a.dataset.i===i)a.value=v;});update();save();}
+
+for(let i=0;i<4;i++)paraBlock(i,$("#paras"),true);
+for(let i=0;i<4;i++)paraBlock(i,$("#paras4"),false);
+const endEdit=$("#end-edit");endEdit.dataset.i=3;endEdit.value=state.paras[3];bind(endEdit);
+
+// tabs
+document.querySelectorAll("nav.steps button").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll("nav.steps button").forEach(x=>x.setAttribute("aria-selected",x===b));
+  document.querySelectorAll("section.panel").forEach(p=>p.hidden=p.id!==b.dataset.step);
+  if(b.dataset.step==="s5")renderStory();
+}));
+
+// verbs
+function renderVerbs(){
+  const host=$("#verbs");host.innerHTML="";
+  VERBS.forEach(([wrong,right,opts,ctx],k)=>{
+    const done=state.fixed[k];
+    const c=document.createElement("div");c.className="verb";
+    c.innerHTML=`<p class="q">Con viết: <s>${wrong}</s> → ?</p>`;
+    const o=document.createElement("div");o.className="opts";
+    opts.forEach(op=>{const b=document.createElement("button");b.textContent=op;
+      if(done&&op===right)b.className="right";
+      b.addEventListener("click",()=>{
+        if(op===right){b.className="right";fix.disabled=!!state.fixed[k];fix.hidden=false;}
+        else{b.className="wrong";}
+      });o.appendChild(b);});
+    c.appendChild(o);
+    const fix=document.createElement("button");fix.className="btn primary";fix.textContent=done?"Đã sửa ✔":"Sửa trong bài";
+    fix.hidden=!done;fix.disabled=!!done;
+    fix.addEventListener("click",()=>{
+      const re=new RegExp("\\b"+(ctx||wrong)+"\\b"),to=ctx?ctx.replace(wrong,right):right;
+      for(let i=0;i<4;i++){if(re.test(state.paras[i])){setPara(i,state.paras[i].replace(re,to));break;}}
+      state.fixed[k]=true;save();fix.textContent="Đã sửa ✔";fix.disabled=true;scoreVerbs();
+    });
+    c.appendChild(fix);host.appendChild(c);
+  });
+  scoreVerbs();
+}
+function scoreVerbs(){const n=Object.keys(state.fixed).length;$("#vscore").textContent=`Đã sửa ${n} / ${VERBS.length} động từ`+(n===VERBS.length?" — tuyệt vời! 🎉":"");}
+
+// speech builder
+function speechText(){
+  let w=$("#sp-words").value.trim();if(!w)return"";
+  w=w.charAt(0).toUpperCase()+w.slice(1);
+  const who=$("#sp-who").value,verb=$("#sp-verb").value;
+  if(/[.]$/.test(w))w=w.slice(0,-1)+",";
+  else if(!/[?!,]$/.test(w))w=w+",";
+  return {w,tail:` ${verb} ${who}.`};
+}
+function renderSpeech(){
+  const s=speechText();const p=$("#sp-prev");
+  if(!s){p.innerHTML='<span class="meta" style="font-family:var(--f-body)">Câu nói sẽ hiện ở đây…</span>';return;}
+  p.innerHTML=`<span class="qm">“</span>${esc(s.w)}<span class="qm">”</span>${esc(s.tail)}`;
+}
+function esc(t){return t.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));}
+["#sp-words","#sp-who","#sp-verb"].forEach(s=>$(s).addEventListener("input",renderSpeech));
+$("#sp-add").addEventListener("click",()=>{
+  const s=speechText();if(!s){$("#sp-toast").textContent="Con gõ lời nói trước nhé.";return;}
+  const i=+$("#sp-to").value;const cur=state.paras[i].trim();
+  setPara(i,(cur?cur+" ":"")+`“${s.w}”${s.tail}`);
+  $("#sp-words").value="";renderSpeech();
+  $("#sp-toast").textContent=`Đã thêm vào đoạn ${LABELS[i]}. Con có thể sửa lại ở bước 1.`;
+});
+
+// wow bank
+(function(){
+  const host=$("#bank");
+  for(const [g,words] of Object.entries(BANK)){
+    const d=document.createElement("div");d.innerHTML=`<h3>${g}</h3>`;
+    const c=document.createElement("div");c.className="chips";
+    words.forEach(w=>{const b=document.createElement("button");b.className="chip";b.textContent=w;b.dataset.w=w;
+      b.addEventListener("mousedown",e=>e.preventDefault());
+      b.addEventListener("click",()=>insertWord(w));c.appendChild(b);});
+    d.appendChild(c);host.appendChild(d);
+  }
+})();
+function insertWord(w){
+  if(active===null){$("#target b").textContent="Bấm vào một đoạn trước đã!";return;}
+  const t=areas.find(a=>+a.dataset.i===active&&a===document.activeElement)||areas.find(a=>+a.dataset.i===active&&a.closest("#paras4"));
+  const v=t.value,s=t.selectionStart??v.length,e=t.selectionEnd??v.length;
+  const pre=v.slice(0,s),post=v.slice(e);
+  const ins=(pre&&!/\s$/.test(pre)?" ":"")+w+(post&&!/^\s/.test(post)?" ":"");
+  t.value=pre+ins+post;t.focus();const pos=(pre+ins).length;t.setSelectionRange(pos,pos);
+  state.paras[active]=t.value;syncOthers(t);update();save();
+}
+
+// checks
+function sentences(t){return t.split(/[.!?]+/).map(x=>x.trim()).filter(x=>x.split(/\s+/).length>=2).length;}
+function wowUsed(){const all=state.paras.join(" ").toLowerCase();
+  return ALLWOW.filter(w=>{const k=w.toLowerCase().replace(/[,!]/g,"");return new RegExp("\\b"+k.replace(/[-]/g,"\\-")+"\\b").test(all);});}
+function update(){
+  const p=state.paras;
+  document.querySelectorAll("[data-meta]").forEach(m=>{const n=sentences(p[+m.dataset.meta]);m.textContent=`${n} câu`+(n<3?" · cần thêm":"");});
+  $("#endmeta").textContent=`${sentences(p[3])} câu`;
+  const speech=(p.join(" ").match(/[“"][^”"]{2,}[”"]/g)||[]).length;
+  const used=wowUsed();
+  document.querySelectorAll("#bank .chip").forEach(b=>b.classList.toggle("used",used.includes(b.dataset.w)));
+  $("#wcount").textContent=used.length;
+  const filled=p.filter(x=>sentences(x)>=3).length;
+  set("#c1",sentences(p[0])>=2&&sentences(p[1])>=2&&sentences(p[2])>=2&&sentences(p[3])>=3,
+      sentences(p[0])<2?"Còn thiếu đoạn mở đầu":sentences(p[3])<3?"Kết thúc cần thêm câu":"Cần thêm ý");
+  set("#c2",speech>=2,`${speech} / 2 câu nói`);
+  set("#c3",used.length>=6,`${used.length} / 6 WOW words`);
+  set("#c4",filled===4,`${filled} / 4 đoạn đủ 3 câu`);
+}
+function set(id,ok,msg){const el=$(id);el.classList.toggle("ok",ok);el.querySelector(".st").textContent=ok?"✔ Xong!":msg;}
+
+// final story
+function renderStory(){
+  const s=$("#story");s.innerHTML="<h3>Lila's Secret Bakery</h3>";
+  state.paras.filter(x=>x.trim()).forEach(x=>{const p=document.createElement("p");p.textContent=x.trim();s.appendChild(p);});
+  s.insertAdjacentHTML("beforeend",'<p class="meta" style="text-indent:0;font-family:var(--f-body)">by Peter</p>');
+}
+$("#copy").addEventListener("click",()=>{
+  const txt="Lila's Secret Bakery\n\n"+state.paras.filter(x=>x.trim()).map(x=>x.trim()).join("\n\n");
+  const ok=()=>$("#copy-toast").textContent="Đã copy!";
+  try{navigator.clipboard.writeText(txt).then(ok,()=>selectStory());}catch(e){selectStory();}
+});
+function selectStory(){const r=document.createRange();r.selectNodeContents($("#story"));const sel=getSelection();sel.removeAllRanges();sel.addRange(r);$("#copy-toast").textContent="Đã bôi đen — bấm Copy.";}
+
+// self-check + stars
+["k1","k2","k3","k4"].forEach(k=>{const c=$("#"+k);c.checked=!!state.self[k];c.addEventListener("change",()=>{state.self[k]=c.checked;save();});});
+["st1","st2","wish"].forEach(k=>{const c=$("#"+k);c.value=state.stars[k]||"";c.addEventListener("input",()=>{state.stars[k]=c.value;save();});});
+
+// reset (two taps, no confirm dialog)
+let armed=false;
+$("#reset").addEventListener("click",()=>{
+  if(!armed){armed=true;$("#reset-toast").textContent="Bấm lần nữa để xoá hết và quay về bài gốc.";return;}
+  try{localStorage.removeItem(KEY);}catch(e){}
+  state={paras:ORIGINAL.slice(),fixed:{},self:{},stars:{}};
+  areas.forEach(a=>a.value=state.paras[+a.dataset.i]);
+  ["k1","k2","k3","k4"].forEach(k=>$("#"+k).checked=false);["st1","st2","wish"].forEach(k=>$("#"+k).value="");
+  renderVerbs();update();armed=false;$("#reset-toast").textContent="Đã về bài gốc.";
+});
+
+renderVerbs();renderSpeech();update();
+})();
+</script>
+
+<a href="../" aria-label="Back to Peter's World" style="position:fixed;left:calc(10px + env(safe-area-inset-left,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:2147483000;width:48px;height:48px;border-radius:50%;background:#fff;border:3px solid #5fd3b0;display:grid;place-items:center;font-size:22px;text-decoration:none;box-shadow:0 3px 0 rgba(0,0,0,.18)">🏠</a>
+</body></html>

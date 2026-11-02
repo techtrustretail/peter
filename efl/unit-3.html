@@ -1,0 +1,629 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,-apple-system,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
+<title>Sea Power Mission</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Lexend:wght@400;500;700&display=swap">
+<style>
+/* Layout: a sea chart — one column of islands; each island opens a full-width mission card with big tap targets */
+:root{
+  --deep:#0a2f45; --sea:#0d5c7d; --foam:#eef7f6; --sand:#f7e9cc; --coral:#ff6b57; --kelp:#1e9c8c; --sun:#ffc23d;
+  --ink:#13323f; --muted:#5a7682; --card:#ffffff; --line:#cfe3e4; --ok:#1d9a52; --okbg:#e3f6ea; --bad:#cf3f3f; --badbg:#fdeaea;
+  --display:"Baloo 2","Trebuchet MS",system-ui,sans-serif; --body:"Lexend","Segoe UI",system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{background:var(--foam);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.5}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.wrap{max-width:860px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 56px}
+h1,h2,h3{font-family:var(--display);line-height:1.1;text-wrap:balance;margin:0}
+.hero{background:linear-gradient(180deg,var(--deep),var(--sea));color:#fff;position:relative;overflow:hidden}
+.hero .wrap{padding-block:22px 64px;display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.hero h1{font-size:clamp(34px,7vw,52px);letter-spacing:.5px}
+.hero p{margin:4px 0 0;color:#cfeaf0;font-size:16px}
+.pearls{background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.25);border-radius:999px;padding:8px 16px;font-family:var(--display);font-size:22px;white-space:nowrap}
+.hero svg{position:absolute;left:0;bottom:-1px;width:100%;height:44px;display:block}
+.topbar{display:flex;align-items:center;gap:12px;padding-block:14px}
+.back{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:8px 14px;font-weight:700}
+.crumb{color:var(--muted);font-size:15px}
+.goals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:-34px;position:relative}
+.goal{background:var(--card);border-radius:18px;padding:12px 14px;box-shadow:0 6px 20px rgba(10,47,69,.12);min-width:0}
+.goal b{font-family:var(--display);font-size:20px;display:block}
+.goal small{color:var(--muted);font-size:13px;display:block}
+.bar{height:10px;background:var(--line);border-radius:9px;overflow:hidden;margin:8px 0 4px;position:relative}
+.bar i{display:block;height:100%;background:var(--kelp);border-radius:9px}
+.bar em{position:absolute;top:-3px;bottom:-3px;width:3px;background:var(--coral)}
+.section-h{margin:28px 0 10px;font-size:26px}
+.sub{color:var(--muted);margin:0 0 12px;font-size:16px}
+.islands{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.isle{background:var(--card);border:2px solid var(--line);border-radius:20px;padding:14px 16px;text-align:left;display:grid;grid-template-columns:auto 1fr;gap:4px 12px;align-items:center;min-width:0;transition:transform .15s}
+.isle:hover{transform:translateY(-2px);border-color:var(--kelp)}
+.isle .ic{font-size:36px;grid-row:span 2}
+.isle h3{font-size:21px}
+.isle p{margin:0;color:var(--muted);font-size:14px;line-height:1.35}
+.isle .st{grid-column:1/-1;font-size:15px;color:var(--ink);display:flex;justify-content:space-between;gap:8px}
+.isle.focus{border-color:var(--coral);background:linear-gradient(0deg,#fff,#fff6f3)}
+.tag{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;padding:2px 8px;border-radius:99px;background:var(--coral);color:#fff}
+.tag.k{background:var(--kelp)}
+.plan{display:grid;gap:8px}
+.day{background:var(--card);border-radius:16px;padding:10px 14px;display:grid;grid-template-columns:64px 1fr;gap:10px;align-items:start;border:2px solid var(--line)}
+.day b{font-family:var(--display);font-size:20px;color:var(--sea)}
+.day span{font-size:15px}
+.card{background:var(--card);border-radius:22px;padding:18px;box-shadow:0 6px 24px rgba(10,47,69,.10)}
+.passage{background:var(--sand);border-radius:18px;padding:16px 18px;margin-bottom:14px;max-height:none}
+.passage h3{font-size:24px;margin-bottom:6px}
+.passage p{margin:6px 0}
+.passage .poem{white-space:pre-line;font-size:19px;line-height:1.6}
+.passage .cap{font-size:14px;font-style:italic;color:var(--muted);border-top:2px dashed #e2cfa6;padding-top:6px;margin-top:8px}
+details.ptoggle summary{cursor:pointer;font-weight:700;color:var(--sea);margin-bottom:6px}
+.qhead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;color:var(--muted);font-size:15px}
+.dots{display:flex;gap:4px;flex-wrap:wrap}
+.dots i{width:10px;height:10px;border-radius:50%;background:var(--line)}
+.dots i.ok{background:var(--ok)} .dots i.half{background:var(--sun)} .dots i.now{background:var(--coral)}
+.q{font-size:22px;font-weight:500;margin:4px 0 14px}
+.choices{display:grid;gap:10px}
+.ch{background:var(--foam);border:3px solid var(--line);border-radius:16px;padding:12px 16px;text-align:left;font-size:19px;min-height:56px}
+.ch:hover{border-color:var(--kelp)}
+.ch.right{background:var(--okbg);border-color:var(--ok)}
+.ch.wrong{background:var(--badbg);border-color:var(--bad);animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.tip{margin-top:12px;padding:12px 14px;border-radius:14px;font-size:17px}
+.tip.ok{background:var(--okbg)} .tip.no{background:#fff5dc}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{background:var(--coral);color:#fff;border:0;border-radius:16px;padding:12px 22px;font-weight:700;font-size:18px;min-height:52px}
+.btn.alt{background:var(--card);color:var(--ink);border:2px solid var(--line)}
+.btn.k{background:var(--kelp)}
+.btn:disabled{opacity:.5;cursor:default}
+.slots,.pool{display:flex;flex-wrap:wrap;gap:8px;min-height:60px;padding:10px;border-radius:16px}
+.slots{background:var(--foam);border:3px dashed var(--line);flex-direction:column}
+.pool{padding-left:0}
+.chip{background:var(--sand);border:2px solid #e6cf9f;border-radius:14px;padding:10px 14px;font-size:17px;text-align:left}
+.slots .chip{background:#fff;border-color:var(--kelp)}
+.slots .chip::before{content:attr(data-n) ". ";font-weight:700;color:var(--kelp)}
+.end{text-align:center;padding:10px 0}
+.end .big{font-family:var(--display);font-size:56px;color:var(--sea);line-height:1}
+.stars{font-size:40px;letter-spacing:6px}
+.code{font-family:ui-monospace,Menlo,monospace;font-size:13px;background:var(--foam);border-radius:10px;padding:8px;word-break:break-all;text-align:left}
+/* writing builder */
+.topics{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.topics button{background:var(--card);border:2px solid var(--line);border-radius:999px;padding:8px 14px;font-size:15px}
+.topics button.on{background:var(--sea);border-color:var(--sea);color:#fff}
+.bank{background:var(--sand);border-radius:16px;padding:12px 14px;font-size:15px;margin-bottom:12px}
+.bank .w{display:inline-block;background:#fff;border-radius:99px;padding:2px 10px;margin:3px 3px 0 0;font-weight:500}
+.bank .w.used{background:var(--okbg);color:var(--ok);text-decoration:line-through}
+.field{margin-bottom:14px}
+.field label{display:block;font-family:var(--display);font-size:20px;color:var(--sea)}
+.field .hint{font-size:14px;color:var(--muted);margin:0 0 4px}
+.field textarea,.field input{width:100%;border:2px solid var(--line);border-radius:14px;padding:10px 12px;font-size:18px;background:#fff;line-height:1.45}
+.field textarea{min-height:76px;resize:vertical}
+.starters{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0}
+.starters button{background:var(--foam);border:1.5px solid var(--line);border-radius:10px;padding:3px 10px;font-size:14px}
+.labels3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.meter{position:sticky;bottom:0;background:var(--deep);color:#fff;border-radius:18px 18px 0 0;padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));margin-top:14px;display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:center}
+.meter .sc{font-family:var(--display);font-size:34px;line-height:1}
+.meter .mbars{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;font-size:11px}
+.meter .mbars div i{display:block;height:7px;border-radius:5px;background:rgba(255,255,255,.2);margin-top:2px;overflow:hidden}
+.meter .mbars div i b{display:block;height:100%;background:var(--sun)}
+.checks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 14px;font-size:15px;margin:10px 0}
+.checks div{min-width:0}
+.warn{background:#fff5dc;border-radius:12px;padding:8px 12px;font-size:15px;margin:4px 0}
+.ai{background:#f3fbfa;border:2px solid var(--kelp);border-radius:18px;padding:14px 16px;margin-top:12px}
+.ai h3{font-size:22px;color:var(--kelp)}
+.ai .fix{background:#fff;border-radius:12px;padding:8px 12px;margin:6px 0;font-size:16px}
+.ai del{color:var(--bad)} .ai ins{color:var(--ok);text-decoration:none;font-weight:700}
+.vn{background:var(--sand);border-radius:12px;padding:8px 12px;font-size:15px;margin-top:8px}
+/* speaking */
+.spk{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.timer{font-family:var(--display);font-size:64px;color:var(--sea);text-align:center;line-height:1}
+.frame{background:var(--sand);border-radius:14px;padding:10px 14px;font-size:17px}
+.frame li{margin:4px 0}
+.rub{display:grid;gap:8px;margin:10px 0}
+.rub .r{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;background:var(--foam);border-radius:12px;padding:8px 12px;font-size:15px}
+.rub .r div{display:flex;gap:2px}
+.rub .r button{background:none;border:0;font-size:26px;padding:0 2px;filter:grayscale(1);opacity:.4}
+.rub .r button.on{filter:none;opacity:1}
+.vnbox{background:#fff;border:2px dashed var(--line);border-radius:16px;padding:12px 14px;font-size:16px}
+.vnbox h3{font-size:20px}
+table.sk{width:100%;border-collapse:collapse;font-size:15px}
+table.sk td,table.sk th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}
+.tbl{overflow-x:auto}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:50}
+@media (max-width:600px){
+  .islands,.spk{grid-template-columns:1fr}
+  .goals{grid-template-columns:1fr;margin-top:-30px}
+  .checks{grid-template-columns:1fr}
+  .labels3{grid-template-columns:1fr}
+  .meter .mbars{font-size:10px}
+  .q{font-size:20px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<canvas id="fx"></canvas>
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <h1>Sea Power Mission</h1>
+      <p>Captain Peter · EFL Unit 3 · The Power of the Sea</p>
+    </div>
+    <div class="pearls" id="pearls" title="Pearls you have collected">🫧 0 pearls</div>
+  </div>
+  <svg viewBox="0 0 1200 44" preserveAspectRatio="none" aria-hidden="true"><path d="M0 24 C150 4 300 44 450 24 S750 4 900 24 S1100 40 1200 22 V44 H0Z" fill="var(--foam)"/></svg>
+</header>
+<main class="wrap" id="app"></main>
+
+<script>
+/* ============ CONTENT ============ */
+const LINKS=["first","firstly","at first","next","then","after that","finally","at last","eventually","because","so","as a result","therefore","over time","gradually","this causes","which leads to","this means","when"];
+
+const LEVELS={
+ /* ---------- READING ---------- */
+ "read-cave":{area:"reading",title:"Reading: How Is a Sea Cave Made?",skill:"doc-hieu",
+  passage:{title:"How Is a Sea Cave Made?",html:`<p>Have you ever seen a dark cave at the bottom of a cliff? Sea caves are made by the power of the sea, and they take hundreds of years to form.</p>
+<p><b>1</b> First, waves crash against the bottom of a cliff again and again. Every wave carries sand and small stones, which scrape the rock like sandpaper.</p>
+<p><b>2</b> Next, the waves find a weak part of the rock, such as a crack. Water and air are pushed into the crack with great force, so the crack gets bigger. This wearing away of rock is called <b>erosion</b>.</p>
+<p><b>3</b> Then, small pieces of rock break off and fall into the sea. Gradually, the crack becomes a hole, and the hole becomes a cave.</p>
+<p><b>4</b> Finally, over many years, the cave grows deeper. Sometimes the waves break right through the cliff and make an arch.</p>
+<p>As a result, the sea slowly changes the shape of our coastline. Next time you visit the beach, look closely at the cliffs!</p>
+<p class="cap">Caption under the diagram: Waves repeatedly hit a weakness in the rock, gradually making the cave larger.</p>`},
+  qs:[
+   {q:"Is this text fiction or non-fiction?",c:["Non-fiction","Fiction","A poem"],a:0,tip:"It gives true facts and explains a process, so it is non-fiction."},
+   {q:"What is the main purpose of this text?",c:["To explain how a sea cave is made","To tell a story about a pirate cave","To persuade people to visit caves"],a:0,tip:"An explanation text tells us HOW or WHY something happens.",skill:"dac-diem-explanation"},
+   {q:"Which word in paragraph 2 means 'the wearing away of rock'?",c:["erosion","crack","force"],a:0,tip:"Look for the word in bold: erosion. That is precise, scientific vocabulary.",skill:"tu-khoa-hoc"},
+   {type:"order",q:"Put the stages in the correct order.",w:["Waves crash against the bottom of the cliff.","The waves find a crack and make it bigger.","Small pieces of rock break off and a hole forms.","The cave grows deeper over many years."],tip:"First → Next → Then → Finally. The linking words show the order!",skill:"sap-xep-quy-trinh"},
+   {q:"'…which scrape the rock like sandpaper.' What is 'like sandpaper'?",c:["A simile","Alliteration","A rhyme"],a:0,tip:"It compares two things using 'like', so it is a simile.",skill:"bien-phap-tho"},
+   {q:"Why does the crack get bigger?",c:["Water and air are pushed into it with great force","People dig it with spades","The sun makes it hot"],a:0,tip:"Paragraph 2: 'Water and air are pushed into the crack with great force, SO the crack gets bigger.'"},
+   {q:"Which adverb tells us HOW the crack becomes a hole?",c:["Gradually","Next","Small"],a:0,tip:"'Gradually' means slowly, little by little. Many adverbs end in -ly.",skill:"tinh-tu-trang-tu"},
+   {q:"What can happen if the waves break right through the cliff?",c:["An arch is made","The cliff becomes sand straight away","A tsunami starts"],a:0,tip:"Paragraph 4: the waves can break through the cliff and make an arch."},
+   {q:"Which linking words show a RESULT?",c:["As a result","First","Have you ever"],a:0,tip:"'As a result', 'so', 'therefore' and 'which leads to' show cause and effect.",skill:"tu-noi-trinh-tu"},
+   {q:"Why did the writer number the paragraphs?",c:["To show the stages in a clear order","To make the text longer","Because it is a poem"],a:0,tip:"Explanation texts give information in a logical order. Numbers help the reader follow each stage.",skill:"dac-diem-explanation"},
+   {q:"What is the job of the caption?",c:["It explains what the diagram shows","It is the title of the text","It tells a joke"],a:0,tip:"A caption is a sentence under a picture or diagram that explains it.",skill:"dac-diem-explanation"},
+   {q:"Which sentence is written in the PRESENT simple tense, like an explanation text?",c:["The waves crash against the cliff.","The waves crashed against the cliff.","The waves will crash against the cliff."],a:0,tip:"Explanation texts use the present simple: crash, break, grow, make.",skill:"thi-hien-tai"}
+  ]},
+ "read-poem":{area:"reading",title:"Reading: Storm at Sea (poem)",skill:"bien-phap-tho",
+  passage:{title:"Storm at Sea",html:`<div class="poem">The wild waves roar like hungry lions,
+They leap and snap at the shore.
+Grey gulls glide through the howling wind,
+Crash! Smash! The breakers roar.
+
+The angry sky throws silver spears,
+The tired boats toss and sway.
+Then slowly, softly, the storm creeps off,
+And sunshine sparkles on the bay.</div>`},
+  qs:[
+   {q:"What is happening in the poem?",c:["A storm hits the sea, then it calms down","Children build sandcastles","A ship sinks in a calm sea"],a:0,tip:"Verse 1–2: a wild storm. The last lines: the storm creeps off and the sun comes out.",skill:"doc-hieu"},
+   {q:"Find the SIMILE.",c:["roar like hungry lions","Grey gulls glide","Crash! Smash!"],a:0,tip:"A simile compares with 'like' or 'as…as'. The waves are compared to hungry lions."},
+   {q:"Find the ALLITERATION.",c:["Grey gulls glide","the tired boats","the angry sky"],a:0,tip:"Grey Gulls Glide: three words close together starting with the same sound (g)."},
+   {q:"'Crash! Smash!' Words that sound like the noise they describe are called…",c:["onomatopoeia","similes","rhymes"],a:0,tip:"Crash, splash, boom, whoosh are onomatopoeia."},
+   {q:"'The angry sky throws silver spears.' What are the silver spears?",c:["Flashes of lightning","Real spears","Fish"],a:0,tip:"The poet imagines lightning as shiny spears thrown from the sky."},
+   {q:"The sky is 'angry' and the boats are 'tired'. This is called…",c:["personification","alliteration","a caption"],a:0,tip:"Personification gives human feelings or actions to things that are not human."},
+   {q:"Find a pair of rhyming words.",c:["shore / roar","waves / wind","sky / boats"],a:0,tip:"shore and roar end with the same sound. sway and bay also rhyme."},
+   {q:"How does the mood change from the beginning to the end?",c:["From wild and scary to calm and peaceful","From happy to sad","It does not change"],a:0,tip:"At the start the sea is wild. At the end 'sunshine sparkles on the bay', so it feels peaceful.",skill:"doc-hieu"},
+   {q:"Which is the most POWERFUL verb for the waves?",c:["leap","go","are"],a:0,tip:"Powerful verbs (leap, snap, toss, roar) help the reader picture the action.",skill:"tinh-tu-trang-tu"},
+   {q:"'Then slowly, softly, the storm creeps off.' Why did the poet use 'slowly, softly'?",c:["To show the storm leaves gently and quietly","To show the storm is getting stronger","Because they rhyme"],a:0,tip:"These adverbs make the ending calm. 'creeps' also shows quiet, slow movement.",skill:"tinh-tu-trang-tu"}
+  ]},
+ /* ---------- WRITING LAB ---------- */
+ "w-features":{area:"writing",title:"Writing Lab 1: Explanation Text Features",skill:"dac-diem-explanation",
+  qs:[
+   {q:"An explanation text tells us…",c:["how or why something happens","a made-up adventure story","what you did at the weekend"],a:0,tip:"Explanation = HOW or WHY. Example: How is sand made?"},
+   {q:"Which is the BEST title for an explanation text?",c:["How Is Sand Made?","My Day at the Beach","sand"],a:0,tip:"A clear, interesting title often starts with How or Why and has capital letters."},
+   {q:"What should the introduction do?",c:["Tell the reader what is being explained","Say goodbye to the reader","List all the diagrams"],a:0,tip:"Intro example: 'Sand is made of tiny grains of rock. But how is it made?'"},
+   {q:"Which one is NOT a feature of an explanation text?",c:["Characters and talking (dialogue)","Linking words like first, next, so","Diagrams with labels and a caption"],a:0,tip:"Characters and dialogue belong in stories, not explanation texts."},
+   {q:"What are LABELS on a diagram?",c:["Words that name the parts, with arrows","The last sentence of the text","A list of linking words"],a:0,tip:"Labels: cliff → cave → waves. Short words with arrows pointing to the parts."},
+   {q:"Which is the best CAPTION for a diagram of a cave?",c:["Waves repeatedly hit a weakness in the rock, gradually making the cave larger.","cave","I like caves."],a:0,tip:"A caption is a full sentence that explains what is happening in the diagram."},
+   {q:"Which is the best CONCLUDING sentence?",c:["As a result, the sea slowly turns huge rocks into soft sand.","The end.","and then sand happens"],a:0,tip:"A strong conclusion sums up the result. Start with 'As a result,' or 'This is why…'."},
+   {q:"Explanation texts are usually written in the…",c:["present simple tense (waves crash)","past tense (waves crashed)","future tense (waves will crash)"],a:0,tip:"Facts that are always true use the present simple.",skill:"thi-hien-tai"},
+   {q:"What is the logical order of an explanation?",c:["First → Next → Then → Finally","Finally → First → Then → Next","Then → Then → Then → Then"],a:0,tip:"First: what happens. Next: the next stage. Then: more detail and WHY. Finally: the result.",skill:"tu-noi-trinh-tu"},
+   {q:"In the 'Then' part, the writer should also explain…",c:["WHY it happens (because… / so…)","their favourite colour","a joke"],a:0,tip:"Level up: add 'because…' or 'which means…' to explain WHY each stage happens."}
+  ]},
+ "w-linking":{area:"writing",title:"Writing Lab 2: Linking Word Lab",skill:"tu-noi-trinh-tu",
+  qs:[
+   {q:"____, rain and wind break down the rocks.",c:["First","Finally","Because"],a:0,tip:"The first stage starts with 'First,' plus a comma."},
+   {q:"The rocks are near a fault line. ____, they crumble and break.",c:["As a result","However","Once upon a time"],a:0,tip:"'As a result' shows what happens BECAUSE of something."},
+   {q:"The water gets shallower, ____ the first wave slows down.",c:["so","but","first"],a:0,tip:"'so' joins a cause to its result."},
+   {q:"The waves smash the stones together. ____ the stones to break into tiny pieces.",c:["This causes","Next day","Finally I"],a:0,tip:"'This causes…' links a stage to what it makes happen."},
+   {q:"____, the tiny pieces end up on the beach as sand.",c:["Finally","First","Because"],a:0,tip:"'Finally' introduces the last stage or the result."},
+   {q:"____, over hundreds of years, the cave grows bigger.",c:["Gradually","Suddenly","Yesterday"],a:0,tip:"'Gradually' and 'over time' show something happening slowly."},
+   {q:"Some sea creatures glow ____ they want to scare predators away.",c:["because","so","then"],a:0,tip:"'because' gives the REASON."},
+   {q:"The light bends inside the raindrop, ____ the colours of the rainbow.",c:["which leads to","first","however"],a:0,tip:"'which leads to' joins a stage to its result in one longer sentence."},
+   {q:"Which word shows an OPPOSITE idea (not a result)?",c:["however","therefore","so"],a:0,tip:"Use 'however' only for a different or opposite idea. For results use so / therefore / as a result."},
+   {q:"Which sentence uses linking words best?",c:["Next, the river carries the stones to the sea, so they rub against each other.","And then the stones go and then they go to the sea.","Stones. Sea. River."],a:0,tip:"Avoid 'and then… and then'. Use Next, so, because, which leads to."},
+   {type:"order",q:"Build the sentence:",w:["Waves","hit","the","cliff,","so","the","crack","gets","bigger."],tip:"Waves hit the cliff, so the crack gets bigger. (cause → so → result)",skill:"tu-noi-trinh-tu"}
+  ]},
+ "w-vocab":{area:"writing",title:"Writing Lab 3: Science Word Swap",skill:"tu-khoa-hoc",
+  qs:[
+   {q:"The sea slowly wears away the rock. This is called ____.",c:["erosion","explosion","exploring"],a:0,tip:"Erosion = the slow wearing away of rock by water, wind or ice."},
+   {q:"Sand is made of millions of tiny ____ of rock.",c:["grains","bits and things","stuff"],a:0,tip:"'grains' is the precise word for tiny pieces of sand."},
+   {q:"A colourful, rocky home for fish, made by tiny sea animals, is called ____.",c:["coral","a cave","a cliff"],a:0,tip:"A coral reef is built by tiny animals called polyps."},
+   {q:"The high, steep wall of rock next to the sea is a ____.",c:["cliff","beach","wave"],a:0,tip:"cliff → cave → arch: the sea can carve all of these."},
+   {q:"When sea creatures make their own light, it is called ____.",c:["bioluminescence","refraction","electricity"],a:0,tip:"bio = life, lumin = light. From your Wednesday homework!"},
+   {q:"When light bends as it goes into a raindrop, it is called ____.",c:["refraction","erosion","reflection only"],a:0,tip:"From your Thursday homework: the light bends. This is called refraction."},
+   {q:"A tsunami is often caused by an earthquake on the ____.",c:["sea bed","sky","sand castle"],a:0,tip:"The sea bed is the floor at the bottom of the sea."},
+   {q:"Which sentence is more PRECISE?",c:["Powerful waves pound the bottom of the cliff.","The water hits the thing.","Water goes on rocks."],a:0,tip:"Precise = exact words. 'pound', 'bottom of the cliff' help the reader picture it."},
+   {q:"Pick the stronger adjective: The ____ wave caused a lot of damage.",c:["gigantic","big","nice"],a:0,tip:"gigantic is stronger than big. Also: enormous, towering, colossal.",skill:"tinh-tu-trang-tu"},
+   {q:"Pick the precise word: The waves carry sand and stones to the ____.",c:["coastline","place","area"],a:0,tip:"coastline = where the land meets the sea."}
+  ]},
+ "w-fix":{area:"writing",title:"Writing Lab 4: Sentence Fixer",skill:"viet-hoa",
+  qs:[
+   {q:"Which sentence is correct?",c:["First, the waves hit the cliff.","first, the waves hit the cliff.","First, The waves hit the cliff."],a:0,tip:"Capital letter only at the START of a sentence (and for names)."},
+   {q:"Which sentence is correct?",c:["The stones fall into the sea like heavy rain.","The stones fall into the sea Like heavy rain.","the stones fall into the sea like heavy rain."],a:0,tip:"'like' in the middle of a sentence stays small."},
+   {q:"____ enormous wave crashed onto the land.",c:["An","A"],a:0,tip:"enormous starts with a vowel sound (e) → AN enormous.",skill:"a-an"},
+   {q:"This is ____ explanation text.",c:["an","a"],a:0,tip:"explanation starts with a vowel sound → AN explanation.",skill:"a-an"},
+   {q:"____ huge storm hit the coast.",c:["A","An"],a:0,tip:"huge starts with 'h', a consonant sound → A huge storm.",skill:"a-an"},
+   {q:"____ octopus can squirt ink.",c:["An","A"],a:0,tip:"a, e, i, o, u sounds → AN. AN octopus.",skill:"a-an"},
+   {q:"Every day, the waves ____ against the rocks.",c:["crash","crashed","crashing"],a:0,tip:"Explanation texts use the present simple: the waves crash.",skill:"thi-hien-tai"},
+   {q:"Sand ____ made from tiny pieces of rock.",c:["is","are","were"],a:0,tip:"Sand (one thing) → is. Present tense.",skill:"thi-hien-tai"},
+   {q:"Which spelling is correct?",c:["gradually","gradualy","gradully"],a:0,tip:"gradual + ly = gradually (double L).",skill:"chinh-ta"},
+   {q:"Which spelling is correct?",c:["explanation","explaination","explenation"],a:0,tip:"explain → explanation (the 'i' disappears!).",skill:"chinh-ta"},
+   {q:"Which spelling is correct?",c:["because","becuase","becose"],a:0,tip:"Big Elephants Can Always Understand Small Elephants = BECAUSE.",skill:"chinh-ta"},
+   {q:"Where is the comma missing? 'Next the river carries the stones.'",c:["After 'Next'","After 'river'","After 'stones'"],a:0,tip:"Put a comma after a linking word at the start: Next, the river…"}
+  ]},
+ "w-order":{area:"writing",title:"Writing Lab 5: Order the Process",skill:"sap-xep-quy-trinh",
+  qs:[
+   {type:"order",q:"How is sand made? Put the stages in order.",w:["Rain and wind break down the rocks.","Rivers carry the stones to the sea.","Waves smash the stones into smaller pieces.","Tiny grains end up on the beach as sand."],tip:"Rocks → river → sea → sand. (Collins pages 35–36)"},
+   {type:"order",q:"How does a tsunami happen?",w:["An earthquake shakes the sea bed.","Shock waves push the water up into long waves.","The waves slow down and grow taller near the land.","A giant wave crashes onto the land."],tip:"Earthquake → shock waves → waves grow tall → crash. (Collins pages 31–32)"},
+   {type:"order",q:"How does a rainbow form?",w:["Sunlight enters a raindrop.","The light bends (refraction).","The light reflects off the inside of the drop.","The light splits into different colours."],tip:"Enter → bend → reflect → colours. (Thursday homework)"},
+   {type:"order",q:"How do some sea creatures make light?",w:["A chemical inside the animal mixes with oxygen.","This causes a reaction.","The reaction creates a bright light.","The animal uses the light to scare predators or find food."],tip:"Bioluminescence: chemical + oxygen → light → used to survive."},
+   {type:"order",q:"Build the explanation sentence:",w:["Finally,","the","tiny","pieces","end","up","on","the","beach","as","sand."],tip:"Finally, the tiny pieces end up on the beach as sand."}
+  ]},
+ "poetry":{area:"language",title:"Poetry & Word Pool",skill:"bien-phap-tho",
+  qs:[
+   {q:"'The sea whispered its secrets.' This is…",c:["personification","a simile","alliteration"],a:0,tip:"The sea cannot really whisper. Giving it a human action = personification."},
+   {q:"'The moon shone like a silver coin.' This is…",c:["a simile","onomatopoeia","a label"],a:0,tip:"like / as…as = simile."},
+   {q:"Which simile is written correctly?",c:["The wind was as gentle as silk.","The wind was as gentle silk.","The wind was gentle as like silk."],a:0,tip:"Formula: as + adjective + as + a thing. as gentle AS silk.",skill:"simile"},
+   {q:"How many lines does a HAIKU have?",c:["3 lines (5-7-5 syllables)","5 lines","10 lines that rhyme"],a:0,tip:"Haiku: 3 lines, 5-7-5 syllables. Tanka: 5 lines, 5-7-5-7-7."},
+   {q:"How many syllables? 'gi-gan-tic'",c:["3","2","4"],a:0,tip:"Clap it: gi / gan / tic = 3."},
+   {q:"In 'The boat bobs gently', which word is the ADVERB?",c:["gently","boat","bobs"],a:0,tip:"Adverbs describe verbs (HOW it bobs). Many end in -ly.",skill:"tinh-tu-trang-tu"},
+   {q:"In 'The sparkling sea', which word is the ADJECTIVE?",c:["sparkling","sea","the"],a:0,tip:"Adjectives describe nouns: sparkling, grey, shallow, dark.",skill:"tinh-tu-trang-tu"},
+   {q:"Which word means the same as 'exhausted'?",c:["tired","hungry","huge"],a:0,tip:"exhausted = very tired. ravenous = very hungry. gigantic = very huge.",skill:"tinh-tu-trang-tu"},
+   {q:"Which word is NOT in the 'danger' word family?",c:["dancing","dangerous","endangered"],a:0,tip:"danger → dangerous, dangerously, endangered. 'dancing' only looks similar!",skill:"ho-tu"},
+   {q:"Which word belongs to the 'invent' family?",c:["invention","event","vent"],a:0,tip:"invent → inventor, invention, inventive.",skill:"ho-tu"},
+   {q:"Best upgrade for 'The sea was big and noisy.'",c:["The gigantic sea roared like a thunderstorm.","The sea was very big and very noisy.","Sea big noisy."],a:0,tip:"Strong adjective + powerful verb + simile = WOW line."},
+   {q:"'Crash, crash, went the waves.' Which TWO devices?",c:["onomatopoeia and repetition","simile and rhyme","haiku and tanka"],a:0,tip:"'Crash' sounds like the noise (onomatopoeia) and it is repeated (repetition)."},
+   {q:"Pick the most powerful verb: The waves ____ against the rocks.",c:["smashed","went","moved"],a:0,tip:"Powerful verbs: smash, pound, roar, hurl, sweep."},
+   {q:"'Wind whistles through the treetops.' Find the alliteration.",c:["Wind whistles","through the","the treetops"],a:0,tip:"Wind Whistles: same 'w' sound. From your Monday homework!",skill:"alliteration"}
+  ]}
+};
+LEVELS["w-fix"].qs.forEach(q=>{if(!q.skill&&/capital|correct\?/i.test(q.tip+q.q))q.skill="viet-hoa"});
+
+const TOPICS={
+ sand:{name:"How Is Sand Made?",words:["rocks","rain","wind","river","stones","sea","waves","smash","grains","erosion","beach","coastline"],
+  steps:["Rain and wind break down rocks. Stones fall into the river.","The river carries the stones to the sea.","Waves smash the stones together. Why do they get smaller?","Tiny grains end up on the beach."],
+  labels:["rocks","river","sand"]},
+ cave:{name:"How Is a Sea Cave Made?",words:["cliff","waves","crack","weakness","rock","force","erosion","hole","cave","arch","coastline","gradually"],
+  steps:["Waves crash against the bottom of the cliff.","The waves find a crack or weakness. Why does it get bigger?","Pieces of rock break off. The crack becomes a hole.","Over many years the cave grows. Sometimes an arch forms."],
+  labels:["cliff","cave","waves"]},
+ tsunami:{name:"What Causes a Tsunami?",words:["earthquake","sea bed","fault line","shock waves","surface","shallow","coastline","towering","gigantic","damage","floods","rapidly"],
+  steps:["An earthquake shakes the sea bed near a fault line.","Shock waves push the water up into long, low waves. How fast do they travel?","Near the land the water is shallower, so the waves slow down and grow taller.","A towering wall of water crashes onto the land. What damage does it cause?"],
+  labels:["sea bed","shock waves","coastline"]},
+ rainbow:{name:"How Does a Rainbow Form?",words:["sunlight","raindrop","bends","refraction","reflects","prism","colours","red","violet","arc","sky","gradually"],
+  steps:["Sunlight enters a raindrop.","The light bends. This is called refraction.","The light reflects off the inside of the raindrop and bends again as it leaves.","The light splits into seven colours: red, orange, yellow, green, blue, indigo, violet."],
+  labels:["sun","raindrop","rainbow"]},
+ glow:{name:"Why Do Some Sea Creatures Glow?",words:["bioluminescence","chemical","oxygen","reaction","predators","prey","jellyfish","angler fish","deep","dark","survive","attract"],
+  steps:["Deep in the ocean it is very dark.","A chemical inside the animal reacts with oxygen. This makes light.","Animals use the light to attract prey or to warn predators.","Some make a cloud of light to confuse predators and escape."],
+  labels:["jellyfish","light","predator"]}
+};
+
+const SPEAK=[
+ {id:"s-sand",t:"Explain how sand is made",k:"Explanation · 1 minute",frame:["Sand is… Have you ever wondered how it is made?","First, … because …","Next, …","Then, … so …","Finally, …","As a result, …"],
+  model:"Have you ever wondered how sand is made? First, rain and wind break down big rocks, so stones fall into rivers. Next, the river carries the stones all the way to the sea. Then, powerful waves smash the stones against each other, which makes them smaller and smaller. Finally, the tiny grains end up on the beach. As a result, the sea slowly turns huge rocks into soft sand."},
+ {id:"s-tsunami",t:"Explain how a tsunami happens",k:"At first · next · then · finally",frame:["A tsunami is…","At first, …","Next, …","Then, … because …","Finally, …"],
+  model:"A tsunami is a gigantic sea wave. At first, an earthquake shakes the sea bed near a fault line. Next, shock waves push the water up into long, low waves that travel as fast as a jet plane. Then, the water near the coast gets shallower, so the waves slow down and grow taller. Finally, a towering wall of water crashes onto the land and causes floods and damage."},
+ {id:"s-senses",t:"Describe a stormy sea with your 5 senses",k:"Description · WOW words",frame:["I can see … like …","I can hear …","I can feel …","I can smell …","I can taste …","It makes me feel …"],
+  model:"I can see gigantic grey waves leaping like hungry lions. I can hear the wind howling and the waves crashing against the rocks. I can feel the cold, salty spray on my face. I can smell the fresh seaweed. I can taste salt on my lips. It makes me feel small but excited, because the sea is so powerful."},
+ {id:"s-poem",t:"Which sea poem do you prefer, and why?",k:"Opinion · because · for example",frame:["My favourite poem is … because …","For example, the poet writes '…'","This makes me imagine …","I also like … because …","That is why I prefer …"],
+  model:"My favourite poem is Sea Haiku because it is short but very powerful. For example, the poet writes 'Like angry grey ghosts the waves hurl handfuls of stones'. This simile makes me imagine scary waves throwing stones at the shore. I also like the alliteration 'grey ghosts'. That is why I prefer Sea Haiku."},
+ {id:"s-glow",t:"Explain why some sea creatures glow",k:"Explanation · science words",frame:["Deep in the ocean, …","This is called …","It happens when …","Animals use their light to … because …","For example, …","This helps them to survive."],
+  model:"Deep in the ocean it is very dark, but some creatures can make their own light. This is called bioluminescence. It happens when a chemical inside the animal reacts with oxygen. Animals use their light to attract prey or to warn predators. For example, the angler fish uses a glowing light to catch small fish. This helps them to survive."},
+ {id:"s-friend",t:"Is the sea a friend or a danger?",k:"Talk · both sides",frame:["I think the sea is … because …","On one hand, …","For example, …","However, …","This means …","In conclusion, …"],
+  model:"I think the sea is both a friend and a danger. On one hand, it gives us fish, beautiful beaches and coral reefs full of life. For example, we can swim and build sandcastles. However, storms and tsunamis can cause huge damage to towns. This means we must respect the sea and stay safe. In conclusion, the sea is a powerful friend that we need to be careful with."}
+];
+const RUBRIC=["Clear, loud voice · not too fast","Uses linking words (first, next, so…)","Explains WHY (because / so / this means)","Uses science or WOW words","Keeps going for about 1 minute"];
+
+const PLAN=[
+ ["Day 1","Writing Lab 1 + 2 (features, linking words) · Speaking: sand"],
+ ["Day 2","Writing Lab 3 + 4 · Writing Builder: How Is Sand Made? → Coach marks it"],
+ ["Day 3","Reading Reef (cave + poem) · Poetry Pool · Speaking: 5 senses, poem"],
+ ["Day 4","Writing Lab 5 · Writing Builder: Cave or Tsunami (20 minutes, no help words) · Speaking: tsunami"],
+ ["Day 5","Boss Battle (aim 8/10) · Builder: a NEW topic · Speaking: friend or danger?"]
+];
+
+/* ============ STATE ============ */
+const KEY="seaPowerMission.v1";
+let S={best:{},log:[],pearls:0,drafts:{},speak:{}};
+try{const raw=localStorage.getItem(KEY);if(raw)S=Object.assign(S,JSON.parse(raw))}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+const $=s=>document.querySelector(s);
+const app=$("#app");
+function esc(t){return String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function pearls(){$("#pearls").textContent="🫧 "+S.pearls+" pearls"}
+function stamp(){const d=new Date(),p=n=>String(n).padStart(2,"0");return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}`}
+function code(id,score,max,per){return `QQ|EFL|${id}|${stamp()}|${score}/${max}|`+Object.entries(per).map(([k,v])=>`${k}:${v[0]}/${v[1]}`).join(";")}
+function logResult(id,score,max,per,extra){const c=code(id,score,max,per);S.log.push({id,when:stamp(),score,max,per,code:c,extra:extra||null});S.best[id]=Math.max(S.best[id]||0,Math.round(100*score/max));save();return c}
+
+/* ============ SOUND + FX ============ */
+let AC=null;
+function tone(fs,dur=.12,type="sine"){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();let t=AC.currentTime;fs.forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(.18,t+i*dur);g.gain.exponentialRampToValueAtTime(.001,t+i*dur+dur*1.6);o.connect(g).connect(AC.destination);o.start(t+i*dur);o.stop(t+i*dur+dur*1.7)})}catch(e){}}
+const yay=()=>tone([660,880,1175]),oops=()=>tone([300,220],.14,"triangle");
+const fx=$("#fx"),cx=fx.getContext("2d");let parts=[];
+function burst(n=90){if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;fx.width=innerWidth;fx.height=innerHeight;const cols=["#ff6b57","#ffc23d","#1e9c8c","#0d5c7d","#8fd3ff"];for(let i=0;i<n;i++)parts.push({x:innerWidth/2,y:innerHeight*.35,vx:(Math.random()-.5)*14,vy:Math.random()*-12-3,r:4+Math.random()*5,c:cols[i%5],l:90});if(parts.length===n)requestAnimationFrame(step)}
+function step(){cx.clearRect(0,0,fx.width,fx.height);parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.35;p.l--;cx.fillStyle=p.c;cx.beginPath();cx.arc(p.x,p.y,p.r,0,7);cx.fill()});parts=parts.filter(p=>p.l>0&&p.y<fx.height+20);if(parts.length)requestAnimationFrame(step);else cx.clearRect(0,0,fx.width,fx.height)}
+
+/* ============ HOME ============ */
+function lastScore(prefix){const L=S.log.filter(r=>r.id.startsWith(prefix));return L.length?L[L.length-1]:null}
+function starsFor(id){const b=S.best[id];if(b==null)return "☆☆☆";return b>=90?"⭐⭐⭐":b>=70?"⭐⭐☆":"⭐☆☆"}
+function home(){
+ const wr=lastScore("builder-"),sp=lastScore("speak-"),boss=lastScore("boss");
+ const wNow=wr?wr.score:13,sNow=sp?sp.score:17;
+ app.innerHTML=`
+ <div class="goals">
+  <div class="goal"><small>Reading · last test 21/23</small><b>Keep it! 🐠</b><div class="bar"><i style="width:${21/23*100}%"></i><em style="left:${20/23*100}%"></em></div><small>${boss?"Boss Battle: "+(boss.score/boss.max*10).toFixed(1)+"/10":"Target: 20+/23"}</small></div>
+  <div class="goal"><small>Writing · last test 13/25</small><b>${wNow}/25 → 20 ✍️</b><div class="bar"><i style="width:${wNow/25*100}%;background:var(--coral)"></i><em style="left:80%"></em></div><small>${wr?"From your latest Builder":"Main focus this week"}</small></div>
+  <div class="goal"><small>Speaking · last test 17/25</small><b>${sNow}/25 → 21 🗣️</b><div class="bar"><i style="width:${sNow/25*100}%;background:var(--sun)"></i><em style="left:84%"></em></div><small>${sp?"From your latest practice":"Practise out loud"}</small></div>
+ </div>
+ <h2 class="section-h">Choose your island</h2>
+ <p class="sub">Collect pearls. Three stars on every island = ready for the test!</p>
+ <div class="islands">
+  ${isle("builder","✍️","Writing Builder","Write your own explanation text. Coach marks it out of 25.","Most important","focus")}
+  ${isle("lab","🧪","Writing Lab","5 quick levels: features, linking words, science words, fix-it, order.",labStars())}
+  ${isle("reading","🐠","Reading Reef","A cave explanation text + a stormy sea poem.",starsFor("read-cave")+" "+starsFor("read-poem"))}
+  ${isle("speaking","🗣️","Speaking Cove","6 one-minute talks with a timer and a model answer.",Object.keys(S.speak).length+"/6 done")}
+  ${isle("poetry","🐙","Poetry Pool","Similes, personification, haiku, adverbs, word families.",starsFor("poetry"))}
+  ${isle("boss","👑","Boss Battle","15 mixed test questions. Can you score 8/10?",boss?"Best "+bestBoss()+"/10":"Locked? No, try it!")}
+ </div>
+ <h2 class="section-h">5-day mission plan</h2>
+ <p class="sub">About 25 minutes a day. One day at a time.</p>
+ <div class="plan">${PLAN.map(d=>`<div class="day"><b>${d[0]}</b><span>${d[1]}</span></div>`).join("")}</div>
+ <h2 class="section-h">Góc phụ huynh</h2>
+ ${parentBox()}`;
+ app.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));
+ const cp=$("#copyCodes");if(cp)cp.onclick=()=>copyText($("#codes").textContent,cp);
+ pearls();
+}
+function isle(go,ic,t,p,st,cls){return `<button class="isle ${cls||""}" data-go="${go}"><span class="ic">${ic}</span><h3>${t}</h3><p>${p}</p><span class="st"><span>${cls?'<span class="tag">Focus</span>':""}</span><span>${st}</span></span></button>`}
+function labStars(){const ids=["w-features","w-linking","w-vocab","w-fix","w-order"];return ids.filter(i=>(S.best[i]||0)>=90).length+"/5 ⭐⭐⭐"}
+function bestBoss(){return Math.max(...S.log.filter(r=>r.id==="boss").map(r=>r.score/r.max*10)).toFixed(1)}
+function parentBox(){
+ const per={};S.log.forEach(r=>Object.entries(r.per).forEach(([k,v])=>{per[k]=per[k]||[0,0];per[k][0]+=v[0];per[k][1]+=v[1]}));
+ const NAMES={"doc-hieu":"Đọc hiểu","dac-diem-explanation":"Đặc điểm Explanation text","tu-noi-trinh-tu":"Từ nối","tu-khoa-hoc":"Từ vựng khoa học","thi-hien-tai":"Thì hiện tại đơn","sap-xep-quy-trinh":"Sắp xếp quá trình","bien-phap-tho":"Biện pháp tu từ","tinh-tu-trang-tu":"Tính từ/trạng từ","ho-tu":"Họ từ","viet-hoa":"Viết hoa","a-an":"a / an","chinh-ta":"Chính tả","simile":"Simile","alliteration":"Alliteration","viet-explanation":"Viết bài (điểm/25)","noi":"Nói (điểm/25)"};
+ const rows=Object.entries(per).map(([k,v])=>{const p=Math.round(100*v[0]/v[1]);return [k,v,p]}).sort((a,b)=>a[2]-b[2]);
+ const codes=S.log.slice(-15).map(r=>r.code).join("\n");
+ return `<div class="vnbox">
+ <h3>Cách dùng (Sếp đọc 1 phút)</h3>
+ <ul style="margin:6px 0;padding-left:20px;font-size:15px">
+  <li>Mỗi ngày làm theo "5-day mission plan" ở trên, ~25 phút. Ưu tiên <b>Writing Builder</b>: con viết, bấm "Coach, mark my writing" để được chấm /25 và sửa lỗi.</li>
+  <li>Writing Builder: lần đầu cho con dùng "help words"; ngày 4–5 bấm <b>Test mode</b> để ẩn gợi ý + bấm giờ 20 phút như bài kiểm tra thật.</li>
+  <li>Speaking: Sếp ngồi nghe con nói 1 phút, rồi Sếp chấm 5 tiêu chí bằng sao. Có thể bấm "Listen to a model" để con nghe bài mẫu trước.</li>
+  <li>Không phạt khi sai: con được thử lại; điểm "đúng ngay lần đầu" mới được tính vào bảng dưới.</li>
+ </ul>
+ ${rows.length?`<div class="tbl"><table class="sk"><tr><th>Kỹ năng</th><th>Đúng ngay lần đầu</th><th>Mức</th></tr>${rows.map(([k,v,p])=>`<tr><td>${NAMES[k]||k}</td><td>${v[0]}/${v[1]} (${p}%)</td><td>${p<60?"🔴":p<85?"🟡":"🟢"}</td></tr>`).join("")}</table></div>
+ <p style="font-size:14px;margin:10px 0 4px">Mã kết quả (dán vào <b>ket-qua/ma-ipad.txt</b> rồi nhắn Claude "cập nhật kết quả"):</p>
+ <div class="code" id="codes">${esc(codes)}</div><div class="row" style="margin-top:8px"><button class="btn alt" id="copyCodes">Sao chép mã</button></div>`:`<p style="font-size:15px;color:var(--muted)">Chưa có kết quả. Sau khi con chơi, bảng điểm mạnh/yếu theo kỹ năng sẽ hiện ở đây.</p>`}
+ </div>`;
+}
+function copyText(t,btn){const done=()=>{btn.textContent="Đã sao chép ✓"};try{navigator.clipboard.writeText(t).then(done,()=>sel())}catch(e){sel()}function sel(){const r=document.createRange();r.selectNodeContents($("#codes")||document.body);const s=getSelection();s.removeAllRanges();s.addRange(r);btn.textContent="Đã bôi đen, bấm Copy"}}
+
+/* ============ ROUTER ============ */
+function topBar(title,backTo="home"){return `<div class="topbar"><button class="back" data-back="${backTo}">← ${backTo==="home"?"Map":"Back"}</button><span class="crumb">${esc(title)}</span></div>`}
+function wireBack(){app.querySelectorAll("[data-back]").forEach(b=>b.onclick=()=>go(b.dataset.back))}
+function go(where){
+ window.scrollTo({top:0,behavior:"smooth"});
+ if(where==="home")return home();
+ if(where==="lab")return menu("Writing Lab",["w-features","w-linking","w-vocab","w-fix","w-order"],"Do them in order. Each level takes about 4 minutes.");
+ if(where==="reading")return menu("Reading Reef",["read-cave","read-poem"],"Read the text carefully first. You can open it again during the questions.");
+ if(where==="poetry")return quiz("poetry");
+ if(where==="boss")return boss();
+ if(where==="builder")return builder();
+ if(where==="speaking")return speaking();
+ if(LEVELS[where])return quiz(where);
+}
+function menu(title,ids,sub){
+ app.innerHTML=topBar(title)+`<h2 class="section-h" style="margin-top:4px">${title}</h2><p class="sub">${sub}</p><div class="islands">${ids.map((id,i)=>`<button class="isle" data-go="${id}"><span class="ic">${["🧭","🔗","🔬","🛠️","🧩"][i]||"📖"}</span><h3>${LEVELS[id].title.replace(/^.*?: /,"")}</h3><p>${LEVELS[id].qs.length} questions</p><span class="st"><span></span><span>${starsFor(id)}</span></span></button>`).join("")}</div>`;
+ wireBack();app.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));
+}
+
+/* ============ QUIZ ENGINE ============ */
+function quiz(id,customQs,customTitle){
+ const L=LEVELS[id]||{};const qs=customQs||L.qs;const title=customTitle||L.title;
+ let i=0,score=0,tries=0;const res=[];const back=L.area==="writing"?"lab":L.area==="reading"?"reading":"home";
+ const passage=L.passage?`<details class="ptoggle" open><summary>📖 ${esc(L.passage.title)} (tap to hide/show)</summary><div class="passage"><h3>${esc(L.passage.title)}</h3>${L.passage.html}</div></details>`:"";
+ function render(){
+  const q=qs[i];tries=0;
+  const dots=qs.map((_,k)=>`<i class="${k<i?(res[k]?"ok":"half"):k===i?"now":""}"></i>`).join("");
+  let body="";
+  if(q.type==="order"){body=`<div class="slots" id="slots"></div><div class="pool" id="pool"></div><div class="row"><button class="btn alt" id="reset">Start again</button></div>`}
+  else{const opts=shuffle(q.c.map((t,k)=>({t,k})));body=`<div class="choices">${opts.map(o=>`<button class="ch" data-k="${o.k}">${esc(o.t)}</button>`).join("")}</div>`}
+  app.innerHTML=topBar(title,back)+(customQs?"":passage)+`<div class="card"><div class="qhead"><span>Question ${i+1} of ${qs.length}</span><span class="dots">${dots}</span></div><div class="q">${esc(q.q)}</div>${body}<div id="tip"></div><div class="row" style="margin-top:12px"><button class="btn k" id="next" hidden>Next →</button></div></div>`;
+  wireBack();
+  if(q.type==="order")orderQ(q);else app.querySelectorAll(".ch").forEach(b=>b.onclick=()=>pick(b,q));
+  const p=app.querySelector("details.ptoggle");if(p&&i>0&&innerWidth<700)p.open=false;
+ }
+ function correct(q){const first=tries===0;res[i]=first;score+=first?2:1;S.pearls+=first?2:1;pearls();yay();
+  $("#tip").innerHTML=`<div class="tip ok">✅ ${first?"Brilliant!":"Got it!"} ${esc(q.tip)}</div>`;const n=$("#next");n.hidden=false;n.textContent=i<qs.length-1?"Next →":"See my score";n.focus();n.onclick=()=>{i++;i<qs.length?render():finish()}}
+ function pick(b,q){if(b.disabled)return;const k=+b.dataset.k;
+  if(k===q.a){app.querySelectorAll(".ch").forEach(x=>x.disabled=true);b.classList.add("right");correct(q)}
+  else{tries++;b.classList.add("wrong");b.disabled=true;oops();$("#tip").innerHTML=`<div class="tip no">🤔 Not quite. ${tries>1?esc(q.tip):"Read it again and try once more!"}</div>`}}
+ function orderQ(q){
+  const slots=$("#slots"),pool=$("#pool");let placed=[];
+  const pieces=shuffle(q.w.map((t,k)=>({t,k})));
+  function draw(){slots.innerHTML=placed.length?placed.map((p,n)=>`<button class="chip" data-n="${n+1}" data-i="${n}">${esc(p.t)}</button>`).join(""):`<span style="color:var(--muted);font-size:15px">Tap the cards below in the right order ↓</span>`;
+   pool.innerHTML=pieces.filter(p=>!placed.includes(p)).map(p=>`<button class="chip" data-k="${p.k}">${esc(p.t)}</button>`).join("");
+   const isWords=q.w.every(w=>!w.includes(" "));slots.style.flexDirection=isWords?"row":"column";
+   pool.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{placed.push(pieces.find(p=>p.k===+c.dataset.k));draw();if(placed.length===q.w.length)check()});
+   slots.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{placed.splice(+c.dataset.i);draw()})}
+  function check(){if(placed.every((p,n)=>p.k===n)){slots.querySelectorAll(".chip").forEach(c=>c.disabled=true);$("#reset").hidden=true;correct(q)}
+   else{tries++;oops();slots.style.borderColor="var(--bad)";slots.animate&&slots.animate([{transform:"translateX(-6px)"},{transform:"translateX(6px)"},{transform:"none"}],{duration:300});
+    const firstWrong=placed.findIndex((p,n)=>p.k!==n);$("#tip").innerHTML=`<div class="tip no">🤔 Card ${firstWrong+1} is in the wrong place. ${tries>1?esc(q.tip):"Try again!"}</div>`;
+    setTimeout(()=>{placed=placed.slice(0,firstWrong);slots.style.borderColor="";draw()},900)}}
+  $("#reset").onclick=()=>{placed=[];draw()};draw();
+ }
+ function finish(){
+  const max=qs.length*2,per={};qs.forEach((q,k)=>{const sk=q.skill||L.skill||"chung";per[sk]=per[sk]||[0,0];per[sk][1]++;if(res[k])per[sk][0]++});
+  const c=logResult(id,score,max,per);const pct=score/max;const st=pct>=.9?"⭐⭐⭐":pct>=.7?"⭐⭐☆":"⭐☆☆";
+  if(pct>=.7){burst();tone([523,659,784,1047],.13)}
+  const weak=Object.entries(per).filter(([k,v])=>v[0]<v[1]).map(([k])=>k);
+  app.innerHTML=topBar(title,back)+`<div class="card end"><div class="stars">${st}</div><div class="big">${id==="boss"?(pct*10).toFixed(1)+"/10":score+"/"+max}</div>
+  <p>${pct>=.9?"Superstar! You are ready for this part.":pct>=.7?"Great work! Play once more to get 3 stars.":"Good try! Play again: you will remember the tips now."}</p>
+  ${weak.length?`<p class="sub">Practise again: ${weak.length} skill${weak.length>1?"s":""} were tricky first time.</p>`:""}
+  <div class="row" style="justify-content:center"><button class="btn" id="again">Play again</button><button class="btn alt" data-back="${back}">Back</button></div></div>`;
+  wireBack();$("#again").onclick=()=>id==="boss"?boss():quiz(id,customQs,customTitle);
+ }
+ render();
+}
+function boss(){
+ const pool=[];Object.entries(LEVELS).forEach(([id,L])=>L.qs.forEach(q=>pool.push(Object.assign({skill:L.skill},q))));
+ const pick=shuffle(pool).slice(0,15);LEVELS.boss={area:"boss",title:"👑 Boss Battle",skill:"chung",qs:pick};
+ quiz("boss");
+}
+
+/* ============ WRITING BUILDER ============ */
+let curTopic="sand",testMode=false,timerInt=null;
+function builder(){
+ const T=TOPICS[curTopic];const D=S.drafts[curTopic]||{};
+ const f=(k,lab,hint,starters,rows)=>`<div class="field"><label for="f-${k}">${lab}</label>${hint&&!testMode?`<p class="hint">${hint}</p>`:""}${starters&&!testMode?`<div class="starters">${starters.map(s=>`<button data-st="${k}">${esc(s)}</button>`).join("")}</div>`:""}${rows?`<textarea id="f-${k}" rows="${rows}">${esc(D[k]||"")}</textarea>`:`<input id="f-${k}" value="${esc(D[k]||"")}">`}</div>`;
+ app.innerHTML=topBar("Writing Builder")+`
+ <h2 class="section-h" style="margin-top:4px">Writing Builder ✍️</h2>
+ <p class="sub">Write an explanation text with 4 stages. Watch your Writing Power meter grow!</p>
+ <div class="topics">${Object.entries(TOPICS).map(([k,t])=>`<button data-tp="${k}" class="${k===curTopic?"on":""}">${t.name}</button>`).join("")}</div>
+ <div class="row" style="margin-bottom:12px"><button class="btn ${testMode?"":"alt"}" id="tm">${testMode?"Test mode ON · 20:00":"Test mode (hide help + timer)"}</button><span id="clock" style="font-family:var(--display);font-size:28px;color:var(--sea)"></span></div>
+ ${testMode?"":`<div class="bank"><b>Science words for "${T.name}"</b> (use 4 or more):<br>${T.words.map(w=>`<span class="w" data-w="${esc(w)}">${esc(w)}</span>`).join("")}</div>`}
+ ${f("title","Title","A clear, interesting title. Start with How or Why.",null,0)}
+ ${f("intro","Introduction","Tell the reader what you are explaining. Hook them with a question!",["Have you ever wondered…","…is…","But how does it happen?"],3)}
+ ${T.steps.map((s,n)=>f("s"+n,["First","Next","Then","Finally"][n],"Idea: "+s+(n===2?" Add WHY: because… / so…":""),[["First,","At first,"],["Next,","After that,","This causes"],["Then,","Gradually,","Over time,","because","so"],["Finally,","Eventually,","which leads to"]][n],3)).join("")}
+ ${f("concl","Concluding sentence","Sum up the result.",["As a result,","This is why","Therefore,"],2)}
+ <div class="field"><label>Diagram labels + caption</label>${testMode?"":`<p class="hint">Draw the diagram in your book. Write 3 labels and 1 caption sentence here.</p>`}<div class="labels3">${[0,1,2].map(n=>`<input id="f-l${n}" placeholder="${testMode?"label":esc(T.labels[n])}" value="${esc(D["l"+n]||"")}">`).join("")}</div><textarea id="f-cap" rows="2" style="margin-top:8px" placeholder="Caption: one full sentence that explains the diagram.">${esc(D.cap||"")}</textarea></div>
+ <div class="checks" id="checks"></div><div id="warns"></div>
+ <div class="row"><button class="btn" id="mark">⭐ Coach, mark my writing</button><button class="btn alt" id="copyW">Copy my text</button><button class="btn alt" id="clearW">Start this topic again</button></div>
+ <div id="aiOut"></div>
+ <div class="meter" id="meter"></div>`;
+ wireBack();
+ app.querySelectorAll("[data-tp]").forEach(b=>b.onclick=()=>{curTopic=b.dataset.tp;builder()});
+ $("#tm").onclick=()=>{testMode=!testMode;clearInterval(timerInt);builder();if(testMode)startClock()};
+ if(testMode&&!timerInt)startClock();
+ app.querySelectorAll("[data-st]").forEach(b=>b.onclick=()=>{const el=$("#f-"+b.dataset.st);const s=b.textContent;el.value=(el.value&&!/\s$/.test(el.value)?el.value+" ":el.value)+s+" ";el.focus();upd()});
+ app.querySelectorAll("textarea,input").forEach(el=>el.addEventListener("input",upd));
+ $("#mark").onclick=markWriting;
+ $("#copyW").onclick=()=>{const t=fullText();try{navigator.clipboard.writeText(t).then(()=>$("#copyW").textContent="Copied ✓",()=>{})}catch(e){}};
+ let armed=false;$("#clearW").onclick=()=>{if(!armed){armed=true;$("#clearW").textContent="Tap again to clear";return}delete S.drafts[curTopic];save();builder()};
+ upd();
+}
+function startClock(){let left=20*60;const tick=()=>{const c=$("#clock");if(!c){clearInterval(timerInt);timerInt=null;return}c.textContent=`${Math.floor(left/60)}:${String(left%60).padStart(2,"0")}`;if(left<=0){clearInterval(timerInt);timerInt=null;c.textContent="Time! Check capitals and full stops.";tone([880,660,440])}left--};tick();timerInt=setInterval(tick,1000)}
+const FIELDS=["title","intro","s0","s1","s2","s3","concl","l0","l1","l2","cap"];
+function getD(){const D={};FIELDS.forEach(k=>{const el=$("#f-"+k);D[k]=el?el.value:""});return D}
+function fullText(){const D=getD();return [D.title,"",D.intro,"",D.s0,"",D.s1,"",D.s2,"",D.s3,"",D.concl,"","Diagram labels: "+[D.l0,D.l1,D.l2].filter(Boolean).join(", "),"Caption: "+D.cap].join("\n")}
+function analyse(D,T){
+ const body=[D.intro,D.s0,D.s1,D.s2,D.s3,D.concl].join(" ").replace(/\s+/g," ").trim();const low=" "+body.toLowerCase()+" ";
+ const words=body?body.split(/\s+/).length:0;
+ const links=LINKS.filter(l=>new RegExp("(^|[^a-z])"+l.replace(/ /g,"\\s+")+"([^a-z]|$)").test(low));
+ const sci=T.words.filter(w=>low.includes(w.toLowerCase().replace(/s$/,"")));
+ const why=(low.match(/\b(because|so|this means|which means|this causes|which leads to|as a result|therefore)\b/g)||[]).length;
+ const warns=[];
+ const sents=[D.intro,D.s0,D.s1,D.s2,D.s3,D.concl,D.cap].flatMap(t=>t.trim()?t.trim().split(/(?<=[.!?])\s+/):[]);
+ const noCap=sents.filter(s=>/^[a-z]/.test(s));if(noCap.length)warns.push(`🔠 Capital letter at the start: "${esc(noCap[0].slice(0,30))}…"`);
+ const fields=[["Introduction",D.intro],["First",D.s0],["Next",D.s1],["Then",D.s2],["Finally",D.s3],["Conclusion",D.concl],["Caption",D.cap]].filter(([n,t])=>t.trim().length>8&&!/[.!?]["']?$/.test(t.trim()));
+ if(fields.length)warns.push(`⏺️ Full stop missing at the end of: ${fields.map(f=>f[0]).join(", ")}`);
+ const midCap=body.match(/[a-z,] (Like|The|And|Because|So|Then|It|They)\b/);if(midCap)warns.push(`🔡 No capital in the middle of a sentence: "${esc(midCap[1])}" → "${esc(midCap[1].toLowerCase())}"`);
+ const aan=low.match(/\ba (?!uni|use|one|euro)[aeiou]\w*/);if(aan)warns.push(`🐚 Use AN before a vowel sound: "${esc(aan[0].trim())}" → "an ${esc(aan[0].trim().slice(2))}"`);
+ const PAST={was:"is",were:"are",broke:"break(s)",fell:"fall(s)",went:"go(es)",took:"take(s)",came:"come(s)",became:"become(s)",grew:"grow(s)",crashed:"crash(es)",smashed:"smash(es)",carried:"carry / carries",pushed:"push(es)",formed:"form(s)",caused:"cause(s)",travelled:"travel(s)"};
+ const past=low.match(new RegExp("\\b("+Object.keys(PAST).join("|")+")\\b"));if(past)warns.push(`⏰ Explanation texts use the present tense: "${past[1]}" → "${PAST[past[1]]}"`);
+ if((low.match(/and then/g)||[]).length>1)warns.push(`🔁 "and then" used ${(low.match(/and then/g)||[]).length} times. Swap one for Next, / After that, / so`);
+ const bec=(low.match(/\bbecause\b/g)||[]).length;if(bec>3)warns.push(`🔁 "because" ${bec} times. Try so / this means / as a result`);
+ if(/\bhowever\b/.test(low))warns.push(`🤔 Check "however": use it only for an OPPOSITE idea.`);
+ const stepOK=[D.s0,D.s1,D.s2,D.s3].map(t=>t.trim().split(/\s+/).filter(Boolean).length);
+ const sc={
+  content:Math.min(5,stepOK.filter(n=>n>=10).length+(why>=2?1:0)),
+  structure:(D.title.trim()?1:0)+(D.intro.trim().split(/\s+/).length>=6?1:0)+(stepOK.every(n=>n>=5)?1:0)+(D.concl.trim().split(/\s+/).length>=5?1:0)+([D.l0,D.l1,D.l2].filter(x=>x.trim()).length>=2&&D.cap.trim().split(/\s+/).length>=5?1:0),
+  linking:Math.min(5,links.length),
+  vocab:Math.min(5,Math.round(sci.length*5/6)),
+  accuracy:words<20?0:Math.max(0,5-warns.filter(w=>!/however|and then|because/.test(w)).length)
+ };
+ return {sc,total:Object.values(sc).reduce((a,b)=>a+b,0),links,sci,why,words,warns};
+}
+function upd(){
+ const T=TOPICS[curTopic];const D=getD();S.drafts[curTopic]=D;save();
+ const A=analyse(D,T);
+ app.querySelectorAll(".bank .w").forEach(w=>w.classList.toggle("used",A.sci.includes(w.dataset.w)));
+ const ck=(ok,t)=>`<div>${ok?"✅":"⬜"} ${t}</div>`;
+ $("#checks").innerHTML=ck(D.title.trim(),"Clear title")+ck(D.intro.trim().split(/\s+/).length>=6,"Introduction")+ck([D.s0,D.s1,D.s2,D.s3].every(t=>t.trim().split(/\s+/).length>=5),"4 stages in order")+ck(A.links.length>=5,`Linking words: ${A.links.length}/5`)+ck(A.sci.length>=4,`Science words: ${A.sci.length}/4`)+ck(A.why>=2,`Explains WHY: ${A.why}/2`)+ck(D.concl.trim().split(/\s+/).length>=5,"Concluding sentence")+ck(D.cap.trim().split(/\s+/).length>=5,"Labels + caption");
+ $("#warns").innerHTML=A.warns.map(w=>`<div class="warn">${w}</div>`).join("");
+ const nm={content:"Ideas",structure:"Structure",linking:"Linking",vocab:"Words",accuracy:"Accuracy"};
+ $("#meter").innerHTML=`<div><div style="font-size:12px;opacity:.8">Writing Power</div><div class="sc">${A.total}/25</div></div><div class="mbars">${Object.entries(A.sc).map(([k,v])=>`<div>${nm[k]} ${v}/5<i><b style="width:${v*20}%"></b></i></div>`).join("")}</div>`;
+}
+async function markWriting(){
+ const out=$("#aiOut"),btn=$("#mark");const T=TOPICS[curTopic];const D=getD();const A=analyse(D,T);
+ if(A.words<30){out.innerHTML=`<div class="warn">Write a bit more first (at least one sentence in every box). You have ${A.words} words.</div>`;return}
+ let sample=null;try{sample=await window.claude?.use?.("sample")}catch(e){}
+ const saveScore=(total,parts,note)=>{const per={"viet-explanation":[total,25]};S.pearls+=Math.round(total/2);pearls();return logResult("builder-"+curTopic,total,25,per,note)};
+ if(!sample){const c=saveScore(A.total,A.sc,"meter");out.innerHTML=`<div class="ai"><h3>Writing Power: ${A.total}/25</h3><p>Coach is not available here, so this is the meter score. Fix the yellow hints above, then ask a grown-up to read it with the checklist.</p></div>`;return}
+ btn.disabled=true;out.innerHTML=`<div class="ai"><h3>Coach is reading your writing…</h3><p>This takes about 20–40 seconds. 🐬</p></div>`;
+ const prompt=`You are a kind, encouraging Cambridge Primary English (Stage 4) teacher marking an explanation text written by Peter, an 8-year-old Vietnamese boy in Year 3 (English is his first-language class, his writing test score was 13/25 and the target is 20/25). His known weaknesses: capital letters in the wrong place, "a" vs "an", spelling of longer words, using "however" wrongly, too many "because", not explaining WHY each stage happens.
+
+Topic: "${T.name}". Key science words for this topic: ${T.words.join(", ")}.
+Unit criteria: clear title; introduction saying what is explained; 4 stages in logical order with linking words (first, next, then, finally, because, so, as a result, therefore, over time, gradually, this causes, which leads to); explains WHY each stage happens; precise scientific vocabulary; present simple tense; diagram labels and a caption; strong concluding sentence; correct capitals, full stops, commas after fronted linking words, spelling.
+
+Mark out of 25 using 5 criteria, each 0-5: content (ideas and explaining why), structure (title, intro, ordered stages, conclusion, labels+caption), linking (range of linking words, cause and effect), vocabulary (precise science words and powerful words), accuracy (spelling, capitals, punctuation, grammar, tense). Be fair and realistic for a Stage 4 child: do not give 5 unless it is really excellent.
+
+Reply ONLY with JSON in this shape:
+{"scores":{"content":0,"structure":0,"linking":0,"vocabulary":0,"accuracy":0},"stars":["praise 1 quoting his words","praise 2"],"wish":"one most important thing to improve next time","fixes":[{"wrong":"exact short phrase from his text","right":"corrected phrase","why":"very short reason"}],"upgrade":{"before":"one of his sentences","after":"the same sentence improved to Level 5 (still sounds like a child)"},"parent_vi":"2 câu tiếng Việt cho phụ huynh: con đang ở mức nào và luyện gì tiếp"}
+Use max 5 fixes, only for real mistakes. Write stars, wish and why in simple English for an 8-year-old.
+
+HIS TEXT:
+${fullText()}`;
+ try{
+  const r=await sample.json(prompt,{modelTier:"default"});
+  const s=r.scores||{};const total=["content","structure","linking","vocabulary","accuracy"].reduce((a,k)=>a+(+s[k]||0),0);
+  saveScore(total,s,"coach");if(total>=18){burst();tone([523,659,784,1047],.13)}else yay();
+  out.innerHTML=`<div class="ai"><h3>Coach's mark: ${total}/25 ${total>=20?"🏆":total>=16?"🌟":"💪"}</h3>
+  <p style="font-size:15px">Ideas ${s.content}/5 · Structure ${s.structure}/5 · Linking ${s.linking}/5 · Words ${s.vocabulary}/5 · Accuracy ${s.accuracy}/5</p>
+  ${(r.stars||[]).map(t=>`<p>⭐ ${esc(t)}</p>`).join("")}<p>🌈 <b>Wish:</b> ${esc(r.wish||"")}</p>
+  ${(r.fixes||[]).length?`<p><b>Fix these:</b></p>`+(r.fixes||[]).map(x=>`<div class="fix"><del>${esc(x.wrong)}</del> → <ins>${esc(x.right)}</ins><br><small>${esc(x.why)}</small></div>`).join(""):""}
+  ${r.upgrade?`<p><b>Level-up sentence:</b></p><div class="fix">${esc(r.upgrade.before)}<br>➡️ <ins>${esc(r.upgrade.after)}</ins></div>`:""}
+  ${r.parent_vi?`<div class="vn">👩 Phụ huynh: ${esc(r.parent_vi)}</div>`:""}
+  <p class="sub" style="margin-top:8px">Now fix your text above and ask Coach again!</p></div>`;
+ }catch(e){
+  const c=saveScore(A.total,A.sc,"meter");
+  out.innerHTML=`<div class="ai"><h3>Writing Power: ${A.total}/25</h3><p>${e&&e.code==="not_granted"?"Coach needs permission to read your writing. Ask a grown-up to allow it next time.":e&&e.code==="rate_limited"?"Coach is busy. Wait one minute and try again.":"Coach could not answer this time. Here is your meter score."} Fix the yellow hints above to score higher.</p></div>`;
+ }finally{btn.disabled=false}
+}
+
+/* ============ SPEAKING ============ */
+let spIdx=0,spInt=null;
+function speaking(){
+ const P=SPEAK[spIdx];const R=(S.speak[P.id]&&S.speak[P.id].r)||[0,0,0,0,0];
+ app.innerHTML=topBar("Speaking Cove")+`
+ <h2 class="section-h" style="margin-top:4px">Speaking Cove 🗣️</h2>
+ <p class="sub">Read the frame, press Start, talk for 1 minute. A grown-up gives the stars.</p>
+ <div class="topics">${SPEAK.map((s,n)=>`<button data-sp="${n}" class="${n===spIdx?"on":""}">${S.speak[s.id]?"✅ ":""}${esc(s.t)}</button>`).join("")}</div>
+ <div class="spk">
+  <div class="card"><span class="tag k">${esc(P.k)}</span><h3 style="font-size:26px;margin:8px 0">${esc(P.t)}</h3>
+   <ol class="frame">${P.frame.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>
+   <div class="row" style="margin-top:10px"><button class="btn alt" id="listen">🔊 Listen to a model</button><button class="btn alt" id="showM">Show model</button></div>
+   <p id="model" hidden style="font-size:16px;background:var(--foam);border-radius:12px;padding:10px 12px">${esc(P.model)}</p>
+  </div>
+  <div class="card"><div class="timer" id="t">1:00</div>
+   <div class="row" style="justify-content:center;margin:10px 0"><button class="btn" id="go">▶ Start talking</button></div>
+   <p style="font-size:15px;margin:0 0 4px"><b>Grown-up: give 1–5 stars</b></p>
+   <div class="rub">${RUBRIC.map((r,n)=>`<div class="r"><span>${r}</span><div>${[1,2,3,4,5].map(v=>`<button data-r="${n}" data-v="${v}" class="${R[n]>=v?"on":""}" aria-label="${v} stars">⭐</button>`).join("")}</div></div>`).join("")}</div>
+   <div class="row"><b style="font-family:var(--display);font-size:26px" id="rs">${R.reduce((a,b)=>a+b,0)}/25</b><button class="btn k" id="saveS">Save score</button></div>
+   <p class="sub" style="margin-top:8px">Tips: look at the listener, speak slowly, use full sentences. Aim for 21/25.</p>
+  </div>
+ </div>`;
+ wireBack();
+ app.querySelectorAll("[data-sp]").forEach(b=>b.onclick=()=>{spIdx=+b.dataset.sp;clearInterval(spInt);speechSynthesis&&speechSynthesis.cancel();speaking()});
+ $("#showM").onclick=()=>{$("#model").hidden=!$("#model").hidden};
+ $("#listen").onclick=()=>{try{const u=new SpeechSynthesisUtterance(P.model);u.lang="en-GB";u.rate=.9;const v=speechSynthesis.getVoices().find(v=>/en-GB/.test(v.lang));if(v)u.voice=v;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){$("#model").hidden=false}};
+ $("#go").onclick=()=>{clearInterval(spInt);let left=60;const t=$("#t");$("#go").textContent="↺ Restart";tone([523,784]);spInt=setInterval(()=>{left--;if(!$("#t")){clearInterval(spInt);return}t.textContent=`0:${String(Math.max(0,left)).padStart(2,"0")}`;if(left<=0){clearInterval(spInt);t.textContent="Time! 🎉";yay()}},1000)};
+ app.querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>{R[+b.dataset.r]=+b.dataset.v;app.querySelectorAll(`[data-r="${b.dataset.r}"]`).forEach(x=>x.classList.toggle("on",+x.dataset.v<=R[+b.dataset.r]));$("#rs").textContent=R.reduce((a,b)=>a+b,0)+"/25"});
+ $("#saveS").onclick=()=>{const tot=R.reduce((a,b)=>a+b,0);if(!tot)return;S.speak[P.id]={r:R.slice(),when:stamp()};S.pearls+=Math.round(tot/2);logResult("speak-"+P.id,tot,25,{noi:[tot,25]});pearls();if(tot>=21){burst()}yay();$("#saveS").textContent="Saved ✓"};
+}
+
+/* ============ BOOT ============ */
+function start(){home()}
+start();
+</script>
+
+<a href="../" aria-label="Back to Peter's World" style="position:fixed;left:calc(10px + env(safe-area-inset-left,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:2147483000;width:48px;height:48px;border-radius:50%;background:#fff;border:3px solid #5fd3b0;display:grid;place-items:center;font-size:22px;text-decoration:none;box-shadow:0 3px 0 rgba(0,0,0,.18)">🏠</a>
+</body></html>

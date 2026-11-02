@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,-apple-system,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
+<title>Peter's Story Nights</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Grandstander:wght@500;700;800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Layout: two printable A4 "sheets" — sheet 1 = Mum's 4-night script, sheet 2 = desk word bank. Single paper look on purpose. */
+:root {
+  --paper: #ffffff;
+  --desk: #eef3f2;
+  --ink: #2e2a35;
+  --muted: #6b6574;
+  --teal: #2f8a86;
+  --teal-soft: #e3f2f0;
+  --saffron: #e9a23b;
+  --saffron-soft: #fdf1dc;
+  --rose: #e6879a;
+  --rose-soft: #fbe7ec;
+  --cat: #b4b1bd;
+  --line: #d9d4de;
+  --display: "Grandstander", "Comic Sans MS", "Chalkboard SE", system-ui, sans-serif;
+  --body: "Atkinson Hyperlegible", "Helvetica Neue", Arial, sans-serif;
+  color-scheme: light;
+}
+body {
+  background: var(--desk);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 15px;
+  line-height: 1.45;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 24px;
+}
+.sheet {
+  background: var(--paper);
+  max-width: 210mm;
+  margin: 0 auto 28px;
+  padding: 22px 26px 26px;
+  border-radius: 6px;
+  box-shadow: 0 2px 14px rgba(46, 42, 53, .10);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+h1, h2, h3 { font-family: var(--display); margin: 0; text-wrap: balance; line-height: 1.1; }
+p { margin: 0; }
+.head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: center;
+  border-bottom: 2px dashed var(--line);
+  padding-bottom: 12px;
+}
+.head h1 { font-size: 30px; font-weight: 800; color: var(--ink); }
+.head h1 span { color: var(--teal); }
+.head .sub { color: var(--muted); font-size: 14px; margin-top: 4px; }
+.head svg { width: 92px; height: 78px; }
+.rules {
+  display: flex; flex-wrap: wrap; gap: 6px 8px;
+}
+.rules span {
+  font-size: 12.5px;
+  background: var(--teal-soft);
+  color: var(--teal);
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+.nights {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.night {
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px 12px;
+  display: flex; flex-direction: column; gap: 6px;
+  min-width: 0;
+  break-inside: avoid;
+}
+.night .top { display: flex; align-items: baseline; gap: 8px; }
+.night .tag {
+  font-family: var(--display); font-weight: 700; font-size: 12px;
+  color: var(--paper); background: var(--saffron);
+  padding: 2px 8px; border-radius: 6px; letter-spacing: .04em; text-transform: uppercase;
+  flex: none;
+}
+.night h2 { font-size: 19px; font-weight: 700; }
+.night .goal { font-size: 12.5px; color: var(--muted); font-style: italic; }
+.scene { width: 100%; height: auto; aspect-ratio: 240 / 110; max-width: 100%; display: block; background: var(--saffron-soft); border-radius: 8px; }
+.say {
+  background: var(--rose-soft);
+  border-radius: 8px;
+  padding: 6px 9px;
+  font-size: 13.5px;
+}
+.say b { font-family: var(--display); color: var(--rose); font-weight: 700; margin-right: 4px; }
+.night ul { margin: 0; padding-left: 18px; font-size: 13.5px; display: flex; flex-direction: column; gap: 2px; }
+.night .label { font-family: var(--display); font-weight: 700; font-size: 13px; color: var(--teal); }
+.night .out {
+  font-size: 12.5px; border-top: 1px dashed var(--line); padding-top: 5px; margin-top: auto;
+}
+.night .out b { color: var(--saffron); }
+.foot { font-size: 12px; color: var(--muted); text-align: center; }
+
+/* Sheet 2: word bank */
+.bank { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.box {
+  border-radius: 10px; padding: 10px 12px; min-width: 0;
+  display: flex; flex-direction: column; gap: 6px; break-inside: avoid;
+}
+.box h3 { font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.box h3 svg { width: 34px; height: 28px; flex: none; }
+.box.cat { background: #f1f0f4; }
+.box.cat h3 { color: #5d5868; }
+.box.market { background: var(--saffron-soft); }
+.box.market h3 { color: #a8661a; }
+.box.door { background: var(--teal-soft); }
+.box.door h3 { color: var(--teal); }
+.box.said { background: var(--rose-soft); }
+.box.said h3 { color: #b34d63; }
+.words { display: flex; flex-wrap: wrap; gap: 5px; }
+.words span {
+  background: var(--paper); border-radius: 6px; padding: 2px 8px; font-size: 14px;
+  border: 1px solid var(--line);
+}
+.words small { width: 100%; font-size: 11.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-top: 2px; }
+.wide { grid-column: 1 / -1; }
+.starters { display: flex; flex-wrap: wrap; gap: 6px; }
+.starters span { font-family: var(--display); font-size: 15px; background: var(--paper); border: 1.5px dashed var(--saffron); border-radius: 8px; padding: 2px 10px; }
+.speech { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.speech p { font-size: 15px; background: var(--paper); border-radius: 8px; padding: 8px 10px; border: 1px solid var(--line); }
+.speech mark { background: #ffe39a; color: var(--ink); padding: 0 2px; border-radius: 3px; }
+.check { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 14px; font-size: 14px; }
+.check span::before { content: ""; display: inline-block; width: 13px; height: 13px; border: 2px solid var(--teal); border-radius: 3px; margin-right: 7px; vertical-align: -2px; }
+
+@media (max-width: 620px) {
+  .nights, .bank, .speech, .check { grid-template-columns: 1fr; }
+  .sheet { padding: 16px; }
+  .head h1 { font-size: 24px; }
+}
+@media print {
+  @page { size: A4; margin: 9mm; }
+  body { background: var(--paper); padding: 0; font-size: 12.5px; }
+  .sheet { box-shadow: none; padding: 0; margin: 0; max-width: none; gap: 9px; break-after: page; border-radius: 0; }
+  .sheet:last-child { break-after: auto; }
+  .night ul, .say { font-size: 12px; }
+  .scene { aspect-ratio: 240 / 92; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="cat" viewBox="0 0 120 100">
+      <path d="M100 80 C116 78 118 62 110 58" fill="none" stroke="#2e2a35" stroke-width="9" stroke-linecap="round"/>
+      <path d="M100 80 C116 78 118 62 110 58" fill="none" stroke="#b4b1bd" stroke-width="4.5" stroke-linecap="round"/>
+      <path d="M16 90 C8 66 14 36 34 30 L38 12 L52 26 C58 24 64 24 70 26 L84 12 L88 30 C108 36 112 66 104 90 Z" fill="#b4b1bd" stroke="#2e2a35" stroke-width="3.5" stroke-linejoin="round"/>
+      <path d="M54 31 v7 M61 29 v8 M68 31 v7 M98 58 h-7 M100 67 h-8" stroke="#8f8b9b" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="46" cy="56" r="3.4" fill="#2e2a35"/>
+      <circle cx="76" cy="56" r="3.4" fill="#2e2a35"/>
+      <path d="M56 62 q2.5 3 5 0 q2.5 3 5 0" fill="none" stroke="#2e2a35" stroke-width="2" stroke-linecap="round"/>
+      <ellipse cx="39" cy="64" rx="5" ry="3" fill="#f4a7b9"/>
+      <ellipse cx="83" cy="64" rx="5" ry="3" fill="#f4a7b9"/>
+      <path d="M30 58 h-12 M30 63 l-11 3 M92 58 h12 M92 63 l11 3" stroke="#2e2a35" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M36 90 q5 -6 10 0 M74 90 q5 -6 10 0" fill="none" stroke="#2e2a35" stroke-width="2.4" stroke-linecap="round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- ================= SHEET 1 ================= -->
+<section class="sheet">
+  <header class="head">
+    <div>
+      <h1>Peter's Story Nights: <span>Lila meets Stormy</span></h1>
+      <p class="sub">The Story Continues… · 4 nights · 10 minutes a night · Mum asks, Peter imagines</p>
+    </div>
+    <svg viewBox="0 0 120 100" role="img" aria-label="A chubby grey cat"><use href="#cat"/></svg>
+  </header>
+
+  <div class="rules">
+    <span>Every idea is a good idea</span>
+    <span>Talk first, write last</span>
+    <span>Ask, don't fix</span>
+    <span>Stuck? Offer two choices</span>
+    <span>Peter can answer in Vietnamese</span>
+  </div>
+
+  <div class="nights">
+    <!-- NIGHT 1 -->
+    <article class="night">
+      <div class="top"><span class="tag">Night 1</span><h2>Behind the Door</h2></div>
+      <p class="goal">Imagine the place and meet the cat.</p>
+      <svg class="scene" viewBox="0 0 240 110" role="img" aria-label="An old wooden door opens and a grey cat peeks out">
+        <rect x="0" y="92" width="240" height="18" fill="#f3d9ae"/>
+        <path d="M20 22 h50 M30 22 v10 M60 22 v10" stroke="#c98a2f" stroke-width="2"/>
+        <rect x="24" y="32" width="12" height="16" rx="4" fill="#e9a23b"/>
+        <rect x="54" y="32" width="12" height="16" rx="4" fill="#e6879a"/>
+        <path d="M86 96 V44 a32 32 0 0 1 64 0 V96 Z" fill="#3a2a22"/>
+        <path d="M86 96 V44 a32 32 0 0 1 32 -32 V96 Z" fill="#9a6440" stroke="#2e2a35" stroke-width="2.5"/>
+        <path d="M97 30 V96 M108 18 V96" stroke="#7a4c2f" stroke-width="2"/>
+        <circle cx="112" cy="62" r="3" fill="#e9a23b"/>
+        <circle cx="134" cy="40" r="2" fill="#ffe39a"/><circle cx="142" cy="52" r="1.6" fill="#ffe39a"/><circle cx="128" cy="30" r="1.4" fill="#ffe39a"/>
+        <use href="#cat" x="116" y="56" width="54" height="45"/>
+        <g transform="translate(176 90)"><circle r="6" fill="none" stroke="#c98a2f" stroke-width="3"/><path d="M6 0 h22 M22 0 v6 M28 0 v5" stroke="#c98a2f" stroke-width="3" stroke-linecap="round"/></g>
+      </svg>
+      <p class="say"><b>Say:</b>"Lila turns the rusty key… <i>click!</i> The door creaks open. Guess who is sitting inside? A chubby grey cat…"</p>
+      <span class="label">Ask, one by one</span>
+      <ul>
+        <li>What is Stormy doing when Lila walks in?</li>
+        <li>What can Lila <b>see</b>, <b>hear</b> and <b>smell</b>?</li>
+        <li>What are Stormy's very first words? Say it in Stormy's voice!</li>
+      </ul>
+      <p class="out"><b>Write down:</b> 3–5 key words + Stormy's first line = <b>speech #1</b>.</p>
+    </article>
+
+    <!-- NIGHT 2 -->
+    <article class="night">
+      <div class="top"><span class="tag">Night 2</span><h2>Uh-oh!</h2></div>
+      <p class="goal">Find the problem and Stormy's special power.</p>
+      <svg class="scene" viewBox="0 0 240 110" role="img" aria-label="A cheeky mouse runs off with the map while the cat looks surprised">
+        <rect x="0" y="92" width="240" height="18" fill="#f3d9ae"/>
+        <use href="#cat" x="20" y="38" width="76" height="63"/>
+        <path d="M92 18 q14 -8 22 4 q4 10 -8 14 l-4 8 -2 -9 q-12 -4 -8 -17Z" fill="#ffffff" stroke="#2e2a35" stroke-width="2"/>
+        <text x="103" y="32" font-family="Grandstander, sans-serif" font-weight="800" font-size="16" fill="#e6879a" text-anchor="middle">!</text>
+        <g transform="translate(150 62) rotate(-12)">
+          <rect x="0" y="0" width="44" height="30" rx="3" fill="#fdf1dc" stroke="#2e2a35" stroke-width="2"/>
+          <path d="M6 22 q10 -14 18 -4 t14 -10" fill="none" stroke="#e6879a" stroke-width="2" stroke-dasharray="3 3"/>
+          <path d="M33 6 l6 6 M39 6 l-6 6" stroke="#2f8a86" stroke-width="2"/>
+        </g>
+        <g transform="translate(196 76)">
+          <ellipse cx="10" cy="10" rx="13" ry="9" fill="#8f8b9b" stroke="#2e2a35" stroke-width="2"/>
+          <circle cx="20" cy="2" r="5" fill="#8f8b9b" stroke="#2e2a35" stroke-width="2"/>
+          <circle cx="21" cy="9" r="1.5" fill="#2e2a35"/>
+          <path d="M-3 12 q-8 2 -10 -6" fill="none" stroke="#2e2a35" stroke-width="2"/>
+        </g>
+        <path d="M150 100 h6 M162 100 h6 M174 100 h6" stroke="#c98a2f" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <p class="say"><b>Say:</b>"Everything was fine until… <i>CRASH!</i> What happened?"</p>
+      <span class="label">Stuck? Let Peter pick one</span>
+      <ul>
+        <li>The door slams shut and locks them inside.</li>
+        <li>A cheeky mouse steals the map.</li>
+        <li>Stormy vanishes, leaving tiny paw prints.</li>
+      </ul>
+      <p class="say"><b>Ask:</b>"Stormy is too chubby to run fast. So what special power does it have?"</p>
+      <p class="out"><b>Role-play 2 min:</b> Peter = Stormy, Mum = Lila. Catch one great line = <b>speech #2</b>.</p>
+    </article>
+
+    <!-- NIGHT 3 -->
+    <article class="night">
+      <div class="top"><span class="tag">Night 3</span><h2>The Twist</h2></div>
+      <p class="goal">A surprise, an ending, and four little drawings.</p>
+      <svg class="scene" viewBox="0 0 240 110" role="img" aria-label="A treasure map with an X and a jar full of cookies">
+        <rect x="0" y="92" width="240" height="18" fill="#f3d9ae"/>
+        <g transform="translate(18 18) rotate(-6)">
+          <rect width="96" height="64" rx="4" fill="#fdf1dc" stroke="#2e2a35" stroke-width="2.5"/>
+          <path d="M12 50 q18 -30 34 -10 t36 -24" fill="none" stroke="#e6879a" stroke-width="2.5" stroke-dasharray="4 4"/>
+          <path d="M76 10 l10 10 M86 10 l-10 10" stroke="#2f8a86" stroke-width="3" stroke-linecap="round"/>
+          <use href="#cat" x="10" y="8" width="22" height="18"/>
+        </g>
+        <path d="M150 40 h44 v52 a8 8 0 0 1 -8 8 h-28 a8 8 0 0 1 -8 -8 Z" fill="#e3f2f0" stroke="#2e2a35" stroke-width="2.5"/>
+        <rect x="146" y="32" width="52" height="10" rx="4" fill="#2f8a86" stroke="#2e2a35" stroke-width="2"/>
+        <circle cx="163" cy="62" r="9" fill="#d9a35f" stroke="#2e2a35" stroke-width="1.5"/><circle cx="181" cy="78" r="9" fill="#d9a35f" stroke="#2e2a35" stroke-width="1.5"/><circle cx="165" cy="84" r="7" fill="#d9a35f" stroke="#2e2a35" stroke-width="1.5"/>
+        <circle cx="161" cy="60" r="1.6" fill="#5a3a22"/><circle cx="166" cy="64" r="1.6" fill="#5a3a22"/><circle cx="183" cy="76" r="1.6" fill="#5a3a22"/>
+        <text x="216" y="40" font-family="Grandstander, sans-serif" font-weight="800" font-size="22" fill="#e9a23b">?</text>
+        <path d="M128 22 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3Z" fill="#ffe39a"/>
+      </svg>
+      <p class="say"><b>Ask:</b>"Hmm… who drew Lila's map in the first place?"</p>
+      <span class="label">Twist ideas, only if Peter needs them</span>
+      <ul>
+        <li>Stormy drew the map to find a friend.</li>
+        <li>The rusty key is really Stormy's collar bell.</li>
+        <li>The treasure is… a giant jar of cookies!</li>
+      </ul>
+      <p class="say"><b>Ask:</b>"Does Lila take Stormy home, or does Stormy stay to guard the door?"</p>
+      <p class="out"><b>Peter's job:</b> draw 4 comic boxes: door opens · problem · rescue · ending.</p>
+    </article>
+
+    <!-- NIGHT 4 -->
+    <article class="night">
+      <div class="top"><span class="tag">Night 4</span><h2>Pictures to Paragraphs</h2></div>
+      <p class="goal">One drawing becomes one paragraph.</p>
+      <svg class="scene" viewBox="0 0 240 110" role="img" aria-label="The cat sits beside a page of writing and a pencil">
+        <rect x="0" y="92" width="240" height="18" fill="#f3d9ae"/>
+        <g transform="translate(110 14)">
+          <rect width="94" height="76" rx="4" fill="#ffffff" stroke="#2e2a35" stroke-width="2.5"/>
+          <path d="M10 16 h74 M10 28 h74 M10 40 h60 M10 52 h70 M10 64 h44" stroke="#d9d4de" stroke-width="2"/>
+          <path d="M10 16 h30 M10 28 h46 M10 40 h22" stroke="#2f8a86" stroke-width="2.5" stroke-linecap="round"/>
+          <text x="58" y="44" font-family="Grandstander, sans-serif" font-size="13" font-weight="800" fill="#e6879a">“ ”</text>
+        </g>
+        <g transform="translate(206 30) rotate(30)">
+          <rect width="10" height="56" fill="#e9a23b" stroke="#2e2a35" stroke-width="2"/>
+          <path d="M0 56 l5 12 5 -12Z" fill="#fdf1dc" stroke="#2e2a35" stroke-width="2"/>
+          <rect y="-8" width="10" height="8" fill="#e6879a" stroke="#2e2a35" stroke-width="2"/>
+        </g>
+        <use href="#cat" x="18" y="36" width="78" height="65"/>
+        <path d="M30 26 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2Z" fill="#ffe39a"/>
+      </svg>
+      <p class="say"><b>Peter:</b> writes one paragraph for each picture, in part 4 of the worksheet.</p>
+      <span class="label">Mum's 10 minutes: upgrade 2–3 sentences by asking</span>
+      <ul>
+        <li>"How did Stormy move?" (waddled, tiptoed, rolled)</li>
+        <li>"Did Lila say it, whisper it or shout it?"</li>
+        <li>"What did the room smell like right then?"</li>
+      </ul>
+      <p class="out"><b>Check together:</b> problem + solution + ending · 2 speech lines in “ ” · wow words · 4 paragraphs.</p>
+    </article>
+  </div>
+
+  <p class="foot">If Peter gets excited and talks for longer than 10 minutes, let him. That is the best sign of all.</p>
+</section>
+
+<!-- ================= SHEET 2 ================= -->
+<section class="sheet">
+  <header class="head">
+    <div>
+      <h1>Peter's <span>Wow Word</span> Bank</h1>
+      <p class="sub">Keep this next to the desk. Pick a word, try it in a sentence, tick it when you use it!</p>
+    </div>
+    <svg viewBox="0 0 120 100" role="img" aria-label="A chubby grey cat"><use href="#cat"/></svg>
+  </header>
+
+  <div class="bank">
+    <div class="box cat">
+      <h3><svg viewBox="0 0 120 100" aria-hidden="true"><use href="#cat"/></svg>Stormy looks…</h3>
+      <div class="words">
+        <span>chubby</span><span>round</span><span>plump</span><span>fluffy</span><span>soft</span><span>silky grey</span><span>tiny paws</span><span>twitchy whiskers</span><span>sleepy eyes</span><span>rosy cheeks</span><span>stripy forehead</span>
+      </div>
+    </div>
+
+    <div class="box cat">
+      <h3><svg viewBox="0 0 120 100" aria-hidden="true"><use href="#cat"/></svg>Stormy moves & feels…</h3>
+      <div class="words">
+        <small>moves</small>
+        <span>waddled</span><span>tiptoed</span><span>rolled</span><span>bounced</span><span>crept</span><span>pounced</span><span>curled up</span><span>stretched</span>
+        <small>sounds & feelings</small>
+        <span>purred</span><span>mewed</span><span>yawned</span><span>sniffed</span><span>munched</span><span>curious</span><span>nervous</span><span>brave</span><span>delighted</span>
+      </div>
+    </div>
+
+    <div class="box market">
+      <h3><svg viewBox="0 0 40 32" aria-hidden="true"><path d="M6 4 h28 M12 4 v6 M28 4 v6" stroke="#a8661a" stroke-width="2.5"/><rect x="7" y="10" width="10" height="16" rx="4" fill="#e9a23b"/><rect x="23" y="10" width="10" height="16" rx="4" fill="#e6879a"/></svg>The busy market</h3>
+      <div class="words">
+        <span>bustling</span><span>crowded</span><span>noisy</span><span>colourful</span><span>golden sunshine</span><span>swaying lanterns</span><span>silk fabrics</span><span>clay pots</span><span>spicy smell</span><span>sweet dates</span><span>shouting sellers</span>
+      </div>
+    </div>
+
+    <div class="box door">
+      <h3><svg viewBox="0 0 40 32" aria-hidden="true"><path d="M10 31 V14 a10 10 0 0 1 20 0 V31 Z" fill="#9a6440" stroke="#2e2a35" stroke-width="2"/><circle cx="25" cy="21" r="1.8" fill="#e9a23b"/></svg>Behind the door</h3>
+      <div class="words">
+        <span>dusty</span><span>dim</span><span>glowing</span><span>secret</span><span>ancient</span><span>echoing</span><span>creaky</span><span>cobwebs</span><span>flickering candles</span><span>sparkling</span><span>hidden staircase</span><span>musty air</span>
+      </div>
+    </div>
+
+    <div class="box said wide">
+      <h3><svg viewBox="0 0 40 32" aria-hidden="true"><path d="M6 6 h28 a4 4 0 0 1 4 4 v10 a4 4 0 0 1 -4 4 h-16 l-7 6 v-6 h-5 a4 4 0 0 1 -4 -4 v-10 a4 4 0 0 1 4 -4Z" fill="#ffffff" stroke="#b34d63" stroke-width="2"/></svg>Instead of "said", try…</h3>
+      <div class="words">
+        <span>whispered</span><span>gasped</span><span>giggled</span><span>shouted</span><span>cried</span><span>muttered</span><span>squeaked</span><span>called</span><span>purred</span><span>explained</span><span>wondered</span>
+      </div>
+    </div>
+
+    <div class="box market wide">
+      <h3>Sentence starters</h3>
+      <div class="starters">
+        <span>Suddenly,…</span><span>Without warning,…</span><span>To her surprise,…</span><span>Moments later,…</span><span>Just then,…</span><span>At last,…</span><span>From that day on,…</span>
+      </div>
+    </div>
+
+    <div class="box door wide">
+      <h3>Speech marks: how they look</h3>
+      <div class="speech">
+        <p><mark>“</mark>Who are you?<mark>”</mark> whispered Lila.</p>
+        <p><mark>“</mark>I'm Stormy,<mark>”</mark> purred the cat, <mark>“</mark>and I've been waiting for you.<mark>”</mark></p>
+      </div>
+    </div>
+
+    <div class="box cat wide">
+      <h3>My story checklist</h3>
+      <div class="check">
+        <span>What Lila does next</span>
+        <span>A problem</span>
+        <span>A clever solution</span>
+        <span>An ending (with a twist!)</span>
+        <span>2 speech lines in “ ”</span>
+        <span>4 paragraphs</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<a href="../" aria-label="Back to Peter's World" style="position:fixed;left:calc(10px + env(safe-area-inset-left,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:2147483000;width:48px;height:48px;border-radius:50%;background:#fff;border:3px solid #5fd3b0;display:grid;place-items:center;font-size:22px;text-decoration:none;box-shadow:0 3px 0 rgba(0,0,0,.18)">🏠</a>
+</body></html>

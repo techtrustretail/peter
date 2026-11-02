@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Golden Bone Hunt – Grade 3 Science Unit 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800&display=swap&subset=vietnamese" rel="stylesheet">
+<style>
+:root{
+  --jungle:#0F6A5B; --jungle-2:#0B5247; --leaf-bg:#12806D;
+  --sun:#FFC23D; --sun-d:#D99A12;
+  --coral:#FF6B5B; --coral-d:#C9483A;
+  --sky:#3BA7E8; --sky-d:#1F7DB5;
+  --mint:#54C46A; --mint-d:#35914A;
+  --ink:#16213A; --paper:#FFFFFF; --paper-2:#EEF6F3; --muted:#5A6B7A;
+  --shadow:rgba(10,30,25,.35); --disp:"Baloo 2","Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){ --jungle:#0A4A40; --jungle-2:#073A32; --leaf-bg:#0D5E50; --paper:#F7FBF9; --paper-2:#E3EFEA; }
+}
+:root[data-theme="dark"]{ --jungle:#0A4A40; --jungle-2:#073A32; --leaf-bg:#0D5E50; --paper:#F7FBF9; --paper-2:#E3EFEA; }
+*,*::before,*::after{box-sizing:border-box}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  margin:0;min-height:100%;font-family:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);
+  background:var(--jungle);
+  background-image:
+    radial-gradient(circle at 12% 18%, rgba(255,255,255,.06) 0 38px, transparent 39px),
+    radial-gradient(circle at 88% 70%, rgba(255,255,255,.05) 0 60px, transparent 61px),
+    radial-gradient(circle at 60% 10%, rgba(255,255,255,.04) 0 24px, transparent 25px);
+  -webkit-tap-highlight-color:transparent;
+}
+h1,h2,h3,.display{font-family:"Baloo 2","Nunito",system-ui,sans-serif;line-height:1.05;margin:0}
+button{font:inherit;cursor:pointer;border:0;color:inherit}
+button:focus-visible,input:focus-visible{outline:4px solid var(--sun);outline-offset:3px}
+.wrap{max-width:960px;margin:0 auto;padding:16px}
+.hidden{display:none!important}
+
+/* chunky toy button */
+.chunk{background:var(--paper);border-radius:18px;box-shadow:0 6px 0 var(--c-d,#B9C9C3);transition:transform .08s, box-shadow .08s;position:relative}
+.chunk:active{transform:translateY(4px);box-shadow:0 2px 0 var(--c-d,#B9C9C3)}
+.btn-go{--c-d:var(--sun-d);background:var(--sun);font-family:var(--disp);font-weight:800;font-size:1.6rem;padding:14px 34px;border-radius:22px}
+.btn-plain{--c-d:#B9C9C3;padding:10px 18px;font-weight:800}
+
+/* HOME */
+.hero{text-align:center;color:#fff;padding:18px 0 10px}
+.hero .bone{font-size:3.4rem;display:inline-block;animation:wig 2.4s ease-in-out infinite}
+@keyframes wig{0%,100%{transform:rotate(-12deg)}50%{transform:rotate(12deg)}}
+.hero h1{font-size:clamp(2.6rem,9vw,4.4rem);font-weight:800;color:var(--sun);text-shadow:0 5px 0 var(--jungle-2);letter-spacing:.5px}
+.hero p{margin:6px 0 0;font-size:1.1rem;opacity:.9}
+.panel{background:var(--paper);border-radius:26px;padding:20px;margin-top:18px;box-shadow:0 8px 0 var(--jungle-2)}
+.panel h2{font-size:1.5rem;margin-bottom:10px}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+input.name{font:inherit;font-weight:800;font-size:1.2rem;padding:12px 16px;border-radius:14px;border:3px solid #CFE0DA;width:min(100%,320px);color:var(--ink);background:#fff}
+.avatars{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:10px;margin-top:14px}
+.av{font-size:2.3rem;height:70px;border-radius:18px;background:var(--paper-2);box-shadow:0 5px 0 #C6D8D1}
+.av[aria-pressed="true"]{background:var(--sun);box-shadow:0 5px 0 var(--sun-d);transform:scale(1.06)}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:560px){.modes{grid-template-columns:1fr}}
+.mode{text-align:left;padding:18px;border-radius:22px;color:#fff;min-height:130px}
+.mode .ic{font-size:2.4rem}
+.mode h3{font-size:1.6rem;margin:4px 0}
+.mode p{margin:0;font-weight:700;opacity:.95}
+.mode.gold{--c-d:var(--coral-d);background:var(--coral)}
+.mode.race{--c-d:var(--sky-d);background:var(--sky)}
+.mode[aria-pressed="true"]{outline:5px solid var(--sun);outline-offset:3px}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip{padding:10px 16px;border-radius:999px;font-weight:800;background:var(--paper-2);box-shadow:0 4px 0 #C6D8D1}
+.chip[aria-pressed="true"]{background:var(--mint);color:#fff;box-shadow:0 4px 0 var(--mint-d)}
+.sub{color:var(--muted);font-weight:700;margin:4px 0 12px}
+.start-row{display:flex;justify-content:center;margin:26px 0 30px}
+
+/* PLAY */
+.topbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;color:#fff}
+.me{display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.2);padding:6px 14px 6px 8px;border-radius:999px;font-weight:800}
+.me .e{font-size:1.8rem}
+.gold-pill{background:var(--sun);color:var(--ink);font-family:var(--disp);font-weight:800;font-size:1.4rem;padding:4px 16px;border-radius:999px;box-shadow:0 4px 0 var(--sun-d)}
+.spacer{flex:1}
+.tool{background:rgba(255,255,255,.16);color:#fff;padding:8px 12px;border-radius:12px;font-weight:800}
+.tool[aria-pressed="true"]{background:#fff;color:var(--ink)}
+.prog{height:12px;background:rgba(0,0,0,.25);border-radius:99px;margin:14px 0 4px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--sun);border-radius:99px;transition:width .4s}
+.count{color:#fff;opacity:.85;font-weight:800;font-size:.95rem}
+.qcard{background:var(--paper);border-radius:26px;padding:22px 22px 18px;margin-top:10px;box-shadow:0 8px 0 var(--jungle-2);text-align:center}
+.tag{display:inline-block;font-weight:800;font-size:.9rem;padding:4px 12px;border-radius:99px;background:var(--paper-2);color:var(--jungle)}
+.tag.focus{background:#FFE7A6;color:#7A5200}
+.qtext{font-family:var(--disp);font-weight:700;font-size:clamp(1.4rem,4.2vw,2rem);margin:10px auto 0;max-width:30ch}
+.tblwrap{overflow-x:auto;margin:14px auto 0;max-width:100%}
+table.d{border-collapse:separate;border-spacing:0;margin:0 auto;font-weight:800;border-radius:12px;overflow:hidden;border:3px solid #CFE0DA}
+table.d td{padding:8px 14px;border-bottom:2px solid #E1ECE8}
+table.d tr:first-child td{background:var(--paper-2)}
+table.d tr:last-child td{border-bottom:0}
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+@media (max-width:560px){.answers{grid-template-columns:1fr}}
+.ans{min-height:84px;padding:14px 16px;border-radius:20px;color:#fff;font-weight:800;font-size:1.25rem;text-align:left;display:flex;align-items:center;gap:12px;line-height:1.2}
+.ans .k{font-family:var(--disp);background:rgba(255,255,255,.28);width:38px;height:38px;flex:none;border-radius:12px;display:grid;place-items:center;font-size:1.3rem}
+.ans.c0{--c-d:var(--coral-d);background:var(--coral)}
+.ans.c1{--c-d:var(--sky-d);background:var(--sky)}
+.ans.c2{--c-d:var(--sun-d);background:var(--sun);color:var(--ink)}
+.ans.c3{--c-d:var(--mint-d);background:var(--mint)}
+.ans.dim{opacity:.35}
+.ans.right{outline:5px solid #fff;animation:pop .35s}
+.ans.wrongpick{animation:shake .4s}
+@keyframes pop{50%{transform:scale(1.05)}}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+
+/* side boards */
+.board{background:rgba(0,0,0,.18);border-radius:22px;padding:14px;margin-top:18px;color:#fff}
+.board h3{font-size:1.2rem;margin-bottom:8px}
+.lb{display:grid;gap:8px}
+.lbrow{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.12);border-radius:14px;padding:6px 12px;font-weight:800;transition:transform .3s}
+.lbrow.you{background:var(--sun);color:var(--ink)}
+.lbrow .e{font-size:1.6rem}
+.lbrow .g{margin-left:auto;font-family:var(--disp);font-size:1.2rem}
+.track{display:grid;gap:8px}
+.lane{position:relative;height:52px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.1) 0 2px,transparent 2px var(--step,10%));border-radius:14px;overflow:hidden}
+.lane.you{background-color:rgba(255,194,61,.28)}
+.lane .runner{position:absolute;top:50%;transform:translate(-50%,-50%);font-size:2rem;transition:left .6s cubic-bezier(.3,1.4,.5,1);filter:drop-shadow(0 3px 0 rgba(0,0,0,.25))}
+.lane .nm{position:absolute;left:10px;top:3px;font-size:.75rem;font-weight:800;opacity:.8}
+.lane .flag{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:1.5rem}
+
+/* overlays */
+.ov{position:fixed;inset:0;background:rgba(8,28,24,.72);display:grid;place-items:center;padding:16px;z-index:20}
+.ovcard{background:var(--paper);border-radius:28px;padding:24px;max-width:560px;width:100%;text-align:center;box-shadow:0 10px 0 var(--jungle-2);max-height:92vh;overflow:auto}
+.big{font-family:var(--disp);font-weight:800;font-size:2.4rem}
+.good{color:var(--mint-d)} .bad{color:var(--coral-d)}
+.explain{background:var(--paper-2);border-radius:16px;padding:14px;text-align:left;font-weight:700;margin:14px 0}
+.explain .vi{color:var(--muted);margin-top:6px}
+.correct-ans{font-family:var(--disp);font-size:1.4rem;font-weight:800;color:var(--mint-d)}
+.chests{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0 8px}
+.chest{--c-d:#8A5A1E;background:#E09A3E;border-radius:20px;height:120px;font-size:3.2rem;display:grid;place-items:center;color:var(--ink);padding:6px}
+.chest:hover{transform:translateY(-3px)}
+.chest.open{background:#fff;box-shadow:0 6px 0 #C6D8D1;font-size:1rem;font-weight:800;cursor:default;animation:pop .4s}
+.chest.open.mine{outline:5px solid var(--sun)}
+.chest .oe{font-size:2rem;display:block}
+.chest.other{opacity:.55}
+.outcome{font-family:var(--disp);font-size:1.6rem;font-weight:800;min-height:2.2em}
+
+/* END */
+.podium{display:flex;justify-content:center;align-items:flex-end;gap:10px;margin:18px 0 6px}
+.pod{width:min(30%,150px);text-align:center;color:#fff;font-weight:800}
+.pod .e{font-size:2.8rem}
+.pod .bar{border-radius:16px 16px 0 0;margin-top:6px;display:grid;place-items:start center;padding-top:8px;font-family:var(--disp);font-size:2rem}
+.pod.p1 .bar{height:150px;background:var(--sun);color:var(--ink)}
+.pod.p2 .bar{height:110px;background:var(--sky)}
+.pod.p3 .bar{height:80px;background:var(--coral)}
+.pod.you .nm{background:var(--sun);color:var(--ink);border-radius:99px;padding:0 8px}
+.stats{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:10px 0}
+.stat{background:var(--paper-2);border-radius:16px;padding:10px 18px;font-weight:800}
+.stat b{font-family:var(--disp);font-size:1.8rem;display:block;line-height:1}
+.review{text-align:left;display:grid;gap:10px;margin-top:10px}
+.rv{background:var(--paper-2);border-radius:16px;padding:12px 14px;font-weight:700}
+.rv .q{font-weight:800}
+.rv .a{color:var(--mint-d);font-weight:800;margin-top:4px}
+.rv .x{color:var(--muted);font-size:.95rem;margin-top:4px}
+.confetti{position:fixed;top:-40px;font-size:1.8rem;pointer-events:none;z-index:30;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .confetti{display:none}
+}
+
+.diffs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media (max-width:560px){.diffs{grid-template-columns:1fr}}
+.diff{padding:14px;border-radius:20px;text-align:left;background:var(--paper-2);--c-d:#C6D8D1}
+.diff h3{font-size:1.45rem}
+.diff p{margin:4px 0 0;font-weight:700;color:var(--muted);font-size:.95rem}
+.diff[aria-pressed="true"].easy{background:var(--mint);--c-d:var(--mint-d);color:#fff}
+.diff[aria-pressed="true"].medium{background:var(--sun);--c-d:var(--sun-d)}
+.diff[aria-pressed="true"].hard{background:var(--coral);--c-d:var(--coral-d);color:#fff}
+.diff[aria-pressed="true"] p{color:inherit;opacity:.95}
+.lvl{font-weight:800;padding:4px 12px;border-radius:99px;font-size:.95rem}
+.lvl.easy{background:var(--mint);color:#fff}.lvl.medium{background:var(--sun);color:var(--ink)}.lvl.hard{background:var(--coral);color:#fff}
+.timer{height:10px;background:var(--paper-2);border-radius:99px;margin:14px auto 0;overflow:hidden;max-width:520px}
+.timer i{display:block;height:100%;background:var(--mint);border-radius:99px;width:100%}
+.timer i.warn{background:var(--coral)}
+.tnum{font-family:var(--disp);font-weight:800;font-size:1.1rem;color:var(--muted);margin-top:4px}
+.typebox{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;justify-content:center}
+.typebox input{font:inherit;font-weight:800;font-size:1.4rem;padding:14px 18px;border-radius:18px;border:4px solid var(--sky);width:min(100%,360px);text-align:center;color:var(--ink);background:#fff}
+.hint{margin-top:14px;--c-d:var(--sun-d);background:#FFF1C7;padding:8px 18px;font-weight:800;border-radius:14px}
+.hint[disabled]{opacity:.4;cursor:default}
+.ans.gone{display:none}
+.yours{color:var(--coral-d);font-weight:800;margin-top:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<section id="home">
+  <div class="hero">
+    <div class="bone" aria-hidden="true">🦴</div>
+    <h1>Golden Bone Hunt</h1>
+    <p>Grade 3 Science · Unit 1 review: bones, muscles, animals, enquiry and medicines</p>
+  </div>
+
+  <div class="panel">
+    <h2>Who's playing?</h2>
+    <input class="name" id="nameIn" maxlength="14" placeholder="Type your name" aria-label="Player name">
+    <div class="avatars" id="avatars" role="group" aria-label="Choose a character"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Choose a game</h2>
+    <div class="modes">
+      <button class="chunk mode gold" data-mode="gold" aria-pressed="true">
+        <div class="ic">🎁</div><h3>Treasure Chests</h3>
+        <p>Answer right to open a chest. Double your bones, steal from a bot, or lose some!</p>
+      </button>
+      <button class="chunk mode race" data-mode="race" aria-pressed="false">
+        <div class="ic">🏁</div><h3>Race to the Flag</h3>
+        <p>Every right answer moves you one step. Three in a row gives you a turbo boost!</p>
+      </button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Choose a level</h2>
+    <div class="diffs" id="diffs"></div>
+  </div>
+
+  <div class="panel">
+    <h2>What do you want to practise?</h2>
+    <p class="sub">Pick one topic or more.</p>
+    <div class="chips" id="topics"></div>
+    <h2 style="margin-top:18px">How many questions?</h2>
+    <div class="chips" id="lens"></div>
+  </div>
+
+  <div class="start-row"><button class="chunk btn-go" id="startBtn">Start game</button></div>
+</section>
+
+<section id="play" class="hidden">
+  <div class="topbar">
+    <div class="me"><span class="e" id="pAv"></span><span id="pName"></span></div>
+    <div class="gold-pill" id="pScore"></div>
+    <span class="lvl" id="pLvl"></span>
+    <div class="spacer"></div>
+    <button class="tool" id="sndBtn" aria-pressed="true" title="Sound">🔊</button>
+    <button class="tool" id="quitBtn" title="Quit">✕</button>
+  </div>
+  <div class="prog"><i id="progBar" style="width:0%"></i></div>
+  <div class="count" id="countTxt"></div>
+
+  <div class="qcard">
+    <span class="tag" id="qTag"></span>
+    <div class="qtext" id="qText"></div>
+    <div class="tblwrap" id="qTbl"></div>
+    <div id="timerBox"><div class="timer"><i id="tBar"></i></div><div class="tnum" id="tNum"></div></div>
+    <div class="answers" id="answers"></div>
+    <div id="typeArea"></div>
+    <div id="hintArea"></div>
+  </div>
+
+  <div class="board" id="board"></div>
+</section>
+
+<section id="end" class="hidden">
+  <div class="hero"><h1 id="endTitle"></h1><p id="endSub"></p></div>
+  <div class="podium" id="podium"></div>
+  <div class="panel">
+    <div class="stats" id="stats"></div>
+    <div id="reviewBox"></div>
+  </div>
+  <div class="start-row" style="gap:14px;flex-wrap:wrap">
+    <button class="chunk btn-go" id="againBtn">Play again</button>
+    <button class="chunk btn-plain" id="homeBtn">Home</button>
+  </div>
+</section>
+</div>
+
+<div class="ov hidden" id="ov"><div class="ovcard" id="ovCard" role="dialog" aria-modal="true"></div></div>
+
+<script>
+const Q = [{"t":"bones","d":1,"q":"Which bone protects the brain?","o":["skull","ribs","hip","jaw"],"a":"skull","e":"The skull is a hard box of bone around your brain."},{"t":"bones","d":1,"q":"Which bones make a cage around your chest?","o":["ribs","skull","jaw","hip"],"a":"ribs","e":"The ribs (rib cage) protect your heart and lungs."},{"t":"bones","d":1,"q":"Which bone do you use for chewing and opening your mouth?","o":["jaw","hip","ribs","spine"],"a":"jaw","e":"The jaw bone moves when you chew and talk."},{"t":"bones","d":1,"q":"Where do the legs join the body?","o":["hip","skull","jaw","ribs"],"a":"hip","e":"The hip bones are where your legs join your body."},{"t":"bones","d":1,"q":"Which bones run down the middle of your back?","o":["spine","ribs","jaw","skull"],"a":"spine","e":"The spine (backbone) holds your body up."},{"t":"bones","d":2,"q":"Which one is NOT a job of the skeleton?","o":["It helps us digest food","It helps the body move","It gives support and shape","It protects organs"],"a":"It helps us digest food","e":"The skeleton helps us move, gives support and shape, protects organs and helps us grow. Digesting food is not its job."},{"t":"bones","d":2,"q":"A classroom skeleton model is made of plastic. How is it different from a real skeleton?","o":["It cannot grow or heal","It has bones","It is shaped like a person","It has a skull"],"a":"It cannot grow or heal","e":"Real skeletons grow and heal. A plastic model cannot."},{"t":"bones","d":2,"q":"Why might a teacher choose a SMALL skeleton model?","o":["It is easier to carry","It is harder to move","It can talk","It grows bigger"],"a":"It is easier to carry","e":"A small model is easier to carry and may be cheaper."},{"t":"bones","d":2,"q":"A model can be different from the real thing in…","o":["size, material, detail or weight","nothing at all","only its name","how old it is"],"a":"size, material, detail or weight","e":"A model represents a real object, but its size, material, detail or weight can be different."},{"t":"bones","d":1,"q":"Gita measured feet. Who has the LONGEST foot?","o":["Sister","Baby brother","Gita"],"a":"Sister","e":"18 cm is the biggest number, so the sister has the longest foot.","tb":[["","Baby brother","Sister","Gita"],["Foot length (cm)","5","18","11"]]},{"t":"bones","d":1,"q":"Gita measured feet. Who has the SHORTEST foot?","o":["Baby brother","Sister","Gita"],"a":"Baby brother","e":"5 cm is the smallest number.","tb":[["","Baby brother","Sister","Gita"],["Foot length (cm)","5","18","11"]]},{"t":"bones","d":2,"q":"Older children have longer feet. This shows the skeleton helps the body…","o":["grow","smell","see","taste"],"a":"grow","e":"Bones get bigger as we get older – the skeleton helps us grow."},{"t":"bones","d":2,"q":"Gita's big brother is 18 years old. Guess his foot length.","o":["25 cm","15 cm","40 cm"],"a":"25 cm","e":"He is older than the 14-year-old sister, so his foot is a bit longer than 18 cm. 40 cm is far too big!","tb":[["","Baby brother","Gita","Sister (14)"],["Foot length (cm)","5","11","18"]]},{"t":"muscles","d":1,"q":"What do muscles attach to?","o":["bones","hair","nails","teeth"],"a":"bones","e":"Muscles attach to bones and work with the skeleton to move the body."},{"t":"muscles","d":1,"q":"Muscles work in…","o":["pairs","threes","tens","alone"],"a":"pairs","e":"Muscles work in pairs: when one contracts, the other relaxes."},{"t":"muscles","d":2,"q":"When a muscle CONTRACTS, it gets…","o":["shorter","longer","softer","smaller bone"],"a":"shorter","e":"A contracting muscle gets shorter and pulls on a bone."},{"t":"muscles","d":2,"q":"When you bend your arm, one muscle contracts. What does the other muscle do?","o":["It relaxes","It turns into bone","It disappears","It contracts too"],"a":"It relaxes","e":"Muscles work in pairs – one contracts, the other relaxes."},{"t":"muscles","d":2,"q":"When a muscle RELAXES, it…","o":["returns to normal size","gets shorter","breaks","turns hard"],"a":"returns to normal size","e":"A relaxing muscle goes back to its normal size."},{"t":"muscles","d":2,"q":"Muscles move bones by…","o":["pulling","pushing","kicking","spinning"],"a":"pulling","e":"Muscles can only PULL, they never push."},{"t":"muscles","d":1,"q":"Why are muscles important?","o":["They work with bones to move the body","They help us see","They make our hair grow","They cause diseases"],"a":"They work with bones to move the body","e":"Without muscles, our bones could not move."},{"t":"muscles","d":2,"q":"True or False? Muscles can push bones.","o":["False","True"],"a":"False","e":"False! Muscles pull rather than push."},{"t":"animals","d":1,"q":"A vertebrate is an animal WITH a…","o":["backbone","exoskeleton","shell","pair of wings"],"a":"backbone","e":"Vertebrates have a backbone. Invertebrates do not."},{"t":"animals","d":2,"q":"Which animal is a VERTEBRATE?","o":["fish","worm","grasshopper","ant"],"a":"fish","e":"Only the fish has a backbone. The worm, grasshopper and ant are invertebrates.","f":1},{"t":"animals","d":2,"q":"Is a grasshopper a vertebrate or an invertebrate?","o":["invertebrate","vertebrate"],"a":"invertebrate","e":"A grasshopper has no backbone. It has a hard exoskeleton on the outside instead.","f":1},{"t":"animals","d":2,"q":"What is an exoskeleton?","o":["A hard layer on the outside of an animal's body","The bones inside a fish","A backbone","Soft fur"],"a":"A hard layer on the outside of an animal's body","e":"'Exo' means outside. An exoskeleton is a hard covering on the outside of the body.","f":1},{"t":"animals","d":2,"q":"Which animal has an exoskeleton?","o":["grasshopper","fish","dog","bird"],"a":"grasshopper","e":"Insects like grasshoppers have a hard exoskeleton.","f":1},{"t":"animals","d":1,"q":"Which animal has an exoskeleton?","o":["crab","dog","fish","bird"],"a":"crab","e":"Crabs have a hard shell – an exoskeleton."},{"t":"animals","d":2,"q":"An exoskeleton helps an animal because it…","o":["supports and protects its body","helps it breathe","keeps it warm","helps it see"],"a":"supports and protects its body","e":"The hard outer covering supports and protects the soft body inside."},{"t":"animals","d":1,"q":"A dog, a fish and a bird all have backbones. What group do they belong to?","o":["vertebrates","invertebrates","insects","plants"],"a":"vertebrates","e":"Animals with a backbone are vertebrates."},{"t":"animals","d":2,"q":"Which is NOT one of the five vertebrate groups?","o":["insects","mammals","reptiles","amphibians"],"a":"insects","e":"The five groups are mammals, birds, fish, reptiles and amphibians. Insects are invertebrates."},{"t":"animals","d":1,"q":"Which feature could be used to sort animals into groups?","o":["has wings","is interesting","is cute","is my favourite"],"a":"has wings","e":"We sort using features we can observe, like legs, wings, scales or a backbone."},{"t":"animals","d":1,"q":"Which animal is an INVERTEBRATE?","o":["ant","dog","bird","fish"],"a":"ant","e":"An ant has no backbone."},{"t":"animals","d":1,"q":"True or False? A butterfly is a vertebrate.","o":["False","True"],"a":"False","e":"False! A butterfly is an insect – it has no backbone."},{"t":"animals","d":2,"q":"A worm has no backbone and no exoskeleton. It is…","o":["an invertebrate","a vertebrate","a mammal","a bird"],"a":"an invertebrate","e":"No backbone means invertebrate."},{"t":"enquiry","d":2,"q":"Why is it better to measure in centimetres instead of hand spans?","o":["Centimetres are the same for everyone","Centimetres are always bigger","Centimetres are slower to use","Hand spans are too small"],"a":"Centimetres are the same for everyone","e":"Centimetres are standard units. Hand spans change because people's hands are different sizes."},{"t":"enquiry","d":2,"q":"Hand spans are…","o":["non-standard units","standard units","the best units","not measurements"],"a":"non-standard units","e":"They are non-standard because hands differ in size."},{"t":"enquiry","d":1,"q":"Look at Lina's table. As height increases, the jump height…","o":["increases","decreases","stays the same"],"a":"increases","e":"Taller students jumped higher, so jump height increases.","tb":[["Student","Height (cm)","Jump (cm)"],["Billy","120","21"],["Layla","135","30"],["Kai","145","36"]]},{"t":"enquiry","d":2,"q":"Looking for a relationship between two things (like height and jump height) is called…","o":["pattern seeking","research","classifying"],"a":"pattern seeking","e":"Pattern seeking looks for a link between two things."},{"t":"enquiry","d":2,"q":"Students use science books and trusted websites to learn how exercise keeps bones healthy. What enquiry type is this?","o":["research","fair test","pattern seeking"],"a":"research","e":"Finding information in books or trusted websites is research."},{"t":"enquiry","d":2,"q":"Which question is PATTERN SEEKING?","o":["Do people with longer legs jump further?","What is a skull?","Which book has a skeleton picture?"],"a":"Do people with longer legs jump further?","e":"It looks for a link between leg length and jump distance."},{"t":"enquiry","d":1,"q":"Which is a GOOD place to do research?","o":["A trusted science website","A random stranger","Just guessing","A cartoon"],"a":"A trusted science website","e":"Use books, trusted websites and other reliable sources."},{"t":"medicine","d":1,"q":"Who should give or tell a child to take medicine?","o":["A doctor, nurse or trusted adult","Any friend","A stranger","Nobody – just take it"],"a":"A doctor, nurse or trusted adult","e":"Only take medicine from a doctor, nurse or trusted adult."},{"t":"medicine","d":2,"q":"What CAUSES infectious diseases?","o":["germs","coughing","cold weather","medicines"],"a":"germs","e":"Germs cause infectious diseases. Coughing is a way germs can spread – it is not the cause.","f":1},{"t":"medicine","d":2,"q":"Why are vaccinations given?","o":["To stop us from getting some diseases","To help us recover when we are already ill","To make us taller","To fix broken bones"],"a":"To stop us from getting some diseases","e":"Vaccinations are injections that STOP us from getting some diseases – they protect us BEFORE we get ill.","f":1},{"t":"medicine","d":1,"q":"Injections that stop us from getting some diseases are called…","o":["vaccinations","instructions","germs","bones"],"a":"vaccinations","e":"Vaccinations protect us from some diseases.","f":1},{"t":"medicine","d":1,"q":"Tiny living things that cause infectious diseases are called…","o":["germs","medicines","muscles","vaccinations"],"a":"germs","e":"Germs are too small to see, and they cause infectious diseases.","f":1},{"t":"medicine","d":1,"q":"True or False? Animals and plants can also have infectious diseases.","o":["True","False"],"a":"True","e":"True! Bird flu affects birds and leaf blast affects plants."},{"t":"medicine","d":2,"q":"Which one is an infectious disease?","o":["measles","a broken leg","a bruise","feeling tired"],"a":"measles","e":"Measles is caused by germs and spreads between people."},{"t":"medicine","d":2,"q":"Leaf blast is an infectious disease of…","o":["plants","fish","people","rocks"],"a":"plants","e":"Leaf blast attacks plants such as rice."},{"t":"medicine","d":1,"q":"These tell us how to take medicines correctly.","o":["instructions","germs","vaccinations","muscles"],"a":"instructions","e":"Always follow the instructions from a doctor, nurse or trusted adult."},{"t":"medicine","d":1,"q":"We take these to make us better when we are ill.","o":["medicines","germs","exoskeletons","hand spans"],"a":"medicines","e":"Medicines help people recover from illness."},{"t":"medicine","d":1,"q":"True or False? It is safe to take a friend's medicine.","o":["False","True"],"a":"False","e":"False! Only take medicine given by a doctor, nurse or trusted adult."},{"t":"medicine","d":1,"q":"An infectious disease can spread between…","o":["living things","rocks","toys only","books"],"a":"living things","e":"Germs spread between living things."},{"t":"medicine","d":1,"q":"Which is an example of an infectious disease from our unit?","o":["flu","a cut finger","a toothache from sweets","sunburn"],"a":"flu","e":"Flu, measles, malaria, bird flu and leaf blast are all infectious diseases."},{"t":"bones","d":3,"q":"Which bone's main job is NOT to protect an organ?","o":["jaw","skull","ribs","spine"],"a":"jaw","e":"The jaw is mainly for chewing and talking. The skull protects the brain, the ribs protect the heart and lungs, and the spine protects the spinal cord."},{"t":"bones","d":3,"q":"Which pair is matched correctly?","o":["skull – protects the brain","ribs – help you chew","jaw – protects the lungs","hip – protects the brain"],"a":"skull – protects the brain","e":"Skull → brain. Ribs → heart and lungs. Jaw → chewing. Hip → where legs join the body."},{"t":"bones","d":3,"q":"Sam says: \"A skeleton model is exactly the same as a real skeleton.\" Why is Sam wrong?","o":["A model can differ in size, material, detail or weight","Models are always bigger","Real skeletons are made of plastic","Models can heal when broken"],"a":"A model can differ in size, material, detail or weight","e":"A model represents a real object but is not exactly the same."},{"t":"bones","d":3,"q":"A 1-year-old has a 5 cm foot and a 9-year-old has an 11 cm foot. About how long is a 5-year-old's foot?","o":["8 cm","3 cm","20 cm","30 cm"],"a":"8 cm","e":"A 5-year-old is between 1 and 9 years old, so the foot is between 5 cm and 11 cm."},{"t":"bones","d":3,"q":"Which job of the skeleton do the ribs do BEST?","o":["protect organs","help us chew","help us grow taller","help us smell"],"a":"protect organs","e":"The rib cage protects the heart and lungs."},{"t":"muscles","d":3,"q":"When you STRAIGHTEN your arm, the muscle on the BACK of your upper arm…","o":["contracts","relaxes","turns into bone","pushes the bone"],"a":"contracts","e":"To straighten the arm, the back muscle contracts and pulls, while the front muscle relaxes."},{"t":"muscles","d":3,"q":"When you BEND your arm, the muscle at the FRONT of your upper arm…","o":["contracts and gets shorter","relaxes and gets longer","pushes the bone up","stays exactly the same"],"a":"contracts and gets shorter","e":"Bending the arm: the front muscle contracts (shorter) and pulls the bone up."},{"t":"muscles","d":3,"q":"Why do muscles need to work in pairs?","o":["A muscle can only pull, so another muscle pulls the bone back","One muscle is always asleep","Muscles push bones","Bones are too heavy for one muscle"],"a":"A muscle can only pull, so another muscle pulls the bone back","e":"Muscles pull but never push, so each movement needs a partner muscle to move the bone back."},{"t":"muscles","d":3,"q":"Complete: A contracting muscle becomes ___ and ___ on a bone.","o":["shorter, pulls","longer, pushes","shorter, pushes","longer, pulls"],"a":"shorter, pulls","e":"Contract = get shorter and pull."},{"t":"animals","d":3,"f":1,"q":"Which group contains ONLY invertebrates?","o":["ant, crab, worm","dog, ant, fish","bird, crab, butterfly","fish, bird, dog"],"a":"ant, crab, worm","e":"Ants, crabs and worms have no backbone."},{"t":"animals","d":3,"q":"Which group contains ONLY vertebrates?","o":["frog, snake, eagle","crab, frog, snake","ant, bird, fish","worm, dog, cat"],"a":"frog, snake, eagle","e":"Frogs, snakes and eagles all have backbones."},{"t":"animals","d":3,"q":"A snake has no legs. Is it a vertebrate?","o":["Yes – it has a backbone","No – it has no legs","No – it has an exoskeleton","Yes – it has wings"],"a":"Yes – it has a backbone","e":"Legs do not matter. A snake has a backbone, so it is a vertebrate (a reptile)."},{"t":"animals","d":3,"f":1,"q":"Which animal is an invertebrate WITHOUT an exoskeleton?","o":["worm","crab","ant","grasshopper"],"a":"worm","e":"Crabs, ants and grasshoppers have exoskeletons. A worm has a soft body."},{"t":"animals","d":3,"q":"A frog is a vertebrate. Which group does it belong to?","o":["amphibians","reptiles","fish","mammals"],"a":"amphibians","e":"Frogs are amphibians – they live in water and on land."},{"t":"animals","d":3,"q":"What is the BEST way to decide if an animal is a vertebrate?","o":["Check if it has a backbone","Check if it can fly","Check if it has legs","Check if it lives in water"],"a":"Check if it has a backbone","e":"Vertebrate = backbone. Flying, legs or water do not decide it."},{"t":"animals","d":3,"f":1,"q":"A grasshopper and a fish are both animals. What is the difference?","o":["The fish has a backbone; the grasshopper has an exoskeleton","Both have backbones","The grasshopper has a backbone; the fish does not","Neither has any hard parts"],"a":"The fish has a backbone; the grasshopper has an exoskeleton","e":"Fish = vertebrate. Grasshopper = invertebrate with an exoskeleton."},{"t":"enquiry","d":3,"q":"Using Lina's pattern, a student who is 128 cm tall would probably jump about…","tb":[["Student","Height (cm)","Jump (cm)"],["Billy","120","21"],["Layla","135","30"],["Kai","145","36"]],"o":["25 cm","40 cm","10 cm","36 cm"],"a":"25 cm","e":"128 cm is between Billy (120 cm → 21 cm) and Layla (135 cm → 30 cm), so the jump is between 21 and 30 cm."},{"t":"enquiry","d":3,"q":"What is the FAIREST way to compare the arm bone lengths of two children?","o":["Measure both in centimetres with a ruler","Use each child's own hand span","Guess by looking","Use a different unit for each child"],"a":"Measure both in centimetres with a ruler","e":"Use the same standard unit for everyone."},{"t":"enquiry","d":3,"q":"Tom asks: \"Can people with bigger hands catch more balls?\" What type of enquiry is this?","o":["pattern seeking","research","classifying"],"a":"pattern seeking","e":"He is looking for a relationship between hand size and catching."},{"t":"enquiry","d":3,"q":"Mia sorts animals into 'has wings' and 'no wings'. What type of enquiry is this?","o":["classifying","pattern seeking","research"],"a":"classifying","e":"Sorting things into groups by their features is classifying."},{"t":"enquiry","d":3,"q":"Why is a hand span NOT a good unit for measuring?","o":["People's hands are different sizes","Hands are always exactly 10 cm","You need two hands","Hands are too heavy"],"a":"People's hands are different sizes","e":"Hand spans are non-standard – the result changes from person to person."},{"t":"medicine","d":3,"f":1,"q":"Coughing and sneezing can…","o":["spread germs","cause germs to exist","cure the flu","make bones grow"],"a":"spread germs","e":"Germs CAUSE the disease. Coughing and sneezing only SPREAD the germs to other people."},{"t":"medicine","d":3,"q":"Which is the BEST way to stop germs spreading?","o":["Wash your hands with soap","Share a friend's cup","Sneeze into your hand, then touch food","Never go to the doctor"],"a":"Wash your hands with soap","e":"Washing hands removes germs."},{"t":"medicine","d":3,"f":1,"q":"When is a vaccination given?","o":["Before you get ill, to protect you","Only after you are ill, to cure you","Only to rocks","To make bones stronger"],"a":"Before you get ill, to protect you","e":"Vaccinations PREVENT some diseases. Medicines help us recover AFTER we are ill."},{"t":"medicine","d":3,"q":"Why must we follow the instructions when taking medicine?","o":["Taking the wrong amount can be harmful","It makes medicine taste better","It makes germs grow","It doesn't matter at all"],"a":"Taking the wrong amount can be harmful","e":"Using medicines correctly keeps us safe."},{"t":"medicine","d":3,"q":"Which of these is NOT an infectious disease?","o":["a broken arm","flu","measles","malaria"],"a":"a broken arm","e":"A broken arm is not caused by germs and cannot spread."},{"t":"medicine","d":3,"q":"Bird flu and leaf blast show that infectious diseases can affect…","o":["animals and plants, not just people","only people","only children","only rocks"],"a":"animals and plants, not just people","e":"Bird flu affects birds; leaf blast affects plants."},{"t":"bones","d":3,"type":"text","q":"Type the word: the bone that protects your brain is the ______.","a":"skull","acc":["skull"],"e":"Skull protects the brain."},{"t":"bones","d":3,"type":"text","q":"Type the word: the bone you use for chewing is your ______.","a":"jaw","acc":["jaw","jaw bone","jawbone"],"e":"The jaw moves when you chew."},{"t":"bones","d":3,"type":"text","q":"Type the answer: which bones protect your heart and lungs?","a":"ribs","acc":["ribs","rib cage","ribcage","rib"],"e":"The ribs (rib cage) protect the heart and lungs."},{"t":"muscles","d":3,"type":"text","q":"Type the word: muscles work in ______.","a":"pairs","acc":["pairs"],"e":"Muscles work in pairs."},{"t":"muscles","d":3,"type":"text","q":"Type the word: when a muscle gets shorter, we say it ______.","a":"contracts","acc":["contracts","contract"],"e":"Contract = get shorter."},{"t":"muscles","d":3,"type":"text","q":"Type the word: when a muscle goes back to normal size, it ______.","a":"relaxes","acc":["relaxes","relax"],"e":"Relax = return to normal size."},{"t":"animals","d":3,"type":"text","q":"Type the word: an animal WITH a backbone is a ______.","a":"vertebrate","acc":["vertebrate","vertebrates"],"e":"Vertebrate = has a backbone."},{"t":"animals","d":3,"type":"text","q":"Type the word: an animal WITHOUT a backbone is an ______.","a":"invertebrate","acc":["invertebrate","invertebrates"],"e":"Invertebrate = no backbone."},{"t":"animals","d":3,"type":"text","f":1,"q":"Type the word: a hard covering on the outside of an animal's body is an ______.","a":"exoskeleton","acc":["exoskeleton","exoskeletons"],"e":"'Exo' means outside."},{"t":"medicine","d":3,"type":"text","f":1,"q":"Type the word: tiny living things that cause infectious diseases are called ______.","a":"germs","acc":["germs","germ"],"e":"Germs cause infectious diseases."},{"t":"medicine","d":3,"type":"text","f":1,"q":"Type the word: injections that stop us from getting some diseases are ______.","a":"vaccinations","acc":["vaccinations","vaccination","vaccines","vaccine"],"e":"Vaccinations prevent some diseases."},{"t":"medicine","d":3,"type":"text","q":"Type the word: these tell us how to take medicines correctly: ______.","a":"instructions","acc":["instructions","instruction"],"e":"Always follow the instructions."},{"t":"enquiry","d":3,"type":"text","q":"Type the word: looking for a relationship between two things is called pattern ______.","a":"seeking","acc":["seeking"],"e":"Pattern seeking."}];
+const TOPICS = {bones:"🦴 Bones",muscles:"💪 Muscles",animals:"🦀 Animals",enquiry:"📏 Measuring & enquiry",medicine:"💊 Medicines & germs"};
+const AVATARS = ["🦖","🐙","🦊","🐸","🦉","🐢","🦄","🐧","🦀","🐝","🐼","🦕"];
+const BOTS = [{n:"Shark Bot",e:"🦈"},{n:"Monkey Bot",e:"🐵"},{n:"Chicken Bot",e:"🐔"}];
+const LENS = [10,15,20];
+const LEVELS = {
+  easy:  {name:"Easy",   desc:"3 answer choices, a hint button, no timer. Bots are slow.",
+          w:{1:3,2:1,3:0}, opts:3, time:0, hint:true, botP:.6, botMax:3, botBoost:0, spd:[.40,.33,.27], finish:.6, penalty:false, lose:false},
+  medium:{name:"Medium", desc:"4 answer choices and 20 seconds per question.",
+          w:{1:1,2:3,3:1}, opts:4, time:20, hint:false, botP:.72, botMax:4, botBoost:.07, spd:[.52,.45,.38], finish:.7, penalty:false, lose:true, noType:true},
+  hard:  {name:"Hard",   desc:"Tricky questions, spelling answers, 15 seconds. Wrong answers cost you!",
+          w:{1:0,2:1,3:3}, opts:4, time:15, typeTime:30, hint:false, botP:.85, botMax:5, botBoost:.12, spd:[.66,.58,.5], finish:.75, penalty:true, lose:true}
+};
+
+const $ = s=>document.querySelector(s);
+const esc = s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const store = {
+  get(k,d){try{const v=localStorage.getItem("gbh_"+k);return v==null?d:JSON.parse(v)}catch(e){return d}},
+  set(k,v){try{localStorage.setItem("gbh_"+k,JSON.stringify(v))}catch(e){}}
+};
+let cfg = { name:store.get("name",""), av:store.get("av","🦖"), mode:"gold", lvl:store.get("lvl","medium"),
+  topics:new Set(Object.keys(TOPICS)), len:15, snd:store.get("snd",true) };
+const L=()=>LEVELS[cfg.lvl];
+
+/* sound */
+let actx=null;
+function tone(f,d,type="sine",delay=0,vol=.18){
+  if(!cfg.snd) return;
+  try{ actx=actx||new (window.AudioContext||window.webkitAudioContext)();
+    const t=actx.currentTime+delay,o=actx.createOscillator(),g=actx.createGain();
+    o.type=type;o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+d);
+    o.connect(g).connect(actx.destination);o.start(t);o.stop(t+d);}catch(e){}
+}
+const sfx={
+  right(){[523,659,784,1047].forEach((f,i)=>tone(f,.18,"triangle",i*.07))},
+  wrong(){tone(180,.35,"sawtooth",0,.12);tone(140,.4,"sawtooth",.12,.1)},
+  open(){[880,1175,1568].forEach((f,i)=>tone(f,.14,"square",i*.05,.08))},
+  bad(){tone(300,.25,"triangle");tone(200,.35,"triangle",.15)},
+  step(){tone(660,.1,"square",0,.07)},
+  tick(){tone(1200,.05,"square",0,.05)},
+  win(){[523,659,784,659,784,1047].forEach((f,i)=>tone(f,.22,"triangle",i*.12))}
+};
+
+/* home */
+function buildHome(){
+  $("#nameIn").value=cfg.name;
+  $("#avatars").innerHTML=AVATARS.map(a=>`<button class="chunk av" data-av="${a}" aria-pressed="${a===cfg.av}" aria-label="Character ${a}">${a}</button>`).join("");
+  $("#diffs").innerHTML=Object.entries(LEVELS).map(([k,v])=>`<button class="chunk diff ${k}" data-lvl="${k}" aria-pressed="${k===cfg.lvl}"><h3>${{easy:"🌱",medium:"🔥",hard:"💀"}[k]} ${v.name}</h3><p>${v.desc}</p></button>`).join("");
+  $("#topics").innerHTML=Object.entries(TOPICS).map(([k,v])=>`<button class="chunk chip" data-t="${k}" aria-pressed="${cfg.topics.has(k)}">${v}</button>`).join("");
+  $("#lens").innerHTML=LENS.map(n=>`<button class="chunk chip" data-len="${n}" aria-pressed="${n===cfg.len}">${n} questions</button>`).join("");
+}
+document.addEventListener("click",e=>{
+  const av=e.target.closest("[data-av]"); if(av){cfg.av=av.dataset.av;store.set("av",cfg.av);buildHome();tone(700,.08,"square")}
+  const lv=e.target.closest("[data-lvl]"); if(lv){cfg.lvl=lv.dataset.lvl;store.set("lvl",cfg.lvl);buildHome()}
+  const t=e.target.closest("[data-t]"); if(t){const k=t.dataset.t; if(cfg.topics.has(k)&&cfg.topics.size>1)cfg.topics.delete(k); else cfg.topics.add(k); buildHome()}
+  const l=e.target.closest("[data-len]"); if(l){cfg.len=+l.dataset.len;buildHome()}
+  const m=e.target.closest("[data-mode]"); if(m){cfg.mode=m.dataset.mode;document.querySelectorAll("[data-mode]").forEach(b=>b.setAttribute("aria-pressed",b===m))}
+});
+$("#nameIn").addEventListener("input",e=>{cfg.name=e.target.value.trim();store.set("name",cfg.name)});
+$("#startBtn").onclick=startGame; $("#againBtn").onclick=startGame;
+$("#homeBtn").onclick=()=>show("home");
+$("#quitBtn").onclick=()=>{ if(confirm("Quit this game?")){stopTimer();show("home")} };
+$("#sndBtn").onclick=()=>{cfg.snd=!cfg.snd;store.set("snd",cfg.snd);syncTools()};
+function syncTools(){ $("#sndBtn").setAttribute("aria-pressed",cfg.snd); $("#sndBtn").textContent=cfg.snd?"🔊":"🔇"; }
+function show(id){["home","play","end"].forEach(s=>$("#"+s).classList.toggle("hidden",s!==id));$("#ov").classList.add("hidden");window.scrollTo(0,0)}
+
+/* game */
+let G, timer=null;
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+function weightedDeck(pool){
+  // weighted random order: higher weight → earlier
+  return pool.map(q=>{let w=L().w[q.d]*(q.f?1.6:1); return {q,k:Math.pow(Math.random(),1/w)}}).sort((a,b)=>b.k-a.k).map(x=>x.q);
+}
+function startGame(){
+  const lv=L();
+  let pool=Q.filter(q=>cfg.topics.has(q.t) && lv.w[q.d]>0 && !(lv.noType && q.type==="text"));
+  if(pool.length<6) pool=Q.filter(q=>cfg.topics.has(q.t) && !(q.type==="text" && cfg.lvl!=="hard"));
+  let deck=weightedDeck(pool);
+  while(deck.length<cfg.len+5) deck=deck.concat(weightedDeck(pool));
+  G={deck,di:0,turn:0,retry:[],correct:0,answered:0,wrongList:[],streak:0,bestStreak:0,
+     players:[{n:cfg.name||"Player",e:cfg.av,you:true,gold:0,pos:0}].concat(BOTS.map((b,i)=>({...b,gold:0,pos:0,spd:lv.spd[i]}))),
+     finish:Math.ceil(cfg.len*lv.finish),over:false};
+  $("#pAv").textContent=cfg.av; $("#pName").textContent=cfg.name||"Player";
+  $("#pLvl").textContent=lv.name; $("#pLvl").className="lvl "+cfg.lvl;
+  syncTools(); show("play"); nextQ();
+}
+const me=()=>G.players[0];
+
+function nextQ(){
+  if(G.over) return;
+  if(G.turn>=cfg.len) return endGame();
+  let q; const due=G.retry.findIndex(r=>r.at<=G.turn);
+  q = due>-1 ? G.retry.splice(due,1)[0].q : G.deck[G.di++];
+  G.cur=q; G.turn++; G.locked=false; G.hintUsed=false;
+  $("#progBar").style.width=((G.turn-1)/cfg.len*100)+"%";
+  $("#countTxt").textContent=`Question ${G.turn} of ${cfg.len}`;
+  $("#qTag").textContent=(q.f?"⭐ Tricky one · ":"")+TOPICS[q.t];
+  $("#qTag").className="tag"+(q.f?" focus":"");
+  $("#qText").textContent=q.q;
+  $("#qTbl").innerHTML=q.tb?`<table class="d">${q.tb.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</table>`:"";
+  $("#answers").innerHTML=""; $("#typeArea").innerHTML=""; $("#hintArea").innerHTML="";
+  if(q.type==="text"){
+    $("#typeArea").innerHTML=`<div class="typebox"><input id="typeIn" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Type here" aria-label="Your answer"><button class="chunk btn-go" id="typeGo" style="font-size:1.3rem;padding:10px 24px">Check</button></div>`;
+    const inp=$("#typeIn"); inp.focus();
+    inp.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();submitTyped()}});
+    $("#typeGo").onclick=submitTyped;
+  } else {
+    const tf=/^(True|False)$/.test(q.o[0]);
+    let opts;
+    if(tf) opts=["True","False"];
+    else { const wrong=shuffle(q.o.filter(o=>o!==q.a)).slice(0,L().opts-1); opts=shuffle([q.a,...wrong]); }
+    $("#answers").innerHTML=opts.map((o,i)=>`<button class="chunk ans c${i}" data-o="${encodeURIComponent(o)}"><span class="k">${"ABCD"[i]}</span><span>${esc(o)}</span></button>`).join("");
+    $("#answers").querySelectorAll(".ans").forEach(b=>b.onclick=()=>answer(b));
+    if(L().hint && opts.length>2){
+      $("#hintArea").innerHTML=`<button class="chunk hint" id="hintBtn">💡 Hint: remove one wrong answer</button>`;
+      $("#hintBtn").onclick=useHint;
+    }
+  }
+  renderBoard(); startTimer(q);
+}
+function useHint(){
+  if(G.hintUsed||G.locked) return; G.hintUsed=true;
+  const wrong=[...$("#answers").querySelectorAll(".ans")].filter(b=>decodeURIComponent(b.dataset.o)!==G.cur.a);
+  wrong[Math.floor(Math.random()*wrong.length)].classList.add("gone");
+  $("#hintBtn").disabled=true; tone(900,.1,"triangle");
+}
+
+/* timer */
+function startTimer(q){
+  stopTimer();
+  const secs = q.type==="text" ? (L().typeTime||L().time) : L().time;
+  $("#timerBox").classList.toggle("hidden",!secs);
+  if(!secs) return;
+  const end=performance.now()+secs*1000; let lastSec=secs;
+  const bar=$("#tBar"), num=$("#tNum");
+  const loop=()=>{
+    const left=Math.max(0,end-performance.now()), s=Math.ceil(left/1000);
+    bar.style.width=(left/(secs*1000)*100)+"%"; bar.classList.toggle("warn",s<=5);
+    num.textContent=s+"s";
+    if(s!==lastSec){lastSec=s; if(s<=5&&s>0) sfx.tick();}
+    if(left<=0){ timer=null; timeUp(); return; }
+    timer=requestAnimationFrame(loop);
+  };
+  timer=requestAnimationFrame(loop);
+}
+function stopTimer(){ if(timer){cancelAnimationFrame(timer);timer=null} }
+function timeUp(){ if(G.locked||G.over) return; resolve(false,null,true); }
+
+/* answering */
+const norm=s=>s.toLowerCase().replace(/[^a-z ]/g,"").replace(/\b(the|a|an)\b/g,"").replace(/\s+/g," ").trim();
+function submitTyped(){
+  if(G.locked) return;
+  const v=$("#typeIn").value; if(!v.trim()) { $("#typeIn").focus(); return; }
+  const ok=G.cur.acc.some(a=>norm(a)===norm(v));
+  $("#typeIn").disabled=true; $("#typeIn").style.borderColor= ok?"var(--mint)":"var(--coral)";
+  resolve(ok,v);
+}
+function answer(btn){
+  if(G.locked) return;
+  const pick=decodeURIComponent(btn.dataset.o), ok=pick===G.cur.a;
+  $("#answers").querySelectorAll(".ans").forEach(b=>{ decodeURIComponent(b.dataset.o)===G.cur.a ? b.classList.add("right") : b.classList.add("dim") });
+  if(!ok) btn.classList.add("wrongpick");
+  resolve(ok,pick);
+}
+function resolve(ok,given,timeout){
+  G.locked=true; stopTimer(); G.answered++;
+  const q=G.cur;
+  if(timeout) $("#answers").querySelectorAll(".ans").forEach(b=>{ decodeURIComponent(b.dataset.o)===q.a ? b.classList.add("right") : b.classList.add("dim") });
+  if(ok){ G.correct++; G.streak++; G.bestStreak=Math.max(G.bestStreak,G.streak); sfx.right(); }
+  else {
+    G.streak=0; sfx.wrong();
+    if(!G.wrongList.some(w=>w.q===q)) G.wrongList.push({q,given:timeout?"(ran out of time)":given});
+    if(G.turn+2<cfg.len) G.retry.push({q,at:G.turn+3});
+  }
+  botsTurn();
+  setTimeout(()=> cfg.mode==="gold" ? goldResult(ok,given,timeout) : raceResult(ok,given,timeout), 650);
+}
+
+/* bots */
+function botsTurn(){
+  const lv=L();
+  G.players.slice(1).forEach(b=>{
+    if(cfg.mode==="gold"){
+      if(Math.random()<lv.botP){ b.gold+=rnd(1,lv.botMax)*10; if(b.gold>0&&Math.random()<lv.botBoost) b.gold=Math.round(b.gold*1.5); }
+    } else if(Math.random()<b.spd) b.pos=Math.min(G.finish,b.pos+1);
+  });
+}
+
+/* gold mode */
+const OUT=[{w:18,k:"add",v:10},{w:18,k:"add",v:20},{w:14,k:"add",v:30},{w:10,k:"add",v:50},{w:5,k:"add",v:100},
+  {w:9,k:"x2"},{w:3,k:"x3"},{w:9,k:"steal"},{w:4,k:"swap"},{w:7,k:"lose"},{w:3,k:"none"}];
+function rollOutcome(){ const outs=OUT.filter(o=>L().lose||o.k!=="lose"); let r=Math.random()*outs.reduce((s,o)=>s+o.w,0); for(const o of outs){ if((r-=o.w)<0) return o } return outs[0]; }
+function outLabel(o){ return {add:["🦴",`+${o.v}`],x2:["✨","Double!"],x3:["🌟","Triple!"],steal:["🦝","Steal!"],swap:["🔄","Swap!"],lose:["💨","Lose 25%"],none:["🕸️","Empty"]}[o.k]; }
+function goldResult(ok,given,timeout){
+  if(!ok){
+    let pen="";
+    if(L().penalty){ const p=me(), l=Math.min(p.gold,Math.max(10,Math.round(p.gold*.1))); p.gold-=l; if(l) pen=`Hard mode: you lost ${l} bones.`; renderBoard(); }
+    return wrongCard(given,timeout,false,pen);
+  }
+  const outs=[rollOutcome(),rollOutcome(),rollOutcome()];
+  ov(`<div class="big good">Correct! 🎉</div>
+      <p style="font-weight:800;margin:6px 0 0">Pick a treasure chest!</p>
+      <div class="chests">${[0,1,2].map(i=>`<button class="chunk chest" data-c="${i}" aria-label="Chest ${i+1}">🧰</button>`).join("")}</div>
+      <div class="outcome" id="outTxt"></div>
+      <button class="chunk btn-go hidden" id="nextBtn">Next question</button>`);
+  document.querySelectorAll(".chest").forEach(c=>c.onclick=()=>{
+    if(c.classList.contains("open")) return;
+    const i=+c.dataset.c,o=outs[i],p=me(),before=p.gold; let msg="";
+    const richest=G.players.slice(1).reduce((a,b)=>b.gold>a.gold?b:a);
+    switch(o.k){
+      case "add": p.gold+=o.v; msg=`+${o.v} golden bones!`; break;
+      case "x2": p.gold=Math.max(p.gold*2,p.gold+20); msg=`Double bones: ${before} → ${p.gold}`; break;
+      case "x3": p.gold=Math.max(p.gold*3,p.gold+30); msg=`Triple bones: ${before} → ${p.gold}`; break;
+      case "steal":{const take=Math.min(Math.max(10,Math.round(richest.gold*.2)),richest.gold); richest.gold-=take; p.gold+=take; msg=`You took ${take} bones from ${richest.e} ${richest.n}!`; break;}
+      case "swap":{const t=richest.gold; richest.gold=p.gold; p.gold=t; msg=`Swapped with ${richest.e} ${richest.n}: ${before} → ${p.gold}`; break;}
+      case "lose":{const l=Math.round(p.gold*.25); p.gold-=l; msg=l?`Oh no, the wind blew away ${l} bones!`:"A big wind… but you had nothing to lose 😄"; break;}
+      case "none": msg="This chest was empty!"; break;
+    }
+    const goodish=p.gold>=before; goodish?sfx.open():sfx.bad();
+    document.querySelectorAll(".chest").forEach((cc,j)=>{const [em,tx]=outLabel(outs[j]); cc.classList.add("open",j===i?"mine":"other"); cc.innerHTML=`<span class="oe">${em}</span>${tx}`;});
+    $("#outTxt").textContent=msg; $("#outTxt").className="outcome "+(goodish?"good":"bad");
+    renderBoard();
+    const nb=$("#nextBtn"); nb.classList.remove("hidden"); nb.focus(); nb.onclick=closeAndNext;
+  });
+}
+
+/* race mode */
+function raceResult(ok,given,timeout){
+  const p=me(); let steps=0, pen="";
+  if(ok){ steps=G.streak%3===0?2:1; p.pos=Math.min(G.finish,p.pos+steps); sfx.step(); }
+  else if(L().penalty && p.pos>0){ p.pos--; pen="Hard mode: you moved back 1 step."; }
+  renderBoard();
+  const done=G.players.some(x=>x.pos>=G.finish);
+  if(!ok) return wrongCard(given,timeout,done,pen);
+  ov(`<div class="big good">${steps===2?"TURBO! 🚀":"Correct! 🎉"}</div>
+      <p style="font-weight:800">${steps===2?"Three in a row – you move 2 steps!":"You move 1 step!"} ${G.streak>=2&&steps!==2?`(${G.streak} in a row 🔥)`:""}</p>
+      <button class="chunk btn-go" id="nextBtn">${done?"See results":"Next question"}</button>`);
+  $("#nextBtn").focus(); $("#nextBtn").onclick=done?endGame:closeAndNext;
+}
+
+/* shared */
+function wrongCard(given,timeout,done,pen){
+  const q=G.cur;
+  ov(`<div class="big bad">${timeout?"Time's up! ⏰":"Not quite 😅"}</div>
+      ${given&&!timeout&&q.type==="text"?`<div class="yours">You typed: “${esc(given)}”</div>`:""}
+      <p style="font-weight:800;margin:8px 0 2px">The right answer is:</p>
+      <div class="correct-ans">${esc(q.a)}</div>
+      <div class="explain">💡 ${esc(q.e)}</div>
+      ${pen?`<p class="bad" style="font-weight:800;margin:0 0 8px">${pen}</p>`:""}
+      <p class="sub" style="margin:0 0 14px">${G.turn+2<cfg.len?"This question will come back soon – remember it!":""}</p>
+      <button class="chunk btn-go" id="nextBtn">${done?"See results":"Got it!"}</button>`);
+  $("#nextBtn").focus(); $("#nextBtn").onclick=done?endGame:closeAndNext;
+}
+function closeAndNext(){ $("#ov").classList.add("hidden"); nextQ(); }
+function ov(html){ $("#ovCard").innerHTML=html; $("#ov").classList.remove("hidden"); }
+function ranked(){ return [...G.players].sort((a,b)=>cfg.mode==="gold"?b.gold-a.gold:(b.pos-a.pos)||(a.you?-1:1)); }
+function renderBoard(){
+  const p=me();
+  if(cfg.mode==="gold"){
+    $("#pScore").textContent=`🦴 ${p.gold}`;
+    $("#board").innerHTML=`<h3>Leaderboard</h3><div class="lb">${ranked().map((x,i)=>`<div class="lbrow ${x.you?"you":""}"><span>${i+1}</span><span class="e">${x.e}</span><span>${esc(x.n)}</span><span class="g">🦴 ${x.gold}</span></div>`).join("")}</div>`;
+  } else {
+    $("#pScore").textContent=`🏁 ${p.pos}/${G.finish}`;
+    const step=100/(G.finish+1);
+    $("#board").innerHTML=`<h3>Race track</h3><div class="track">${G.players.map(x=>`<div class="lane ${x.you?"you":""}" style="--step:${step}%"><span class="nm">${esc(x.n)}</span><span class="runner" style="left:${6+x.pos/G.finish*84}%">${x.e}</span><span class="flag">🏁</span></div>`).join("")}</div>`;
+  }
+}
+function endGame(){
+  G.over=true; stopTimer(); $("#progBar").style.width="100%";
+  const r=ranked(), myRank=r.findIndex(x=>x.you)+1;
+  show("end");
+  $("#endTitle").textContent = myRank===1?"You're the champion! 🏆":myRank===2?"2nd place – great job!":"Keep practising – you'll get there!";
+  const ord=["1st","2nd","3rd","4th"][myRank-1];
+  $("#endSub").textContent = `${ord} place on ${L().name} · ` + (cfg.mode==="gold"?`You collected ${me().gold} golden bones`:`You ran ${me().pos} of ${G.finish} steps`);
+  const order=[r[1],r[0],r[2]], cls=["p2","p1","p3"];
+  $("#podium").innerHTML=order.map((x,i)=>x?`<div class="pod ${cls[i]} ${x.you?"you":""}"><div class="e">${x.e}</div><div class="nm">${esc(x.n)}</div><div class="bar">${cls[i][1]}</div></div>`:"").join("");
+  const pct=G.answered?Math.round(G.correct/G.answered*100):0;
+  $("#stats").innerHTML=`<div class="stat"><b>${G.correct}/${G.answered}</b>correct</div><div class="stat"><b>${pct}%</b>accuracy</div><div class="stat"><b>${G.bestStreak} 🔥</b>best streak</div>`;
+  if(cfg.mode==="gold"){ const key="best_"+cfg.lvl, best=store.get(key,0); if(me().gold>best){store.set(key,me().gold); $("#stats").innerHTML+=`<div class="stat"><b>🎖️</b>New ${L().name} record!</div>`} }
+  if(pct>=90 && cfg.lvl!=="hard") $("#stats").innerHTML+=`<div class="stat"><b>⬆️</b>Ready for ${cfg.lvl==="easy"?"Medium":"Hard"}!</div>`;
+  $("#reviewBox").innerHTML = G.wrongList.length
+    ? `<h2 style="margin-top:14px">Let's review ${G.wrongList.length} question${G.wrongList.length>1?"s":""}</h2><div class="review">${G.wrongList.map(({q,given})=>`<div class="rv"><div class="q">${esc(q.q)}</div>${given?`<div class="x">Your answer: ${esc(given)}</div>`:""}<div class="a">✔ ${esc(q.a)}</div><div class="x">${esc(q.e)}</div></div>`).join("")}</div>`
+    : `<h2 style="margin-top:14px;text-align:center">No mistakes – amazing! 🌟</h2>`;
+  if(myRank===1){ sfx.win(); confetti(); }
+}
+function confetti(){
+  const em=["🦴","⭐","🎉","✨",cfg.av];
+  for(let i=0;i<34;i++){ const s=document.createElement("div"); s.className="confetti"; s.textContent=em[i%em.length];
+    s.style.left=Math.random()*100+"vw"; s.style.animationDuration=(2+Math.random()*2.5)+"s"; s.style.animationDelay=Math.random()*.8+"s";
+    document.body.appendChild(s); setTimeout(()=>s.remove(),5500); }
+}
+document.addEventListener("keydown",e=>{
+  if($("#play").classList.contains("hidden")) return;
+  if(!$("#ov").classList.contains("hidden")){
+    if(e.key==="Enter"||e.key===" "){ const nb=$("#nextBtn"); if(nb&&!nb.classList.contains("hidden")){e.preventDefault();nb.click()} }
+    if(["1","2","3"].includes(e.key)){ const c=document.querySelector(`.chest[data-c="${+e.key-1}"]`); c&&c.click(); }
+    return;
+  }
+  if(document.activeElement && document.activeElement.id==="typeIn") return;
+  const i="1234".indexOf(e.key); if(i>-1){ const b=$("#answers").children[i]; b&&!b.classList.contains("gone")&&b.click(); }
+});
+buildHome();
+</script>
+<a href="../" aria-label="Back to Peter's World" style="position:fixed;left:calc(10px + env(safe-area-inset-left,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:2147483000;width:48px;height:48px;border-radius:50%;background:#fff;border:3px solid #5fd3b0;display:grid;place-items:center;font-size:22px;text-decoration:none;box-shadow:0 3px 0 rgba(0,0,0,.18)">🏠</a>
+</body>
+</html>

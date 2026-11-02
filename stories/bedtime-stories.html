@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,-apple-system,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
+<title>Lila & Stormy Bedtime Stories</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Grandstander:wght@500;700;800&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&display=swap">
+<style>
+/* Layout: a picture book in one column — each "page" is a big illustration with the read-aloud text beneath. Two nights, stacked. Single paper look on purpose. */
+:root {
+  --paper: #fffdf8;
+  --desk: #e9efed;
+  --ink: #2e2a35;
+  --muted: #6b6574;
+  --teal: #2f8a86;
+  --teal-soft: #dcefec;
+  --saffron: #e9a23b;
+  --saffron-soft: #fdf1dc;
+  --rose: #e6879a;
+  --rose-soft: #fbe7ec;
+  --plum: #6d4a8c;
+  --plum-soft: #efe6f6;
+  --line: #ddd7e0;
+  --display: "Grandstander", "Chalkboard SE", "Comic Sans MS", system-ui, sans-serif;
+  --read: "Literata", Georgia, "Times New Roman", serif;
+  color-scheme: light;
+}
+body {
+  background: var(--desk);
+  color: var(--ink);
+  font-family: var(--read);
+  font-size: 19px;
+  line-height: 1.65;
+}
+.wrap {
+  max-width: 760px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 24px 48px;
+  display: flex; flex-direction: column; gap: 22px;
+}
+h1, h2, h3 { font-family: var(--display); margin: 0; line-height: 1.12; text-wrap: balance; }
+p { margin: 0; }
+.cover { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; padding-block: 8px; }
+.cover svg { width: 220px; height: 120px; }
+.cover h1 { font-size: 34px; font-weight: 800; }
+.cover p { font-family: var(--display); color: var(--muted); font-size: 16px; max-width: 34em; }
+.jump { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 4px; }
+.jump a {
+  font-family: var(--display); font-weight: 700; font-size: 16px; text-decoration: none; color: var(--paper);
+  background: var(--teal); padding: 8px 16px; border-radius: 12px;
+}
+.jump a.b { background: var(--plum); }
+.jump a:focus-visible { outline: 3px solid var(--saffron); outline-offset: 2px; }
+
+.night { display: flex; flex-direction: column; gap: 18px; scroll-margin-top: 12px; }
+.night-head {
+  border-radius: 18px; padding: 16px 18px; display: flex; flex-direction: column; gap: 4px;
+}
+.a .night-head { background: var(--teal-soft); }
+.b .night-head { background: var(--plum-soft); }
+.night-head .tag { font-family: var(--display); font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.night-head h2 { font-size: 30px; font-weight: 800; }
+.a .night-head h2 { color: var(--teal); }
+.b .night-head h2 { color: var(--plum); }
+.night-head p { font-family: var(--display); font-size: 15.5px; color: var(--muted); }
+
+.page { background: var(--paper); border-radius: 18px; overflow: hidden; box-shadow: 0 2px 0 var(--line); }
+.page svg.scene { display: block; width: 100%; height: auto; aspect-ratio: 400 / 220; max-width: 100%; }
+.page .text { padding: 16px 22px 22px; display: flex; flex-direction: column; gap: 12px; }
+.page h3 { font-size: 21px; font-weight: 700; }
+.page .num { font-family: var(--display); font-size: 13px; color: var(--muted); }
+.q { color: var(--ink); }
+.q .who { font-family: var(--display); font-size: .82em; font-weight: 700; padding: 0 6px; border-radius: 6px; margin-right: 2px; }
+.q .cat { background: #ecebf0; color: #5d5868; }
+.q .lila { background: var(--rose-soft); color: #b34d63; }
+.q .baddie { background: var(--saffron-soft); color: #a8661a; }
+.wow { background: linear-gradient(transparent 62%, #ffe39a 62%); }
+.sound { font-family: var(--display); font-weight: 800; letter-spacing: .02em; color: var(--rose); }
+
+.detective {
+  border: 2.5px dashed var(--saffron); border-radius: 18px; background: var(--paper); padding: 16px 20px;
+  display: flex; flex-direction: column; gap: 10px; font-size: 17px;
+}
+.detective h3 { font-size: 20px; color: #a8661a; }
+.detective ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+.borrow { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.borrow div { background: var(--saffron-soft); border-radius: 12px; padding: 10px 12px; font-size: 16px; min-width: 0; }
+.borrow b { font-family: var(--display); display: block; }
+.mum { font-family: var(--display); font-size: 14.5px; color: var(--muted); }
+
+.yourturn { background: var(--paper); border-radius: 18px; padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; font-size: 17px; }
+.yourturn h2 { font-size: 24px; }
+.yourturn .ideas { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.yourturn .ideas div { background: var(--teal-soft); border-radius: 12px; padding: 8px 12px; font-size: 15.5px; min-width: 0; }
+.yourturn .ideas b { font-family: var(--display); display: block; color: var(--teal); }
+
+@media (max-width: 600px) {
+  body { font-size: 17.5px; }
+  .borrow, .yourturn .ideas { grid-template-columns: 1fr; }
+  .cover h1 { font-size: 27px; }
+  .night-head h2 { font-size: 25px; }
+  .page .text { padding: 14px 16px 18px; }
+}
+@media print {
+  body { background: var(--paper); }
+  .jump { display: none; }
+  .page, .detective { break-inside: avoid; box-shadow: none; border: 1px solid var(--line); }
+  .night.b { break-before: page; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="cat" viewBox="0 0 120 100">
+      <path d="M100 80 C116 78 118 62 110 58" fill="none" stroke="#2e2a35" stroke-width="9" stroke-linecap="round"/>
+      <path d="M100 80 C116 78 118 62 110 58" fill="none" stroke="#b4b1bd" stroke-width="4.5" stroke-linecap="round"/>
+      <path d="M16 90 C8 66 14 36 34 30 L38 12 L52 26 C58 24 64 24 70 26 L84 12 L88 30 C108 36 112 66 104 90 Z" fill="#b4b1bd" stroke="#2e2a35" stroke-width="3.5" stroke-linejoin="round"/>
+      <path d="M54 31 v7 M61 29 v8 M68 31 v7 M98 58 h-7 M100 67 h-8" stroke="#8f8b9b" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="46" cy="56" r="3.4" fill="#2e2a35"/><circle cx="76" cy="56" r="3.4" fill="#2e2a35"/>
+      <path d="M56 62 q2.5 3 5 0 q2.5 3 5 0" fill="none" stroke="#2e2a35" stroke-width="2" stroke-linecap="round"/>
+      <ellipse cx="39" cy="64" rx="5" ry="3" fill="#f4a7b9"/><ellipse cx="83" cy="64" rx="5" ry="3" fill="#f4a7b9"/>
+      <path d="M30 58 h-12 M30 63 l-11 3 M92 58 h12 M92 63 l11 3" stroke="#2e2a35" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M36 90 q5 -6 10 0 M74 90 q5 -6 10 0" fill="none" stroke="#2e2a35" stroke-width="2.4" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="catsleep" viewBox="0 0 120 100">
+      <path d="M16 90 C8 66 14 36 34 30 L38 12 L52 26 C58 24 64 24 70 26 L84 12 L88 30 C108 36 112 66 104 90 Z" fill="#b4b1bd" stroke="#2e2a35" stroke-width="3.5" stroke-linejoin="round"/>
+      <path d="M54 31 v7 M61 29 v8 M68 31 v7" stroke="#8f8b9b" stroke-width="3" stroke-linecap="round"/>
+      <path d="M41 57 q5 4 10 0 M71 57 q5 4 10 0" fill="none" stroke="#2e2a35" stroke-width="2.6" stroke-linecap="round"/>
+      <path d="M56 64 q2.5 3 5 0 q2.5 3 5 0" fill="none" stroke="#2e2a35" stroke-width="2" stroke-linecap="round"/>
+      <ellipse cx="39" cy="65" rx="5" ry="3" fill="#f4a7b9"/><ellipse cx="83" cy="65" rx="5" ry="3" fill="#f4a7b9"/>
+      <path d="M30 60 h-12 M92 60 h12" stroke="#2e2a35" stroke-width="1.6" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="lila" viewBox="0 0 60 100">
+      <path d="M12 54 C9 22 18 7 30 7 C42 7 51 22 48 54 Z" fill="#e6879a" stroke="#2e2a35" stroke-width="2.5" stroke-linejoin="round"/>
+      <circle cx="30" cy="30" r="12" fill="#f3cfa8" stroke="#2e2a35" stroke-width="2"/>
+      <circle cx="25.5" cy="29" r="1.7" fill="#2e2a35"/><circle cx="34.5" cy="29" r="1.7" fill="#2e2a35"/>
+      <path d="M26 35 q4 3 8 0" fill="none" stroke="#2e2a35" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M14 50 L46 50 L52 92 L8 92 Z" fill="#2f8a86" stroke="#2e2a35" stroke-width="2.5" stroke-linejoin="round"/>
+      <rect x="42" y="56" width="13" height="19" rx="4" fill="#e9a23b" stroke="#2e2a35" stroke-width="2"/>
+      <path d="M19 92 v6 M41 92 v6" stroke="#2e2a35" stroke-width="4.5" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="grabbit" viewBox="0 0 70 110">
+      <path d="M12 58 L58 58 L64 106 L6 106 Z" fill="#7a4c9a" stroke="#2e2a35" stroke-width="2.5" stroke-linejoin="round"/>
+      <rect x="10" y="74" width="50" height="7" fill="#e9a23b" stroke="#2e2a35" stroke-width="2"/>
+      <circle cx="35" cy="42" r="14" fill="#e0b48a" stroke="#2e2a35" stroke-width="2"/>
+      <ellipse cx="35" cy="24" rx="21" ry="13" fill="#e9a23b" stroke="#2e2a35" stroke-width="2.5"/>
+      <circle cx="35" cy="22" r="4" fill="#e6879a" stroke="#2e2a35" stroke-width="1.5"/>
+      <path d="M25 37 l7 3 M45 37 l-7 3" stroke="#2e2a35" stroke-width="2.4" stroke-linecap="round"/>
+      <circle cx="29" cy="42" r="1.6" fill="#2e2a35"/><circle cx="41" cy="42" r="1.6" fill="#2e2a35"/>
+      <path d="M22 50 q13 -8 26 0 q-13 5 -26 0Z" fill="#2e2a35"/>
+    </symbol>
+    <symbol id="lamp" viewBox="0 0 90 50">
+      <path d="M62 34 q16 -2 24 -16" fill="none" stroke="#2e2a35" stroke-width="8" stroke-linecap="round"/>
+      <path d="M62 34 q16 -2 24 -16" fill="none" stroke="#e9b949" stroke-width="4" stroke-linecap="round"/>
+      <path d="M16 34 q-12 -8 0 -18" fill="none" stroke="#2e2a35" stroke-width="3.5"/>
+      <path d="M10 38 h56 q-4 -18 -28 -18 q-24 0 -28 18 Z" fill="#e9b949" stroke="#2e2a35" stroke-width="2.5" stroke-linejoin="round"/>
+      <ellipse cx="38" cy="19" rx="8" ry="4" fill="#e9b949" stroke="#2e2a35" stroke-width="2"/>
+      <rect x="24" y="38" width="28" height="7" rx="2" fill="#c98a2f" stroke="#2e2a35" stroke-width="2"/>
+    </symbol>
+    <symbol id="pepper" viewBox="0 0 60 70">
+      <circle cx="30" cy="42" r="24" fill="#8a5a3b" stroke="#2e2a35" stroke-width="2.5"/>
+      <path d="M18 34 q4 -4 8 0 M34 34 q4 -4 8 0" fill="none" stroke="#2e2a35" stroke-width="2.4" stroke-linecap="round"/>
+      <path d="M22 52 q8 -6 16 0" fill="none" stroke="#2e2a35" stroke-width="2.4" stroke-linecap="round"/>
+      <path d="M38 26 a6 6 0 0 1 6 4" fill="none" stroke="#b07a55" stroke-width="3" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="crown" viewBox="0 0 40 24">
+      <path d="M3 22 L3 6 L12 14 L20 2 L28 14 L37 6 L37 22 Z" fill="#e9b949" stroke="#2e2a35" stroke-width="2" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="spark" viewBox="0 0 20 20">
+      <path d="M10 0 l2.6 7.4 7.4 2.6 -7.4 2.6 -2.6 7.4 -2.6 -7.4 -7.4 -2.6 7.4 -2.6Z" fill="#ffe39a"/>
+    </symbol>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#fff3b8" stop-opacity=".95"/>
+      <stop offset="1" stop-color="#fff3b8" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="dusk" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f6b46b"/><stop offset="1" stop-color="#f9dcb0"/>
+    </linearGradient>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8fd0e0"/><stop offset="1" stop-color="#e8f6f4"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<div class="wrap">
+  <header class="cover">
+    <svg viewBox="0 0 220 120" role="img" aria-label="Lila and a chubby grey cat side by side">
+      <use href="#spark" x="20" y="16" width="16" height="16"/><use href="#spark" x="186" y="26" width="12" height="12"/>
+      <use href="#lila" x="52" y="8" width="62" height="104"/>
+      <use href="#cat" x="104" y="44" width="80" height="67"/>
+    </svg>
+    <h1>Lila & Stormy: Two Bedtime Stories</h1>
+    <p>Two ways the story could continue. Each one borrows from a story you already know. Read one each night, then play “Story Detective” at the end.</p>
+    <nav class="jump" aria-label="Choose a night">
+      <a href="#night1">Night 1: The Lamp</a>
+      <a class="b" href="#night2">Night 2: The Tiny Door</a>
+    </nav>
+  </header>
+
+  <!-- ===================== NIGHT 1 ===================== -->
+  <section class="night a" id="night1">
+    <div class="night-head">
+      <span class="tag">Night 1 · borrows from Aladdin</span>
+      <h2>Lila and the Lamp of Whiskers</h2>
+      <p>About 6 minutes to read aloud. Do the voices!</p>
+    </div>
+
+    <article class="page">
+      <svg class="scene" viewBox="0 0 400 220" role="img" aria-label="A dark treasure room full of gold and jars. A grey cat sleeps on a golden lamp. Lila stands in the doorway with sunlight behind her.">
+        <rect width="400" height="220" fill="#3d3350"/>
+        <path d="M0 0 h400 v40 q-40 18 -80 4 t-90 6 t-100 -4 t-130 10Z" fill="#2d2540"/>
+        <polygon points="40,40 110,40 230,220 0,220 0,120" fill="#ffe9a8" opacity=".35"/>
+        <path d="M30 220 V70 a40 40 0 0 1 80 0 V220Z" fill="#ffe9a8" opacity=".55"/>
+        <ellipse cx="300" cy="206" rx="110" ry="22" fill="#e9b949"/>
+        <g fill="#f4d06f" stroke="#c98a2f" stroke-width="1.5">
+          <ellipse cx="250" cy="196" rx="9" ry="4"/><ellipse cx="270" cy="190" rx="9" ry="4"/><ellipse cx="340" cy="192" rx="9" ry="4"/><ellipse cx="362" cy="200" rx="9" ry="4"/><ellipse cx="320" cy="186" rx="9" ry="4"/>
+        </g>
+        <path d="M340 120 h30 v60 a8 8 0 0 1 -8 8 h-14 a8 8 0 0 1 -8 -8Z" fill="#2f8a86" stroke="#1d1a24" stroke-width="2"/>
+        <path d="M200 140 h26 v46 a6 6 0 0 1 -6 6 h-14 a6 6 0 0 1 -6 -6Z" fill="#e6879a" stroke="#1d1a24" stroke-width="2"/>
+        <use href="#lamp" x="244" y="146" width="96" height="54"/>
+        <use href="#catsleep" x="250" y="96" width="66" height="55"/>
+        <text x="320" y="100" font-family="Grandstander, sans-serif" font-weight="800" font-size="16" fill="#cfcbe0">z z z</text>
+        <use href="#lila" x="44" y="106" width="58" height="97"/>
+        <use href="#spark" x="180" y="70" width="14" height="14"/><use href="#spark" x="372" y="60" width="12" height="12"/><use href="#spark" x="228" y="110" width="10" height="10"/>
+      </svg>
+      <div class="text">
+        <span class="num">Page 1</span>
+        <h3>The door creaks open</h3>
+        <p>Lila turned the rusty key. <span class="sound">Clunk!</span> The old door groaned open, and a cloud of <span class="wow">dusty</span>, spicy air puffed out into her face.</p>
+        <p>Inside was a room <span class="wow">glittering</span> with treasure: piles of gold coins, jars as tall as Lila, and silk cushions in every colour of the market. In the middle, on top of a golden lamp, sat a <span class="wow">chubby</span> grey cat. It was fast asleep and snoring very softly.</p>
+        <p class="q"><span class="who lila">Lila</span>“Hello?” she <span class="wow">whispered</span>.</p>
+        <p>One sleepy eye opened. Then the other.</p>
+        <p class="q"><span class="who cat">Stormy</span>“Oh! A visitor!” <span class="wow">purred</span> the cat, stretching its tiny paws. “I'm Stormy, Keeper of the Lamp. You may look at anything you like… but please don't touch the gold. The gold here is very <i>grumpy</i>.”</p>
+        <p>Lila giggled. She had never met a talking cat before, and she liked this one already.</p>
+      </div>
+    </article>
+
+    <article class="page">
+      <svg class="scene" viewBox="0 0 400 220" role="img" aria-label="A grumpy merchant in a purple robe and big orange turban blocks the doorway. Lila holds the cat close.">
+        <rect width="400" height="220" fill="#3d3350"/>
+        <ellipse cx="200" cy="212" rx="210" ry="18" fill="#2d2540"/>
+        <path d="M250 220 V60 a50 50 0 0 1 100 0 V220Z" fill="#9a6440" stroke="#1d1a24" stroke-width="3"/>
+        <path d="M268 50 V220 M290 34 V220 M312 34 V220 M334 50 V220" stroke="#7a4c2f" stroke-width="2.5"/>
+        <path d="M232 70 l-16 -8 M228 100 l-20 0 M232 130 l-16 8" stroke="#ffe39a" stroke-width="4" stroke-linecap="round"/>
+        <use href="#grabbit" x="246" y="70" width="92" height="145"/>
+        <use href="#lamp" x="296" y="140" width="66" height="36"/>
+        <use href="#lila" x="70" y="96" width="66" height="110"/>
+        <use href="#cat" x="104" y="140" width="70" height="58"/>
+        <path d="M150 50 q16 -12 28 2 q6 14 -10 18 l-5 10 -3 -11 q-14 -5 -10 -19Z" fill="#fffdf8" stroke="#2e2a35" stroke-width="2"/>
+        <text x="164" y="68" font-family="Grandstander, sans-serif" font-weight="800" font-size="20" fill="#e6879a" text-anchor="middle">!</text>
+      </svg>
+      <div class="text">
+        <span class="num">Page 2</span>
+        <h3>Uh-oh: Mr Grabbit</h3>
+        <p>Suddenly, a shadow fell across the floor. A tall man in a purple robe and an enormous orange turban stood in the doorway. It was Mr Grabbit, the carpet seller who had been shouting “Rare treasures!” in the market.</p>
+        <p class="q"><span class="who baddie">Mr Grabbit</span>“So, little girl, you found my secret door!” he <span class="wow">sneered</span>, twirling his <span class="wow">curly</span> moustache. “I have been looking for that lamp for <i>forty years</i>.”</p>
+        <p>He snatched the golden lamp right from under Stormy. Then he stepped outside and <span class="sound">SLAM!</span> The door shut. <span class="sound">Click!</span> The key turned in the lock.</p>
+        <p>Everything went <span class="wow">pitch-black</span>.</p>
+        <p class="q"><span class="who lila">Lila</span>“We're locked in!” Lila <span class="wow">gasped</span>, hugging her map tightly.</p>
+        <p class="q"><span class="who cat">Stormy</span>“Don't worry,” said a small voice beside her ankle. “Mr Grabbit took the lamp. But he forgot the most important thing.”</p>
+        <p class="q"><span class="who lila">Lila</span>“What?”</p>
+        <p class="q"><span class="who cat">Stormy</span>“Me.”</p>
+      </div>
+    </article>
+
+    <article class="page">
+      <svg class="scene" viewBox="0 0 400 220" role="img" aria-label="The cat glows with golden light. Through the open door, a colourful flying carpet zooms away into the sky carrying the merchant.">
+        <rect width="400" height="220" fill="url(#sky)"/>
+        <path d="M0 160 h70 v-30 h30 v30 h40 v-50 h22 l10 -14 10 14 h0 v50 h50 v-24 h40 v24 h128 v60 h-400Z" fill="#f3d9ae" stroke="#c98a2f" stroke-width="2"/>
+        <g transform="translate(240 40) rotate(-12)">
+          <path d="M0 30 q30 -14 60 0 t60 0 v18 q-30 -14 -60 0 t-60 0Z" fill="#e6879a" stroke="#2e2a35" stroke-width="2.5"/>
+          <path d="M10 36 q25 -10 50 0 t50 0" fill="none" stroke="#e9b949" stroke-width="3" stroke-dasharray="6 5"/>
+          <use href="#grabbit" x="30" y="-36" width="44" height="70"/>
+          <use href="#lamp" x="72" y="12" width="34" height="19"/>
+        </g>
+        <path d="M200 70 q20 -10 30 0" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+        <path d="M190 84 q24 -8 34 2" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="120" cy="168" r="70" fill="url(#glow)"/>
+        <use href="#cat" x="78" y="128" width="88" height="73"/>
+        <use href="#lila" x="20" y="110" width="58" height="97"/>
+        <use href="#spark" x="70" y="104" width="16" height="16"/><use href="#spark" x="164" y="120" width="14" height="14"/><use href="#spark" x="134" y="96" width="10" height="10"/>
+      </svg>
+      <div class="text">
+        <span class="num">Page 3</span>
+        <h3>The secret of the lamp</h3>
+        <p>In the dark, Stormy began to <span class="wow">glow</span>, softly at first, then brighter and brighter, like a warm golden moon.</p>
+        <p class="q"><span class="who cat">Stormy</span>“That lamp was never magic,” Stormy explained. “It was just my bed. <i>I'm</i> the magic one. But my magic only works when somebody asks nicely.”</p>
+        <p>Lila thought for a moment. Then she knelt down and stroked Stormy's soft, silky ears.</p>
+        <p class="q"><span class="who lila">Lila</span>“Stormy,” she said <span class="wow">politely</span>, “please could you open the door?”</p>
+        <p>Stormy closed its eyes and began to purr. <span class="sound">Rrrrrrr…</span> The purr grew louder and deeper until the whole room <span class="wow">trembled</span>. The lock rattled. Then <span class="sound">POP!</span> The door burst open.</p>
+        <p>Outside, Mr Grabbit was running away through the market with the lamp under his arm. But Stormy gave one more tiny purr, and the colourful carpet he was running across lifted up into the air, with Mr Grabbit sitting on it!</p>
+        <p class="q"><span class="who baddie">Mr Grabbit</span>“Heeeelp! Put me dooooown!” he wailed, as the carpet <span class="wow">zoomed</span> over the rooftops and far away.</p>
+      </div>
+    </article>
+
+    <article class="page">
+      <svg class="scene" viewBox="0 0 400 220" role="img" aria-label="Sunset over the market. Lila walks home with her backpack, and the grey cat peeks happily out of it.">
+        <rect width="400" height="220" fill="url(#dusk)"/>
+        <circle cx="320" cy="110" r="38" fill="#ffe39a"/>
+        <path d="M0 150 h40 v-40 a20 20 0 0 1 40 0 v40 h30 v-26 h40 v26 h40 v-60 l14 -16 14 16 v60 h40 v-30 h50 v30 h92 v70 h-400Z" fill="#c98a5a" opacity=".55"/>
+        <rect x="0" y="186" width="400" height="34" fill="#f3d9ae"/>
+        <path d="M20 40 h120 M40 40 v12 M80 40 v12 M120 40 v12" stroke="#7a4c2f" stroke-width="2"/>
+        <rect x="34" y="52" width="12" height="18" rx="4" fill="#e9a23b"/><rect x="74" y="52" width="12" height="18" rx="4" fill="#e6879a"/><rect x="114" y="52" width="12" height="18" rx="4" fill="#2f8a86"/>
+        <use href="#lila" x="150" y="86" width="70" height="117"/>
+        <use href="#cat" x="196" y="78" width="44" height="37"/>
+        <use href="#spark" x="250" y="60" width="12" height="12"/><use href="#spark" x="110" y="96" width="10" height="10"/>
+      </svg>
+      <div class="text">
+        <span class="num">Page 4</span>
+        <h3>One wish</h3>
+        <p>When everything was quiet again, Stormy sat down in front of Lila and wrapped its tail neatly around its paws.</p>
+        <p class="q"><span class="who cat">Stormy</span>“You were kind to me,” it said. “So you get one wish. You can have all the gold in this room, if you like.”</p>
+        <p>Lila looked at the shining coins. She looked at the jars and the silk cushions. Then she looked at Stormy, who had been alone in that dusty room for a very, very long time.</p>
+        <p class="q"><span class="who lila">Lila</span>“I don't want the gold,” she said. “I wish that <i>you</i> could be free, and come and see the world with me.”</p>
+        <p>Stormy's whiskers <span class="wow">twitched</span>. Its eyes went shiny. Then, with a happy little hop, it jumped straight into Lila's backpack.</p>
+        <p class="q"><span class="who cat">Stormy</span>“Wish granted,” it purred. “Now… do you have any snacks?”</p>
+        <p>And as the sun went down over the busy market, Lila walked home with the best treasure of all: a brand new friend.</p>
+        <p><b>The End.</b></p>
+      </div>
+    </article>
+
+    <aside class="detective">
+      <h3>Story Detective: What did we borrow?</h3>
+      <p>This story borrows from <b>Aladdin</b>. Can Peter spot the borrowed parts?</p>
+      <div class="borrow">
+        <div><b>Kept from Aladdin</b>a cave full of treasure · a magic lamp · a flying carpet · a wish · a greedy baddie</div>
+        <div><b>Changed to make it new</b>the magic is in the cat, not the lamp · magic needs a polite “please” · Lila wishes to set her friend free</div>
+      </div>
+      <ul>
+        <li>If Stormy gave <i>you</i> one wish, what would you wish for?</li>
+        <li>Where do you think Mr Grabbit's carpet landed?</li>
+        <li>Which words made the room feel dark and spooky?</li>
+      </ul>
+      <p class="mum">Gợi ý cho mẹ: những từ tô vàng là từ hay có trong bảng từ của Peter. Đọc xong, hỏi con đã nghe thấy từ nào.</p>
+    </aside>
+  </section>
+
+  <!-- ===================== NIGHT 2 ===================== -->
+  <section class="night b" id="night2">
+    <div class="night-head">
+      <span class="tag">Night 2 · borrows from Alice in Wonderland</span>
+      <h2>Lila and the Tiny Golden Door</h2>
+      <p>About 6 minutes to read aloud. The Queen needs a very loud, very cross voice!</p>
+    </div>
+
+    <article class="page">
+      <svg class="scene" viewBox="0 0 400 220" role="img" aria-label="Lila floats down a long tunnel of colourful carpets. At the bottom, the grey cat holds a plate with a cookie, next to a tiny golden door.">
+        <rect width="400" height="220" fill="#2d2540"/>
+        <g opacity=".95">
+          <path d="M120 0 h160 l-20 220 h-120Z" fill="#3d3350"/>
+          <path d="M126 20 h148 M128 50 h144 M131 80 h138 M134 110 h132 M137 140 h126" stroke="#e6879a" stroke-width="7"/>
+          <path d="M127 35 h146 M130 65 h140 M133 95 h134 M136 125 h128" stroke="#e9b949" stroke-width="5" stroke-dasharray="10 6"/>
+        </g>
+        <use href="#lila" x="166" y="10" width="54" height="90" transform="rotate(14 193 55)"/>
+        <path d="M156 30 q-10 10 0 20 M232 30 q10 10 0 20" fill="none" stroke="#ffffff" stroke-width="2" opacity=".7"/>
+        <rect x="0" y="196" width="400" height="24" fill="#6d4a8c"/>
+        <path d="M310 196 v-34 a12 12 0 0 1 24 0 v34Z" fill="#e9b949" stroke="#2e2a35" stroke-width="2.5"/>
+        <circle cx="328" cy="182" r="2" fill="#2e2a35"/>
+        <use href="#cat" x="40" y="132" width="78" height="65"/>
+        <ellipse cx="128" cy="160" rx="22" ry="6" fill="#fffdf8" stroke="#2e2a35" stroke-width="2"/>
+        <circle cx="128" cy="154" r="10" fill="#d9a35f" stroke="#2e2a35" stroke-width="2"/>
+        <path d="M122 154 h12" stroke="#e6879a" stroke-width="3" stroke-linecap="round"/>
+        <use href="#spark" x="290" y="140" width="12" height="12"/><use href="#spark" x="350" y="150" width="10" height="10"/>
+      </svg>
+      <div class="text">
+        <span class="num">Page 1</span>
+        <h3>Down, down, down</h3>
+        <p>Lila turned the rusty key and stepped through the door. But there was no floor! She began to fall, down, down, down a long tunnel lined with <span class="wow">colourful</span> carpets. Strangely, she fell slowly, like a feather, so it wasn't scary at all.</p>
+        <p class="q"><span class="who lila">Lila</span>“Whoaaaa!” she <span class="wow">squealed</span>. “Where am I going?”</p>
+        <p><span class="sound">Bump!</span> She landed softly on a big purple cushion. In front of her was a tiny golden door, no bigger than a teacup. Next to it sat a <span class="wow">plump</span> grey cat holding a plate with one round cookie on it. The cookie had pink icing that said <i>EAT ME</i>.</p>
+        <p class="q"><span class="who cat">Stormy</span>“Welcome, welcome!” <span class="wow">purred</span> the cat. “I'm Stormy. If you want to go through the tiny door, you have to eat the cookie.” Then it added in a small voice, “I already ate the other eleven.”</p>
+      </div>
+    </article>
+
+    <article class="page">
+      <svg class="scene" viewBox="0 0 400 220" role="img" aria-label="A giant spice garden with huge flowers. A round peppercorn queen with a gold crown shouts at tiny Lila and the cat.">
+        <rect width="400" height="220" fill="url(#sky)"/>
+        <rect y="186" width="400" height="34" fill="#9bc79a"/>
+        <path d="M40 186 V60" stroke="#4f8a4e" stroke-width="8"/>
+        <g transform="translate(40 60)"><circle r="16" fill="#e9b949"/><circle cx="0" cy="-26" r="16" fill="#e6879a"/><circle cx="24" cy="-10" r="16" fill="#e6879a"/><circle cx="-24" cy="-10" r="16" fill="#e6879a"/><circle cx="16" cy="18" r="16" fill="#e6879a"/><circle cx="-16" cy="18" r="16" fill="#e6879a"/><circle r="14" fill="#e9b949" stroke="#2e2a35" stroke-width="2"/></g>
+        <path d="M370 186 V40" stroke="#4f8a4e" stroke-width="8"/>
+        <path d="M370 90 q-40 -10 -60 10 q30 10 60 -10Z M370 130 q40 -14 30 -40 q-30 20 -30 40Z" fill="#6fae6c" stroke="#2e2a35" stroke-width="2"/>
+        <use href="#pepper" x="220" y="70" width="104" height="121"/>
+        <use href="#crown" x="248" y="56" width="48" height="30"/>
+        <path d="M206 100 l-14 -6 M204 120 h-16" stroke="#e6879a" stroke-width="3.5" stroke-linecap="round"/>
+        <use href="#pepper" x="330" y="150" width="32" height="38"/>
+        <use href="#pepper" x="190" y="156" width="28" height="32"/>
+        <use href="#lila" x="96" y="146" width="26" height="43"/>
+        <use href="#cat" x="120" y="166" width="28" height="23"/>
+      </svg>
+      <div class="text">
+        <span class="num">Page 2</span>
+        <h3>The Queen of Spices</h3>
+        <p>Lila took one bite. <span class="sound">Fizz… whoosh!</span> She shrank, and shrank, and shrank, until she was as small as a date. Stormy shrank too. (It was <i>still</i> chubby. Just smaller.)</p>
+        <p>They squeezed through the tiny golden door into an <span class="wow">enormous</span> garden. The flowers were as tall as trees, and the air smelled of cinnamon, ginger and pepper.</p>
+        <p>But waiting for them was a big, round, very cross peppercorn wearing a golden crown. It was the Queen of Spices, and behind her stood a row of peppercorn guards.</p>
+        <p class="q"><span class="who baddie">The Queen</span>“THIEF!” <span class="wow">bellowed</span> the Queen, pointing at Lila's map. “That is MY map! Guards, off with their whiskers!”</p>
+        <p class="q"><span class="who lila">Lila</span>“But I don't even <i>have</i> whiskers!” Lila <span class="wow">protested</span>.</p>
+        <p class="q"><span class="who cat">Stormy</span>“I do,” <span class="wow">squeaked</span> Stormy, hiding behind her. “And I'm very fond of them.”</p>
+      </div>
+    </article>
+
+    <article class="page">
+      <svg class="scene" viewBox="0 0 400 220" role="img" aria-label="Peppercorn guards sneeze in a big cloud of spice while Lila and the cat run towards the tiny golden door.">
+        <rect width="400" height="220" fill="url(#sky)"/>
+        <rect y="186" width="400" height="34" fill="#9bc79a"/>
+        <g fill="#f3c98b" opacity=".85">
+          <circle cx="250" cy="120" r="40"/><circle cx="300" cy="100" r="46"/><circle cx="350" cy="130" r="38"/><circle cx="280" cy="150" r="36"/>
+        </g>
+        <use href="#pepper" x="232" y="120" width="52" height="61"/>
+        <use href="#pepper" x="296" y="110" width="60" height="70"/>
+        <use href="#crown" x="310" y="98" width="32" height="20"/>
+        <text x="300" y="68" font-family="Grandstander, sans-serif" font-weight="800" font-size="28" fill="#e6879a" text-anchor="middle">ACHOO!</text>
+        <path d="M44 186 v-40 a14 14 0 0 1 28 0 v40Z" fill="#e9b949" stroke="#2e2a35" stroke-width="2.5"/>
+        <use href="#lila" x="104" y="124" width="40" height="66"/>
+        <use href="#cat" x="146" y="150" width="44" height="37"/>
+        <path d="M196 150 h22 M194 164 h28 M198 178 h18" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+        <g fill="#c98a2f"><circle cx="210" cy="110" r="2.5"/><circle cx="226" cy="96" r="2"/><circle cx="200" cy="90" r="2.5"/><circle cx="236" cy="80" r="2"/></g>
+      </svg>
+      <div class="text">
+        <span class="num">Page 3</span>
+        <h3>A very clever sneeze</h3>
+        <p>The guards marched closer. <span class="sound">Stomp, stomp, stomp.</span> Lila's heart was <span class="wow">thumping</span>. Then she noticed something: there was a pile of fine brown powder by her feet. It smelled of pepper.</p>
+        <p class="q"><span class="who lila">Lila</span>“Stormy,” she <span class="wow">whispered</span>, “what happens when a peppercorn smells pepper?”</p>
+        <p>Stormy's eyes went wide. “Oh, you <i>clever</i> girl.”</p>
+        <p>Lila scooped up a handful of powder and blew it into the air. A brown, spicy cloud floated over the guards, and…</p>
+        <p class="q"><span class="who baddie">Everyone</span>“Ah… ah… AH-CHOOOO!”</p>
+        <p>The guards sneezed so hard they rolled backwards like marbles. Even the Queen's crown flew off her head! Lila and Stormy ran as fast as they could back to the tiny golden door.</p>
+        <p>But oh no, Stormy had eaten one cookie too many. It was stuck halfway! Lila pushed and pushed, until <span class="sound">POP!</span> Stormy shot through the door like a fluffy cork.</p>
+      </div>
+    </article>
+
+    <article class="page">
+      <svg class="scene" viewBox="0 0 400 220" role="img" aria-label="Lila wakes up on a carpet in the busy market. On her map is a small paw print, and a grey ear pokes out of her backpack.">
+        <rect width="400" height="220" fill="url(#dusk)"/>
+        <path d="M20 40 h160 M40 40 v12 M80 40 v12 M120 40 v12 M160 40 v12" stroke="#7a4c2f" stroke-width="2"/>
+        <rect x="34" y="52" width="12" height="18" rx="4" fill="#e9a23b"/><rect x="74" y="52" width="12" height="18" rx="4" fill="#e6879a"/><rect x="114" y="52" width="12" height="18" rx="4" fill="#2f8a86"/><rect x="154" y="52" width="12" height="18" rx="4" fill="#e9a23b"/>
+        <path d="M30 196 q90 -20 180 0 t160 0 v24 h-340Z" fill="#e6879a" stroke="#2e2a35" stroke-width="2.5"/>
+        <path d="M40 204 q80 -14 160 0 t150 0" fill="none" stroke="#e9b949" stroke-width="3" stroke-dasharray="7 5"/>
+        <use href="#lila" x="96" y="108" width="62" height="103"/>
+        <g transform="translate(220 140) rotate(8)">
+          <rect width="78" height="52" rx="3" fill="#fdf1dc" stroke="#2e2a35" stroke-width="2.5"/>
+          <path d="M10 40 q16 -24 30 -8 t28 -18" fill="none" stroke="#e6879a" stroke-width="2.5" stroke-dasharray="4 4"/>
+          <g fill="#6b6574"><ellipse cx="52" cy="32" rx="6" ry="5"/><circle cx="44" cy="24" r="2.6"/><circle cx="50" cy="21" r="2.6"/><circle cx="57" cy="22" r="2.6"/><circle cx="62" cy="27" r="2.6"/></g>
+        </g>
+        <path d="M150 104 L156 92 L162 104Z M166 104 L172 92 L178 104Z" fill="#b4b1bd" stroke="#2e2a35" stroke-width="2" stroke-linejoin="round"/>
+        <use href="#spark" x="300" y="100" width="14" height="14"/><use href="#spark" x="190" y="80" width="10" height="10"/>
+      </svg>
+      <div class="text">
+        <span class="num">Page 4</span>
+        <h3>Was it a dream?</h3>
+        <p>“Fresh dates! Beautiful rugs!” Lila blinked. She was sitting on a <span class="wow">colourful</span> carpet in the middle of the busy market. The sun was still high in the sky. The old wooden door was gone.</p>
+        <p class="q"><span class="who lila">Lila</span>“It was only a dream,” she <span class="wow">sighed</span>. “What a shame. I liked that cat.”</p>
+        <p>She unrolled her map to find her way home… and <span class="wow">froze</span>. Right in the middle of the map was a small, grey <i>paw print</i>. And next to it, a few pink cookie crumbs.</p>
+        <p>Then, from inside her backpack, came a soft and very happy sound.</p>
+        <p class="q"><span class="who cat">Stormy</span>“Purrrrrrr.”</p>
+        <p>Lila smiled the biggest smile of her life. Maybe, just maybe, it wasn't a dream after all.</p>
+        <p><b>The End.</b></p>
+      </div>
+    </article>
+
+    <aside class="detective">
+      <h3>Story Detective: What did we borrow?</h3>
+      <p>This story borrows from <b>Alice in Wonderland</b>. Can Peter spot the borrowed parts?</p>
+      <div class="borrow">
+        <div><b>Kept from Alice</b>falling down a long tunnel · a tiny door · “EAT ME” to shrink · a shouting queen · “was it all a dream?”</div>
+        <div><b>Changed to make it new</b>the queen is a peppercorn · Lila escapes with a clever sneeze · the paw print proves it was real</div>
+      </div>
+      <ul>
+        <li>Which story was funnier, Night 1 or Night 2? Why?</li>
+        <li>Do you think it was a dream? What is your proof?</li>
+        <li>How did Lila use her brain instead of being strong?</li>
+      </ul>
+      <p class="mum">Gợi ý cho mẹ: hỏi Peter "Con thích phần nào nhất?" rồi ghi lại. Đó có thể là hạt giống cho câu chuyện của chính con.</p>
+    </aside>
+  </section>
+
+  <section class="yourturn">
+    <h2>Your turn, Peter: borrow a story you know!</h2>
+    <p>Pick a story you already love. Keep a few parts, change the rest, and add Lila and Stormy.</p>
+    <div class="ideas">
+      <div><b>Jack and the Beanstalk</b>A magic plant behind the door grows up to a giant's kitchen full of cookies…</div>
+      <div><b>Puss in Boots</b>Stormy gets a pair of tiny boots and a very clever plan…</div>
+      <div><b>Goldilocks</b>Three chairs, three bowls, three beds, but which one is Stormy's?</div>
+      <div><b>The Three Little Pigs</b>A huffing, puffing sandstorm and three houses in the market…</div>
+    </div>
+    <p class="mum">Lưu ý: hai truyện trên để đọc cho Peter nghe, cho con thấy cách "mượn" một truyện quen để viết. Bài nộp nên là truyện của chính con. Con có thể mượn truyện khác, hoặc chỉ lấy một ý con thích.</p>
+  </section>
+</div>
+
+<a href="../" aria-label="Back to Peter's World" style="position:fixed;left:calc(10px + env(safe-area-inset-left,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:2147483000;width:48px;height:48px;border-radius:50%;background:#fff;border:3px solid #5fd3b0;display:grid;place-items:center;font-size:22px;text-decoration:none;box-shadow:0 3px 0 rgba(0,0,0,.18)">🏠</a>
+</body></html>

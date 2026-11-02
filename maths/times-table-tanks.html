@@ -1,0 +1,1082 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Times Table Tanks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#DDF3E0; --paper:#FFFFFF; --ink:#1F2A44; --muted:#52617D; --line:#1F2A44;
+  --tank:#3BAA3F; --tank-dark:#23752A; --red:#E5483B; --sun:#FFC93C; --green:#37A047; --amber:#F2A33A; --grey:#CBD5E2;
+  --shadow:#1F2A44;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#10261C; --paper:#1A3A2B; --ink:#EEF7F0; --muted:#A8C7B4; --line:#07140E; --grey:#35503F; --shadow:#030A06;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#10261C; --paper:#1A3A2B; --ink:#EEF7F0; --muted:#A8C7B4; --line:#07140E; --grey:#35503F; --shadow:#030A06;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;height:100%;background:var(--bg);color:var(--ink);
+  font-family:"Baloo 2","Trebuchet MS","Segoe UI",system-ui,sans-serif;font-size:18px;line-height:1.45;
+  -webkit-tap-highlight-color:transparent}
+body.playing{overflow:hidden}
+.screen{display:none}
+.screen.on{display:block}
+.page{max-width:720px;margin:0 auto;padding:18px 16px 40px}
+h1,h2,h3{margin:0;line-height:1.1}
+p{margin:0}
+
+.btn{font:inherit;font-weight:800;font-size:20px;color:var(--ink);background:var(--paper);
+  border:3px solid var(--line);border-radius:16px;padding:12px 18px;cursor:pointer;
+  box-shadow:0 5px 0 var(--shadow);transition:transform .08s, box-shadow .08s;touch-action:manipulation}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--shadow)}
+.btn:focus-visible,.chip:focus-visible{outline:4px solid var(--sun);outline-offset:3px}
+.btn.primary{background:var(--tank);color:#fff}
+.btn.warn{background:var(--sun);color:#1F2A44}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:0 5px 0 var(--shadow)}
+.btn.small{font-size:16px;padding:6px 12px;border-radius:12px;box-shadow:0 3px 0 var(--shadow)}
+
+.hero{position:relative;background:linear-gradient(#8FD3F4 0 55%, #6DB84A 55% 100%);border:3px solid var(--line);
+  border-radius:24px;overflow:hidden;padding:22px 18px 18px;color:#1F2A44;box-shadow:0 6px 0 var(--shadow)}
+.hero h1{font-size:clamp(34px,8vw,54px);font-weight:800;letter-spacing:-.5px}
+.hero p{font-size:19px;font-weight:600;max-width:32ch;margin-top:4px}
+.hero svg{display:block;width:min(260px,70%);margin:10px 0 0 auto}
+.panel{background:var(--paper);border:3px solid var(--line);border-radius:20px;padding:16px;margin-top:18px}
+.panel h2{font-size:24px;margin-bottom:10px}
+.chips{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+@media (max-width:420px){.chips{grid-template-columns:repeat(4,1fr)}}
+.chip{font:inherit;font-weight:800;font-size:22px;border:3px solid var(--line);border-radius:14px;
+  background:var(--bg);color:var(--ink);padding:6px 0;cursor:pointer;touch-action:manipulation}
+.chip[aria-pressed="true"]{background:var(--sun);color:#1F2A44}
+.presets{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.actions{display:grid;gap:12px;margin-top:18px}
+.note{color:var(--muted);font-size:16px;margin-top:8px}
+.upgrades-info{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:4px}
+.upgrades-info div{background:var(--bg);border-radius:12px;padding:6px 10px;font-size:16px}
+.upgrades-info b{display:block;font-size:17px}
+
+#game.on{display:flex;flex-direction:column;height:100%;max-width:760px;margin:0 auto;padding:10px 10px 8px;gap:8px}
+.hud{display:flex;align-items:center;gap:8px}
+.pill{background:var(--paper);border:3px solid var(--line);border-radius:999px;padding:2px 12px;font-weight:700;font-size:17px;white-space:nowrap}
+.pill b{font-weight:800}
+.hud .grow{flex:1}
+.combo{background:var(--sun);color:#1F2A44;opacity:0;transition:opacity .2s}
+.combo.show{opacity:1}
+.iconbtn{font:inherit;font-size:20px;width:44px;height:44px;border:3px solid var(--line);border-radius:12px;background:var(--paper);color:var(--ink);cursor:pointer;flex:none}
+.ups{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.up{background:var(--paper);border:2px solid var(--line);border-radius:10px;padding:0 8px;font-size:15px;font-weight:700;white-space:nowrap}
+.up i{font-style:normal;letter-spacing:1px;color:var(--tank)}
+.up.pop{animation:pop .5s}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.35);background:var(--sun)}100%{transform:scale(1)}}
+.qbar{background:var(--paper);border:3px solid var(--line);border-radius:18px;text-align:center;padding:4px 10px 6px;position:relative}
+#q{font-size:clamp(40px,10vw,60px);font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums}
+#q .qm{display:inline-block;min-width:1.2em;background:var(--sun);color:#1F2A44;border-radius:12px;padding:0 .15em;border:3px solid var(--line)}
+#q.right .qm{background:var(--green);color:#fff}
+#q.wrong .qm{background:var(--red);color:#fff}
+#fb{font-weight:800;font-size:19px;min-height:1.45em}
+#fb.good{color:var(--green)}
+#fb.bad{color:var(--red)}
+.field{flex:1;min-height:0;position:relative;border:3px solid var(--line);border-radius:20px;overflow:hidden;background:#6DB84A}
+#cv{display:block;width:100%;height:100%;touch-action:manipulation;cursor:crosshair}
+.hint{font-size:14px;color:var(--muted);text-align:center}
+.hint .kb{display:none}
+@media (hover:hover) and (pointer:fine){.hint .kb{display:inline}}
+.pause{position:absolute;inset:0;display:none;place-items:center;background:rgba(10,30,20,.55)}
+.pause.on{display:grid}
+
+.result{text-align:center;padding:20px 16px}
+.stars{font-size:58px;line-height:1;letter-spacing:6px;color:var(--grey)}
+.stars .lit{color:var(--sun);-webkit-text-stroke:2px var(--line)}
+.result h1{font-size:34px;margin-top:6px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
+.stat{border:3px solid var(--line);border-radius:16px;padding:8px 4px;background:var(--bg)}
+.stat b{display:block;font-size:30px;line-height:1.1}
+.stat span{font-size:15px;color:var(--muted)}
+.list{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+.list li{border-left:6px solid var(--grey);padding:4px 10px;background:var(--bg);border-radius:0 10px 10px 0}
+.list li.r{border-color:var(--red)}
+.list li.y{border-color:var(--amber)}
+.list li.g{border-color:var(--green)}
+.fact{font-weight:800;font-variant-numeric:tabular-nums}
+.tip{background:var(--bg);border:2px dashed var(--muted);border-radius:14px;padding:10px 12px;margin-top:10px}
+.tip b{font-weight:800}
+.bars{display:grid;gap:6px}
+.bar{display:grid;grid-template-columns:72px 1fr 46px;align-items:center;gap:8px;font-weight:700;font-size:16px}
+.track{height:18px;border:2px solid var(--line);border-radius:999px;overflow:hidden;background:var(--bg)}
+.track i{display:block;height:100%}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.heat{display:grid;grid-template-columns:repeat(13,minmax(26px,1fr));gap:3px;min-width:380px;font-variant-numeric:tabular-nums}
+.heat div{aspect-ratio:1;display:grid;place-items:center;font-size:13px;font-weight:700;border-radius:6px}
+.heat .h{background:transparent;font-size:15px;font-weight:800}
+.heat .c0{background:var(--grey);color:var(--muted)}
+.heat .c1{background:var(--red);color:#fff}
+.heat .c2{background:var(--amber);color:#1F2A44}
+.heat .c3{background:var(--green);color:#fff}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:15px;margin-top:10px}
+.legend span::before{content:"";display:inline-block;width:14px;height:14px;border-radius:4px;margin-right:6px;vertical-align:-2px;background:var(--c)}
+.row{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.row .btn{flex:1 1 200px}
+.sessions{font-size:16px}
+.sessions li{display:flex;justify-content:space-between;gap:8px}
+.back{margin-bottom:12px}
+@media (prefers-reduced-motion: reduce){.btn{transition:none}.up.pop{animation:none}}
+</style>
+</head>
+<body>
+
+<section id="menu" class="screen on">
+  <div class="page">
+    <div class="hero">
+      <h1>Times Table Tanks</h1>
+      <p>Blast the monster tank carrying the right answer, and upgrade your tank with every hit!</p>
+      <svg viewBox="0 0 260 120" aria-hidden="true">
+        <rect x="30" y="70" width="200" height="34" rx="17" fill="#2E3440" stroke="#1F2A44" stroke-width="4"/>
+        <g fill="#8A95A8"><circle cx="55" cy="87" r="9"/><circle cx="90" cy="87" r="9"/><circle cx="125" cy="87" r="9"/><circle cx="160" cy="87" r="9"/><circle cx="195" cy="87" r="9"/></g>
+        <rect x="45" y="44" width="170" height="34" rx="12" fill="#3BAA3F" stroke="#1F2A44" stroke-width="4"/>
+        <rect x="140" y="18" width="110" height="12" rx="5" fill="#23752A" stroke="#1F2A44" stroke-width="4"/>
+        <rect x="140" y="34" width="110" height="12" rx="5" fill="#23752A" stroke="#1F2A44" stroke-width="4"/>
+        <rect x="95" y="14" width="70" height="38" rx="18" fill="#5CC95F" stroke="#1F2A44" stroke-width="4"/>
+        <text x="130" y="42" font-family="Baloo 2, sans-serif" font-weight="800" font-size="24" fill="#FFC93C" text-anchor="middle" stroke="#1F2A44" stroke-width="1">×</text>
+      </svg>
+    </div>
+
+    <div class="panel">
+      <h2>Choose your times tables</h2>
+      <div class="chips" id="chips"></div>
+      <div class="presets">
+        <button class="btn small" data-set="all">All</button>
+        <button class="btn small" data-set="easy">Easy: 1, 2, 5, 10</button>
+        <button class="btn small" data-set="mid">Medium: 3, 4, 6, 11</button>
+        <button class="btn small" data-set="hard">Hard: 7, 8, 9, 12</button>
+      </div>
+      <div class="actions">
+        <button class="btn primary" id="startBattle">Start battle (20 questions)</button>
+        <button class="btn warn" id="startWeak">Practise weak spots</button>
+        <button class="btn" id="openParent">Progress report</button>
+      </div>
+      <p class="note" id="menuNote"></p>
+    </div>
+
+    <div class="panel">
+      <h2>Every monster you blast upgrades your tank</h2>
+      <div class="upgrades-info">
+        <div><b>🔫 Guns</b>Up to 3 cannons firing at once</div>
+        <div><b>⚡ Speed</b>Your tank drives faster</div>
+        <div><b>🚀 Fire rate</b>Shells fly faster</div>
+        <div><b>💥 Power</b>Bigger blasts. Max power wipes out every monster on screen!</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="game" class="screen" aria-label="Battle">
+  <div class="hud">
+    <button class="iconbtn" id="quit" aria-label="End battle">✕</button>
+    <div class="pill">Q <b id="qn">1</b>/<span id="qt">20</span></div>
+    <div class="pill">Score <b id="score">0</b></div>
+    <div class="grow"></div>
+    <div class="pill combo" id="combo">Combo x2</div>
+    <button class="iconbtn" id="mute" aria-label="Mute">🔊</button>
+  </div>
+  <div class="ups" id="ups"></div>
+  <div class="qbar">
+    <div id="q" aria-live="polite"></div>
+    <div id="fb" aria-live="polite"></div>
+  </div>
+  <div class="field" id="wrap">
+    <canvas id="cv" aria-label="Battlefield. Tap the tank with the right answer."></canvas>
+    <div class="pause" id="pauseBox"><button class="btn primary" id="resume">Keep playing</button></div>
+  </div>
+  <p class="hint">Tap the monster tank with the right answer to fire.<span class="kb"> Keyboard: keys 1 to 4, or arrow keys then Space.</span></p>
+</section>
+
+<section id="report" class="screen"><div class="page" id="reportBody"></div></section>
+<section id="parent" class="screen"><div class="page" id="parentBody"></div></section>
+
+<script>
+(function(){
+"use strict";
+const $ = s => document.querySelector(s);
+const TOTAL_Q = 20, WEAK_Q = 12, SLOW = 5000;
+const STORE_KEY = "xtcc-progress-v1";
+const reduceMotion = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const TIPS = {
+  1:"Anything times 1 stays the same: 1 × 9 = 9.",
+  2:"Times 2 means double it: 2 × 8 = 8 + 8 = 16.",
+  3:"Times 3 = double it, then add one more: 3 × 7 = 14 + 7 = 21.",
+  4:"Times 4 = double, then double again: 4 × 6 → 12 → 24.",
+  5:"Times 5 always ends in 0 or 5, and it's half of times 10: 5 × 8 = 80 ÷ 2 = 40.",
+  6:"Times 6 = times 5, plus one more: 6 × 7 = 35 + 7 = 42.",
+  7:"Times 7 = times 5 plus times 2: 7 × 6 = 30 + 12 = 42. Magic count \"5, 6, 7, 8\": 56 = 7 × 8.",
+  8:"Times 8 = double three times: 8 × 6 → 12 → 24 → 48.",
+  9:"Times 9 = times 10, minus one: 9 × 7 = 70 − 7 = 63. The digits always add up to 9 (6 + 3 = 9). The finger trick works too.",
+  10:"Times 10: just put a 0 on the end: 10 × 7 = 70.",
+  11:"From 1 to 9, just repeat the digit: 11 × 4 = 44. Remember 11 × 10 = 110, 11 × 11 = 121, 11 × 12 = 132.",
+  12:"Times 12 = times 10 plus times 2: 12 × 7 = 70 + 14 = 84."
+};
+
+/* upgrades */
+const UPS = [
+  {key:"guns",  icon:"🔫", name:"Guns",      max:3, msg:"MORE GUNS!"},
+  {key:"speed", icon:"⚡", name:"Speed",     max:5, msg:"SPEED UP!"},
+  {key:"rate",  icon:"🚀", name:"Fire rate", max:5, msg:"FASTER SHELLS!"},
+  {key:"power", icon:"💥", name:"Power",     max:5, msg:"MORE POWER!"}
+];
+
+/* storage */
+function blank(){ return {v:1, updatedAt:0, facts:{}, sessions:[]}; }
+function loadLocal(){
+  try{ const s = localStorage.getItem(STORE_KEY); if(s){ const p = JSON.parse(s); if(p && p.facts) return p; } }catch(e){}
+  return blank();
+}
+let progress = loadLocal();
+let cloudRef = null, cloudChain = Promise.resolve();
+function saveProgress(){
+  progress.updatedAt = Date.now();
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(progress)); }catch(e){}
+  cloudSave();
+}
+function cloudSave(){
+  if(!cloudRef) return;
+  const data = JSON.parse(JSON.stringify(progress));
+  cloudChain = cloudChain.then(() => cloudRef.set(data)).catch(() => {});
+}
+(async function initCloud(){
+  try{
+    if(!window.claude || typeof window.claude.use !== "function") return;
+    const [db, user] = await Promise.all([window.claude.use("db"), window.claude.use("user")]);
+    if(!db || !user) return;
+    const uid = await user.id();
+    if(!uid) return;
+    const ref = db.doc("data/users/" + uid + "/progress");
+    const snap = await ref.get();
+    const remote = snap.exists ? snap.data() : null;
+    if(remote && remote.facts && (remote.updatedAt||0) > (progress.updatedAt||0)){
+      progress = JSON.parse(JSON.stringify(remote));
+      try{ localStorage.setItem(STORE_KEY, JSON.stringify(progress)); }catch(e){}
+      refreshMenu();
+    }
+    cloudRef = ref;
+    if((progress.updatedAt||0) > ((remote && remote.updatedAt)||0)) cloudSave();
+  }catch(e){}
+})();
+
+function record(a,b,ok,ms){
+  const k = a + "x" + b;
+  const f = progress.facts[k] || (progress.facts[k] = {n:0, c:0, ms:0, h:[]});
+  f.n++;
+  if(ok){ f.c++; f.ms += Math.round(ms); }
+  f.h.push(ok ? Math.round(Math.min(ms, 99999)) : -1);
+  if(f.h.length > 5) f.h.shift();
+}
+function mastery(k){
+  const f = progress.facts[k];
+  if(!f || !f.h.length) return 0;
+  if(f.h[f.h.length-1] < 0) return 1;
+  const rec = f.h.slice(-3);
+  if(rec.some(x => x < 0)) return 2;
+  const avg = rec.reduce((s,x)=>s+x,0) / rec.length;
+  return avg > SLOW ? 2 : 3;
+}
+function tableScores(){
+  const out = [];
+  for(let t=1;t<=12;t++){
+    const keys = new Set();
+    for(let x=1;x<=12;x++){ keys.add(t+"x"+x); keys.add(x+"x"+t); }
+    let s=0, n=0;
+    keys.forEach(k => { const m = mastery(k); if(m){ n++; s += m===3 ? 1 : m===2 ? .5 : 0; } });
+    out.push({t, n, score: n ? s/n : null});
+  }
+  return out;
+}
+function weakList(){
+  const list = [];
+  for(const k in progress.facts){
+    const m = mastery(k);
+    if(m === 1) list.push({k, w:3});
+    else if(m === 2) list.push({k, w:2});
+  }
+  return list;
+}
+
+const rand = (a,b) => a + Math.floor(Math.random()*(b-a+1));
+function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+function fmtS(ms){ return (ms/1000).toFixed(1) + "s"; }
+
+/* menu */
+let selected = new Set([1,2,3,4,5,6,7,8,9,10,11,12]);
+const chipsEl = $("#chips");
+for(let t=1;t<=12;t++){
+  const b = document.createElement("button");
+  b.className = "chip"; b.textContent = t; b.dataset.t = t;
+  b.setAttribute("aria-label", t + " times table");
+  b.addEventListener("click", () => { selected.has(t) ? selected.delete(t) : selected.add(t); refreshMenu(); });
+  chipsEl.appendChild(b);
+}
+const PRESETS = {all:[1,2,3,4,5,6,7,8,9,10,11,12], easy:[1,2,5,10], mid:[3,4,6,11], hard:[7,8,9,12]};
+document.querySelectorAll("[data-set]").forEach(b => b.addEventListener("click", () => {
+  selected = new Set(PRESETS[b.dataset.set]); refreshMenu();
+}));
+function refreshMenu(){
+  chipsEl.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-pressed", selected.has(+c.dataset.t)));
+  $("#startBattle").disabled = selected.size === 0;
+  const weak = weakList();
+  const wb = $("#startWeak");
+  wb.disabled = weak.length === 0;
+  wb.textContent = weak.length ? "Practise weak spots (" + weak.length + " facts)" : "Practise weak spots";
+  const n = progress.sessions.length;
+  $("#menuNote").textContent = selected.size === 0 ? "Pick at least one times table to start."
+    : !n ? "The first battle finds out which facts need work. Weak-spot practice unlocks after it."
+    : weak.length ? n + " battles played. " + weak.length + " facts need more practice."
+    : n + " battles played. No weak facts right now. Great job!";
+}
+$("#startBattle").addEventListener("click", () => startGame("battle"));
+$("#startWeak").addEventListener("click", () => startGame("weak"));
+$("#openParent").addEventListener("click", () => { renderParent(); show("parent"); });
+
+function show(id){
+  document.querySelectorAll(".screen").forEach(s => s.classList.toggle("on", s.id === id));
+  document.body.classList.toggle("playing", id === "game");
+  state.screen = id;
+  if(id === "game") requestAnimationFrame(resize);
+  else window.scrollTo(0,0);
+  if(id === "menu") refreshMenu();
+}
+
+/* questions */
+function battleQuestions(){
+  const tables = [...selected];
+  const out = [], recent = [];
+  let bag = [];
+  for(let i=0;i<TOTAL_Q;i++){
+    if(!bag.length) bag = shuffle(tables.slice());
+    const t = bag.pop();
+    let a, b, tries = 0;
+    do{
+      const x = Math.random() < .08 ? 1 : rand(2,12);
+      if(Math.random() < .5){ a=t; b=x; } else { a=x; b=t; }
+      tries++;
+    }while(recent.includes(a+"x"+b) && tries < 20);
+    recent.push(a+"x"+b); if(recent.length > 8) recent.shift();
+    out.push({a, b});
+  }
+  return out;
+}
+function weakQuestions(){
+  let pool = weakList();
+  const keys = new Set(pool.map(p => p.k));
+  pool.slice().forEach(p => {
+    const [a,b] = p.k.split("x");
+    const rk = b+"x"+a;
+    if(!keys.has(rk)){ pool.push({k:rk, w:1}); keys.add(rk); }
+  });
+  if(pool.length < 6){
+    const hard = [6,7,8,9,12];
+    while(pool.length < 6){
+      const k = hard[rand(0,4)] + "x" + rand(2,12);
+      if(!keys.has(k)){ pool.push({k, w:1}); keys.add(k); }
+    }
+  }
+  const out = [];
+  let prev = "";
+  for(let i=0;i<WEAK_Q;i++){
+    const total = pool.reduce((s,p)=>s+p.w,0);
+    let pick, tries = 0;
+    do{
+      let r = Math.random()*total;
+      pick = pool[0];
+      for(const p of pool){ r -= p.w; if(r <= 0){ pick = p; break; } }
+      tries++;
+    }while(pick.k === prev && tries < 10);
+    prev = pick.k;
+    const [a,b] = pick.k.split("x").map(Number);
+    out.push({a,b});
+  }
+  return out;
+}
+function productOptions(a,b){
+  const ans = a*b;
+  const near = shuffle([(a-1)*b, (a+1)*b, a*(b-1), a*(b+1)]);
+  const swapped = ans >= 10 && ans < 100 ? +String(ans).split("").reverse().join("") : -1;
+  const other = shuffle([ans+1, ans-1, ans+2, ans-2, ans+10, ans-10, swapped, a+b]);
+  const opts = [];
+  const add = v => { if(v > 0 && v !== ans && !opts.includes(v) && opts.length < 3) opts.push(v); };
+  near.slice(0,2).forEach(add);
+  other.forEach(add);
+  near.forEach(add);
+  while(opts.length < 3) add(ans + rand(-12, 12));
+  return shuffle([ans, ...opts]);
+}
+function missingOptions(b){
+  const opts = [];
+  const cand = shuffle([b-1, b+1, b-2, b+2, b+3, b-3]);
+  for(const v of cand){ if(v >= 1 && v <= 12 && !opts.includes(v) && opts.length < 3) opts.push(v); }
+  while(opts.length < 3){ const v = rand(1,12); if(v !== b && !opts.includes(v)) opts.push(v); }
+  return shuffle([b, ...opts]);
+}
+
+/* game state */
+const state = {
+  screen:"menu", mode:"battle", questions:[], qi:0, score:0, combo:0, bestCombo:0,
+  results:[], cur:null, phase:"idle", paused:false,
+  enemies:[], player:{x:0, lane:1, recoil:0}, pendingShot:null,
+  shells:[], parts:[], floats:[], shake:0, wave:{t:0, dur:12},
+  up:{guns:1, speed:1, rate:1, power:1}, upCount:0, banner:null, kills:0
+};
+
+function renderUps(popKey){
+  $("#ups").innerHTML = UPS.map(u => {
+    const lv = state.up[u.key];
+    const dots = "●".repeat(lv) + "○".repeat(u.max - lv);
+    return "<span class='up" + (u.key === popKey ? " pop" : "") + "' title='" + u.name + " level " + lv + "'>" + u.icon + " <i>" + dots + "</i></span>";
+  }).join("");
+}
+function grantUpgrade(){
+  const open = UPS.filter(u => state.up[u.key] < u.max);
+  if(!open.length){
+    state.banner = {text:"MAX TANK! +50", life:1.4};
+    state.score += 50;
+    return;
+  }
+  // favour guns early so the change is visible fast
+  let u = open[rand(0, open.length-1)];
+  if(state.upCount === 0) u = UPS[0];
+  state.up[u.key]++;
+  state.upCount++;
+  state.banner = {text:u.icon + " " + u.msg, life:1.4};
+  renderUps(u.key);
+  sfx.power();
+}
+
+function startGame(mode){
+  audio();
+  state.mode = mode;
+  state.questions = mode === "weak" ? weakQuestions() : battleQuestions();
+  state.qi = 0; state.score = 0; state.combo = 0; state.bestCombo = 0; state.results = [];
+  state.shells = []; state.parts = []; state.floats = []; state.banner = null; state.kills = 0;
+  state.up = {guns:1, speed:1, rate:1, power:1}; state.upCount = 0;
+  state.paused = false; $("#pauseBox").classList.remove("on");
+  $("#qt").textContent = state.questions.length;
+  renderUps();
+  show("game");
+  requestAnimationFrame(() => { resize(); state.player.x = laneX(1); state.player.lane = 1; setupWave(); });
+}
+function waveDuration(){
+  const base = state.mode === "weak" ? 13 : 12;
+  if(state.combo >= 8) return base - 3.5;
+  if(state.combo >= 4) return base - 2;
+  return base;
+}
+function setupWave(){
+  const q = state.questions[state.qi];
+  const type = (state.qi >= 2 && Math.random() < .25) ? "missing" : "product";
+  const answer = type === "product" ? q.a*q.b : q.b;
+  const options = type === "product" ? productOptions(q.a,q.b) : missingOptions(q.b);
+  state.cur = {a:q.a, b:q.b, type, answer, options};
+  state.enemies = options.map((v,i) => ({lane:i, value:v, correct:v===answer, alive:true, flash:0, reveal:false, wob:Math.random()*6, y:-200}));
+  state.wave = {t:0, dur:waveDuration()};
+  state.pendingShot = null;
+  state.phase = "aim";
+  renderQuestion();
+  $("#fb").textContent = ""; $("#fb").className = "";
+  $("#qn").textContent = state.qi + 1;
+  $("#score").textContent = state.score;
+}
+function renderQuestion(done){
+  const c = state.cur, el = $("#q");
+  el.className = done || "";
+  const shown = done ? c.answer : "?";
+  if(c.type === "product") el.innerHTML = c.a + " × " + c.b + " = <span class='qm'>" + shown + "</span>";
+  else el.innerHTML = c.a + " × <span class='qm'>" + shown + "</span> = " + (c.a*c.b);
+}
+
+function fire(lane){
+  if(state.screen !== "game" || state.phase !== "aim" || state.paused) return;
+  lane = clamp(lane, 0, 3);
+  state.phase = "fire";
+  state.answerMs = state.wave.t * 1000;
+  state.player.lane = lane;
+  state.pendingShot = lane;
+}
+function resolve(ok, chosen, timeout){
+  state.phase = "resolve";
+  const c = state.cur, ms = timeout ? state.wave.dur*1000 : state.answerMs;
+  record(c.a, c.b, ok, ms);
+  state.results.push({a:c.a, b:c.b, type:c.type, ok, ms, chosen, timeout:!!timeout, answer:c.answer});
+  const fb = $("#fb");
+  if(ok){
+    state.combo++; state.bestCombo = Math.max(state.bestCombo, state.combo);
+    state.kills++;
+    const mult = 1 + Math.floor(state.combo/3)*0.5;
+    const pts = Math.round((100 + Math.max(0, 100 - ms/100)) * mult);
+    state.score += pts;
+    const e = state.enemies.find(e=>e.correct);
+    state.floats.push({x:laneX(e.lane), y:e.y, text:"+"+pts, life:1});
+    const praise = ["Direct hit!","Great shot!","Awesome!","Spot on!","Sharpshooter!","Boom!"];
+    fb.textContent = state.combo >= 3 ? "Combo " + state.combo + "! " + praise[rand(0,praise.length-1)] : praise[rand(0,praise.length-1)];
+    fb.className = "good";
+    renderQuestion("right");
+    sfx.good();
+    grantUpgrade();
+  }else{
+    state.combo = 0;
+    const full = c.a + " × " + c.b + " = " + (c.a*c.b);
+    fb.textContent = (timeout ? "Time's up! " : "Missed! ") + "Remember: " + full;
+    fb.className = "bad";
+    renderQuestion("wrong");
+    state.enemies.forEach(e => { if(e.correct) e.reveal = true; });
+    sfx.bad();
+  }
+  $("#score").textContent = state.score;
+  const cb = $("#combo");
+  cb.textContent = "Combo x" + state.combo;
+  cb.classList.toggle("show", state.combo >= 2);
+  setTimeout(() => {
+    if(state.screen !== "game") return;
+    if(!ok){ const e = state.enemies.find(e=>e.correct); if(e && e.alive) explode(e, true); }
+    setTimeout(nextWave, ok ? 250 : 650);
+  }, ok ? 800 : 1500);
+}
+function nextWave(){
+  if(state.screen !== "game") return;
+  state.qi++;
+  if(state.qi >= state.questions.length) endGame();
+  else setupWave();
+}
+function timeout(){
+  state.phase = "resolve";
+  state.shake = reduceMotion ? 0 : 6;
+  burst(state.player.x, playerY - th*0.2, "#9AA3B2", 14, .8);
+  resolve(false, null, true);
+}
+$("#quit").addEventListener("click", () => {
+  if(state.results.length >= 5) endGame();
+  else { state.phase = "idle"; show("menu"); }
+});
+$("#resume").addEventListener("click", () => { state.paused = false; $("#pauseBox").classList.remove("on"); });
+document.addEventListener("visibilitychange", () => {
+  if(document.hidden && state.screen === "game" && state.phase !== "idle"){ state.paused = true; $("#pauseBox").classList.add("on"); }
+});
+
+/* sound */
+let actx = null, muted = false;
+function audio(){
+  if(!actx){ try{ actx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){ actx = null; } }
+  if(actx && actx.state === "suspended") actx.resume();
+  return actx;
+}
+function tone(f, dur, type, vol, f2, delay){
+  const a = audio(); if(!a || muted) return;
+  const t0 = a.currentTime + (delay||0);
+  const o = a.createOscillator(), g = a.createGain();
+  o.type = type || "square"; o.frequency.setValueAtTime(f, t0);
+  if(f2) o.frequency.exponentialRampToValueAtTime(f2, t0 + dur);
+  g.gain.setValueAtTime(vol || .08, t0); g.gain.exponentialRampToValueAtTime(.0001, t0 + dur);
+  o.connect(g).connect(a.destination); o.start(t0); o.stop(t0 + dur + .02);
+}
+function noise(dur, vol, freq){
+  const a = audio(); if(!a || muted) return;
+  const len = Math.floor(a.sampleRate * dur), buf = a.createBuffer(1, len, a.sampleRate), d = buf.getChannelData(0);
+  for(let i=0;i<len;i++) d[i] = (Math.random()*2-1) * (1 - i/len);
+  const s = a.createBufferSource(), f = a.createBiquadFilter(), g = a.createGain();
+  s.buffer = buf; f.type = "lowpass"; f.frequency.value = freq; g.gain.value = vol;
+  s.connect(f).connect(g).connect(a.destination); s.start();
+}
+const sfx = {
+  shot(){ noise(.14, .3, 2200); tone(180, .12, "square", .05, 80); },
+  boom(p){ noise(.5 + p*.08, .4 + p*.04, 500 + p*60); tone(110, .5, "sine", .25, 35); },
+  clang(){ tone(1250, .18, "square", .05); tone(1870, .14, "triangle", .06); },
+  good(){ tone(660, .1, "triangle", .08, null, 0); tone(880, .1, "triangle", .08, null, .09); tone(1180, .16, "triangle", .08, null, .18); },
+  power(){ tone(400, .25, "square", .05, 1200, .25); tone(1200, .15, "triangle", .06, null, .5); },
+  bad(){ tone(260, .3, "sawtooth", .04, 150); }
+};
+$("#mute").addEventListener("click", () => {
+  muted = !muted; $("#mute").textContent = muted ? "🔇" : "🔊";
+  $("#mute").setAttribute("aria-label", muted ? "Unmute" : "Mute");
+});
+
+/* canvas */
+const cv = $("#cv"), ctx = cv.getContext("2d"), wrap = $("#wrap");
+let W = 300, H = 400, laneW = 75, tw = 60, th = 54, playerY = 350, dangerY = 250, startY = 40, deco = [];
+function laneX(i){ return laneW * (i + .5); }
+function resize(){
+  const r = wrap.getBoundingClientRect();
+  if(!r.width || !r.height) return;
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = Math.round(r.width * dpr); cv.height = Math.round(r.height * dpr);
+  W = r.width; H = r.height;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  laneW = W / 4;
+  tw = Math.min(laneW * .8, 118, H * .19);
+  th = tw * .9;
+  playerY = H - th * .62 - 8;
+  dangerY = playerY - th * 1.45;
+  startY = th * .7;
+  deco = [];
+  let seed = 7;
+  const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+  for(let i=0;i<14;i++) deco.push({x:rnd()*W, y:rnd()*(dangerY), r:6+rnd()*14, type:rnd() < .5 ? "bush" : "crater"});
+  state.player.x = laneX(state.player.lane);
+}
+window.addEventListener("resize", () => { if(state.screen === "game") resize(); });
+
+cv.addEventListener("pointerdown", ev => {
+  audio();
+  const r = cv.getBoundingClientRect();
+  fire(Math.floor((ev.clientX - r.left) / (r.width / 4)));
+});
+document.addEventListener("keydown", ev => {
+  if(state.screen !== "game") return;
+  if(["1","2","3","4"].includes(ev.key)){ fire(+ev.key - 1); ev.preventDefault(); }
+  else if(ev.key === "ArrowLeft" && state.phase === "aim"){ state.player.lane = clamp(state.player.lane-1,0,3); ev.preventDefault(); }
+  else if(ev.key === "ArrowRight" && state.phase === "aim"){ state.player.lane = clamp(state.player.lane+1,0,3); ev.preventDefault(); }
+  else if(ev.key === " " || ev.key === "Enter"){ if(document.activeElement && document.activeElement.tagName === "BUTTON") return; fire(state.player.lane); ev.preventDefault(); }
+});
+
+function rr(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+const INK = "#1F2A44";
+function gunOffsets(n){ return n === 1 ? [0] : n === 2 ? [-.13, .13] : [-.2, 0, .2]; }
+
+function drawTreadsHull(w, h, lw, body, opts){
+  for(const s of [-1,1]){
+    ctx.fillStyle = "#2E3440"; rr(s > 0 ? w*.26 : -w*.5, -h*.5, w*.24, h, w*.08); ctx.fill(); ctx.stroke();
+    ctx.strokeStyle = "#566074"; ctx.lineWidth = lw*.7;
+    const step = h/5, off = (((opts.treadOff || 0) % step) + step) % step;
+    for(let k=-1;k<6;k++){ const yy = -h*.5 + off + k*step; if(yy > -h*.48 && yy < h*.48){ ctx.beginPath(); ctx.moveTo(s>0?w*.29:-w*.47, yy); ctx.lineTo(s>0?w*.47:-w*.29, yy); ctx.stroke(); } }
+    ctx.strokeStyle = INK; ctx.lineWidth = lw;
+  }
+  ctx.fillStyle = body; rr(-w*.34, -h*.42, w*.68, h*.84, w*.1); ctx.fill(); ctx.stroke();
+}
+
+function drawPlayer(x, y){
+  const P = state.player, U = state.up;
+  const w = tw, h = th, lw = Math.max(2.5, w/30);
+  ctx.save(); ctx.translate(x, y);
+  ctx.lineWidth = lw; ctx.strokeStyle = INK; ctx.lineJoin = "round";
+  ctx.fillStyle = "rgba(0,0,0,.18)"; ctx.beginPath(); ctx.ellipse(0, h*.5, w*.5, h*.12, 0, 0, Math.PI*2); ctx.fill();
+  // power aura
+  if(U.power >= 3){
+    const p = .5 + .5*Math.sin(performance.now()/160);
+    ctx.save(); ctx.globalAlpha = .18 + .12*p + (U.power-3)*.06;
+    ctx.fillStyle = U.power >= 5 ? "#FF5A2F" : "#FFC93C";
+    ctx.beginPath(); ctx.arc(0, 0, w*(.62 + .05*p), 0, Math.PI*2); ctx.fill(); ctx.restore();
+  }
+  // barrels
+  const bl = h*.5 + w*.3 - (P.recoil||0)*w*.12;
+  gunOffsets(U.guns).forEach(o => {
+    ctx.fillStyle = "#23752A"; rr(o*w - w*.06, -bl, w*.12, bl, 3); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = "#1F2A44"; rr(o*w - w*.075, -bl, w*.15, w*.07, 2); ctx.fill();
+  });
+  drawTreadsHull(w, h, lw, "#3BAA3F", P);
+  // turret
+  ctx.fillStyle = "#5CC95F"; ctx.beginPath(); ctx.arc(0, 0, w*.2, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = "#FFC93C"; star(0, 0, w*.1, w*.045); ctx.fill();
+  // speed stripes
+  if(U.speed >= 2){
+    ctx.fillStyle = "#FFC93C";
+    for(let i=0;i<Math.min(U.speed-1,4);i++){ rr(-w*.3 + i*w*.045, h*.2, w*.025, h*.16, 2); ctx.fill(); }
+  }
+  ctx.restore();
+}
+
+function drawEnemy(e){
+  const w = tw, h = th, lw = Math.max(2.5, w/30);
+  const sx = e.flash > 0 ? (Math.random()-.5)*6 : 0;
+  const x = laneX(e.lane) + sx + Math.sin(performance.now()/300 + e.wob)*1.5, y = e.y;
+  ctx.save(); ctx.translate(x, y);
+  ctx.lineWidth = lw; ctx.strokeStyle = INK; ctx.lineJoin = "round";
+  ctx.fillStyle = "rgba(0,0,0,.18)"; ctx.beginPath(); ctx.ellipse(0, h*.5, w*.5, h*.12, 0, 0, Math.PI*2); ctx.fill();
+  // barrel pointing down
+  const bl = h*.5 + w*.26;
+  ctx.fillStyle = "#A92F25"; rr(-w*.07, 0, w*.14, bl, 3); ctx.fill(); ctx.stroke();
+  drawTreadsHull(w, h, lw, "#E5483B", {treadOff: state.phase === "aim" ? -performance.now()/40 : 0});
+  if(e.flash > 0){ ctx.fillStyle = "rgba(255,255,255," + e.flash + ")"; rr(-w*.34, -h*.42, w*.68, h*.84, w*.1); ctx.fill(); }
+  // monster horns
+  ctx.fillStyle = "#FFF6D6";
+  for(const s of [-1,1]){ ctx.beginPath(); ctx.moveTo(s*w*.22, -h*.4); ctx.lineTo(s*w*.3, -h*.62); ctx.lineTo(s*w*.1, -h*.42); ctx.closePath(); ctx.fill(); ctx.stroke(); }
+  // plate
+  const pw = w*.62, ph = h*.46, py = -h*.12;
+  if(e.reveal){
+    const p = .5 + .5*Math.sin(performance.now()/120);
+    ctx.save(); ctx.strokeStyle = "#37A047"; ctx.lineWidth = lw*2 + p*3;
+    rr(-pw/2-6, py-ph/2-6, pw+12, ph+12, 12); ctx.stroke(); ctx.restore();
+  }
+  ctx.fillStyle = "#FFF6D6"; rr(-pw/2, py-ph/2, pw, ph, 10); ctx.fill(); ctx.stroke();
+  const txt = String(e.value);
+  const fs = Math.min(ph*.9, pw / (txt.length*.58 + .2));
+  ctx.fillStyle = INK; ctx.font = "800 " + fs + "px 'Baloo 2','Trebuchet MS',sans-serif";
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.fillText(txt, 0, py + fs*.08);
+  // angry eyes
+  const ey = h*.27, er = w*.075;
+  for(const s of [-1,1]){
+    ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(s*w*.14, ey, er, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = INK; ctx.beginPath(); ctx.arc(s*w*.14 - s*er*.15, ey + er*.25, er*.45, 0, Math.PI*2); ctx.fill();
+    ctx.lineWidth = lw*1.2; ctx.beginPath(); ctx.moveTo(s*w*.23, ey - er*1.2); ctx.lineTo(s*w*.06, ey - er*.5); ctx.stroke(); ctx.lineWidth = lw;
+  }
+  ctx.restore();
+}
+function star(cx, cy, R, r){
+  ctx.beginPath();
+  for(let i=0;i<10;i++){ const a = -Math.PI/2 + i*Math.PI/5, rad = i%2 ? r : R; ctx.lineTo(cx + Math.cos(a)*rad, cy + Math.sin(a)*rad); }
+  ctx.closePath();
+}
+function burst(x, y, color, n, scale){
+  for(let i=0;i<n;i++){
+    const a = Math.random()*Math.PI*2, sp = (60 + Math.random()*260) * (scale||1);
+    state.parts.push({x, y, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp, r:3+Math.random()*6*(scale||1), life:1, decay:1.2+Math.random(), color});
+  }
+}
+function explode(e, quiet){
+  if(!e.alive) return;
+  e.alive = false;
+  const p = quiet ? 1 : state.up.power;
+  const sc = 1 + (p-1)*.35;
+  const x = laneX(e.lane), y = e.y;
+  burst(x, y, "#FFC93C", Math.round(16*sc), sc); burst(x, y, "#FF7A2F", Math.round(12*sc), .9*sc); burst(x, y, "#6B7385", Math.round(8*sc), .6*sc);
+  if(p >= 3){ for(let i=0;i<6+p*2;i++){ const a = Math.random()*Math.PI*2, sp = 200 + Math.random()*300*sc; state.parts.push({x, y, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp, r:4, life:1, decay:.9, color:"#A92F25", chunk:true}); } }
+  state.parts.push({x, y, vx:0, vy:0, r:tw*.3, life:1, decay:2.4 - p*.2, color:"#FFF3B0", ring:true, grow:.9*sc});
+  if(!reduceMotion) state.shake = quiet ? 4 : 6 + p*2;
+  sfx.boom(p);
+}
+function megaBlast(){
+  const others = state.enemies.filter(e => e.alive && !e.correct);
+  others.forEach((e, i) => setTimeout(() => { if(state.screen === "game") explode(e); }, 140 + i*130));
+  if(others.length) state.banner = {text:"💥 MEGA BLAST!", life:1.4};
+}
+
+function update(dt){
+  const P = state.player, U = state.up;
+  if(state.phase === "aim" || state.phase === "fire"){
+    state.wave.t += dt;
+    if(state.phase === "aim" && state.wave.t >= state.wave.dur){ timeout(); }
+  }
+  const prog = clamp(state.wave.t / state.wave.dur, 0, 1);
+  const enter = clamp(state.wave.t / .45, 0, 1);
+  state.enemies.forEach(e => {
+    e.y = startY + (dangerY - startY) * prog - (1 - enter*(2-enter)) * th * 1.6;
+    e.flash = Math.max(0, e.flash - dt*2.5);
+  });
+  const tx = laneX(P.lane);
+  const dx = tx - P.x;
+  P.x += dx * Math.min(1, dt*(8 + U.speed*5));
+  const moving = Math.abs(dx) > 1;
+  P.treadOff = (P.treadOff || 0) + (moving ? -Math.sign(dx)*dt*(40 + U.speed*20) : 0);
+  if(moving && U.speed >= 3 && Math.random() < .6) state.parts.push({x:P.x - Math.sign(dx)*tw*.5, y:playerY + th*.35, vx:-Math.sign(dx)*60, vy:-20, r:4, life:.8, decay:2, color:"#C9C2B0"});
+  P.recoil = Math.max(0, P.recoil - dt*4);
+  if(state.pendingShot !== null && Math.abs(tx - P.x) < 4 + U.speed){
+    const speed = Math.max(600, H*1.6) * (1 + (U.rate-1)*.35);
+    const sy = playerY - th*.9;
+    const target = state.enemies[state.pendingShot];
+    const ty = target ? target.y + th*.45 : 0;
+    const time = Math.max(.05, (sy - ty) / speed);
+    gunOffsets(U.guns).forEach(o => {
+      const x0 = tx + o*tw;
+      state.shells.push({x:x0, y:sy, vy:-speed, vx:(tx - x0)/time, lane:state.pendingShot, hit:false, life:1});
+      burst(x0, sy - 4, "#E8E2D0", 4, .35);
+    });
+    state.pendingShot = null; P.recoil = 1;
+    sfx.shot();
+  }
+  state.shells.forEach(s => {
+    s.x += s.vx*dt; s.y += s.vy*dt;
+    if(s.hit){ s.vy += 1400*dt; s.life -= dt*1.4; return; }
+    const e = state.enemies[s.lane];
+    if(e && s.y <= e.y + th*.45){
+      s.hit = true;
+      if(!e.alive){ s.life = 0; burst(s.x, s.y, "#FFC93C", 5, .5); return; }
+      if(state.phase !== "fire"){ s.vy = 260; s.vx = (Math.random()-.5)*420; return; }
+      if(e.correct){
+        s.life = 0; explode(e);
+        resolve(true, e.value);
+        if(state.up.power >= 5) megaBlast();
+      }else{
+        e.flash = 1; s.vy = 260; s.vx = (Math.random()-.5)*420;
+        burst(s.x, s.y, "#FFFFFF", 8, .5);
+        sfx.clang();
+        resolve(false, e.value);
+      }
+    }
+    if(s.y < -40) s.life = 0;
+  });
+  state.shells = state.shells.filter(s => s.life > 0 && s.y < H + 40);
+  state.parts.forEach(p => { p.x += p.vx*dt; p.y += p.vy*dt; p.vx *= .92; p.vy *= .92; if(p.chunk) p.vy += 300*dt; p.life -= dt*p.decay; });
+  state.parts = state.parts.filter(p => p.life > 0);
+  state.floats.forEach(f => { f.y -= 60*dt; f.life -= dt*1.1; });
+  state.floats = state.floats.filter(f => f.life > 0);
+  if(state.banner){ state.banner.life -= dt; if(state.banner.life <= 0) state.banner = null; }
+  state.shake = Math.max(0, state.shake - dt*30);
+}
+
+function draw(){
+  ctx.save();
+  if(state.shake > 0) ctx.translate((Math.random()-.5)*state.shake, (Math.random()-.5)*state.shake);
+  const g = ctx.createLinearGradient(0,0,0,H); g.addColorStop(0,"#5EA93D"); g.addColorStop(1,"#79C152");
+  ctx.fillStyle = g; ctx.fillRect(-20,-20,W+40,H+40);
+  ctx.fillStyle = "rgba(255,255,255,.06)";
+  for(let i=0;i<4;i+=2) ctx.fillRect(laneW*i, 0, laneW, H);
+  deco.forEach(d => {
+    if(d.type === "bush"){ ctx.fillStyle = "#4A8F2E"; ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,Math.PI*2); ctx.arc(d.x+d.r*.8,d.y+2,d.r*.7,0,Math.PI*2); ctx.fill(); }
+    else { ctx.fillStyle = "rgba(90,60,30,.25)"; ctx.beginPath(); ctx.ellipse(d.x,d.y,d.r*1.3,d.r*.6,0,0,Math.PI*2); ctx.fill(); }
+  });
+  const sy = dangerY + th*.62, bagW = 30;
+  for(let x=-bagW/2, i=0; x<W+bagW; x+=bagW-4, i++){
+    ctx.fillStyle = i%2 ? "#D9B97A" : "#CFAE6C"; ctx.strokeStyle = "rgba(31,42,68,.55)"; ctx.lineWidth = 2;
+    rr(x, sy, bagW, 13, 6); ctx.fill(); ctx.stroke();
+  }
+  if(state.phase === "aim"){ ctx.fillStyle = "rgba(255,201,60,.14)"; ctx.fillRect(laneW*state.player.lane, 0, laneW, H); }
+  state.enemies.forEach(e => { if(e.alive) drawEnemy(e); });
+  // shells, coloured by power
+  const pw = state.up.power;
+  const trail = pw >= 5 ? "rgba(140,220,255,.85)" : pw >= 3 ? "rgba(255,140,60,.8)" : "rgba(255,230,150,.7)";
+  const sr = 4 + pw*.8;
+  state.shells.forEach(s => {
+    ctx.globalAlpha = clamp(s.life,0,1);
+    ctx.strokeStyle = trail; ctx.lineWidth = 3 + pw; ctx.lineCap = "round";
+    ctx.beginPath(); ctx.moveTo(s.x, s.y); ctx.lineTo(s.x - s.vx*.035, s.y - s.vy*.035); ctx.stroke();
+    ctx.fillStyle = pw >= 5 ? "#E8F8FF" : "#2E3440"; ctx.beginPath(); ctx.ellipse(s.x, s.y, sr, sr*1.7, 0, 0, Math.PI*2); ctx.fill();
+    ctx.globalAlpha = 1;
+  });
+  drawPlayer(state.player.x, playerY);
+  state.parts.forEach(p => {
+    ctx.globalAlpha = clamp(p.life,0,1);
+    if(p.ring){ ctx.strokeStyle = p.color; ctx.lineWidth = 6*p.life; ctx.beginPath(); ctx.arc(p.x,p.y,p.r + (1-p.life)*tw*(p.grow||.9),0,Math.PI*2); ctx.stroke(); }
+    else if(p.chunk){ ctx.fillStyle = p.color; ctx.fillRect(p.x-4, p.y-4, 8, 8); }
+    else { ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x,p.y,p.r*(.5+p.life*.5),0,Math.PI*2); ctx.fill(); }
+  });
+  ctx.globalAlpha = 1;
+  ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
+  state.floats.forEach(f => {
+    ctx.globalAlpha = clamp(f.life,0,1);
+    ctx.font = "800 " + Math.round(tw*.36) + "px 'Baloo 2','Trebuchet MS',sans-serif";
+    ctx.lineWidth = 5; ctx.strokeStyle = INK; ctx.strokeText(f.text, f.x, f.y);
+    ctx.fillStyle = "#FFC93C"; ctx.fillText(f.text, f.x, f.y);
+  });
+  if(state.banner){
+    const b = state.banner, t = 1.4 - b.life;
+    const sc = t < .2 ? .6 + t*2 : 1;
+    ctx.globalAlpha = clamp(b.life*2, 0, 1);
+    ctx.save(); ctx.translate(W/2, H*.52); ctx.scale(sc, sc);
+    const fs = Math.min(W/11, 42);
+    ctx.font = "800 " + fs + "px 'Baloo 2','Trebuchet MS',sans-serif";
+    ctx.lineWidth = 7; ctx.strokeStyle = INK; ctx.strokeText(b.text, 0, 0);
+    ctx.fillStyle = "#FFC93C"; ctx.fillText(b.text, 0, 0);
+    ctx.restore();
+  }
+  ctx.globalAlpha = 1;
+  ctx.restore();
+}
+let last = performance.now();
+function frame(now){
+  const dt = Math.min(.05, (now - last)/1000); last = now;
+  if(state.screen === "game"){ if(!state.paused) update(dt); draw(); }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+/* report */
+function tablesOf(r){ return r.a === r.b ? [r.a] : [r.a, r.b]; }
+function endGame(){
+  state.phase = "idle";
+  const R = state.results;
+  const n = R.length, c = R.filter(r=>r.ok).length;
+  const okMs = R.filter(r=>r.ok).map(r=>r.ms);
+  const avg = okMs.length ? okMs.reduce((s,x)=>s+x,0)/okMs.length : 0;
+  progress.sessions.push({d:Date.now(), n, c, ms:Math.round(avg), mode:state.mode});
+  if(progress.sessions.length > 40) progress.sessions.shift();
+  saveProgress();
+  renderReport(R, n, c, avg);
+  show("report");
+}
+
+function renderReport(R, n, c, avg){
+  const acc = n ? c/n : 0;
+  const starsN = acc >= .9 ? 3 : acc >= .7 ? 2 : 1;
+  const title = starsN === 3 ? "Tank Commander!" : starsN === 2 ? "Great battle!" : "Brave soldier!";
+  const sub = starsN === 3 ? "You hit almost every target. Keep it up!"
+    : starsN === 2 ? "You got most of them right. A little more practice and you'll be a pro."
+    : "Every battle makes you stronger. Let's practise the ones you missed!";
+
+  const wrong = R.filter(r => !r.ok);
+  const slow = R.filter(r => r.ok && r.ms > SLOW);
+
+  const tStat = {};
+  R.forEach(r => tablesOf(r).forEach(t => {
+    const s = tStat[t] || (tStat[t] = {n:0, ok:0, slow:0});
+    s.n++; if(r.ok){ s.ok++; if(r.ms > SLOW) s.slow++; }
+  }));
+  const tRows = Object.keys(tStat).map(Number).sort((a,b)=>a-b).map(t => ({t, ...tStat[t], rate: tStat[t].ok / tStat[t].n}));
+  const strong = tRows.filter(x => x.n >= 2 && x.rate === 1 && x.slow === 0).map(x=>x.t);
+  const weakT = tRows.filter(x => x.rate < 1 || x.slow > 0).sort((a,b) => (a.rate - b.rate) || (b.slow - a.slow)).map(x=>x.t);
+
+  const adj = wrong.filter(r => r.type === "product" && r.chosen !== null &&
+    [(r.a-1)*r.b, (r.a+1)*r.b, r.a*(r.b-1), r.a*(r.b+1)].includes(r.chosen));
+  const swap = wrong.filter(r => r.a !== r.b && (mastery(r.b+"x"+r.a) === 3 || R.some(o => o.ok && o.a === r.b && o.b === r.a)));
+  const timeouts = wrong.filter(r => r.timeout);
+  const missWrong = wrong.filter(r => r.type === "missing");
+
+  const patterns = [];
+  if(adj.length) patterns.push("<b>Off by one step (" + adj.length + "×):</b> picked the answer to a neighbouring fact, e.g. " + explainAdj(adj[0]) + ". Your child is counting up from a fact they know and slipping a step. Fix: lock in anchor facts like × 5 and × 10 so there are fewer steps to count.");
+  if(swap.length) patterns.push("<b>Not using the swap rule (" + swap.length + "×):</b> got " + swap[0].b + " × " + swap[0].a + " right but " + swap[0].a + " × " + swap[0].b + " wrong. Remind them: swapping the numbers doesn't change the answer, so there's only half a table to learn.");
+  if(slow.length) patterns.push("<b>Knows it but still slow (" + slow.length + " facts):</b> correct but took over 5 seconds, so they're still working it out. Practise these until they're instant.");
+  if(timeouts.length) patterns.push("<b>Ran out of time (" + timeouts.length + "×):</b> these are usually facts they don't have a strategy for yet.");
+  if(missWrong.length) patterns.push("<b>Missing-number questions (" + missWrong.length + " wrong):</b> e.g. " + missWrong[0].a + " × ? = " + (missWrong[0].a*missWrong[0].b) + ". Thinking backwards is the foundation of division, so build it up gradually.");
+
+  const weakFacts = weakList();
+  const tipTables = weakT.slice(0, 2);
+  const U = state.up;
+
+  let h = "";
+  h += "<div class='panel result'>";
+  h += "<div class='stars' aria-label='" + starsN + " out of 3 stars'>" + [1,2,3].map(i => "<span class='" + (i<=starsN?"lit":"") + "'>★</span>").join("") + "</div>";
+  h += "<h1>" + title + "</h1><p style='margin-top:6px'>" + sub + "</p>";
+  h += "<div class='stats'>";
+  h += "<div class='stat'><b>" + c + "/" + n + "</b><span>correct</span></div>";
+  h += "<div class='stat'><b>" + Math.round(acc*100) + "%</b><span>accuracy</span></div>";
+  h += "<div class='stat'><b>" + (avg ? (avg/1000).toFixed(1) + "s" : "–") + "</b><span>per right answer</span></div>";
+  h += "</div>";
+  h += "<p class='note'>Score " + state.score + ". Longest combo " + state.bestCombo + ". Monsters blasted " + state.kills + ".</p>";
+  h += "<p class='note'>Tank at the end: 🔫 " + U.guns + " guns, ⚡ speed " + U.speed + ", 🚀 fire rate " + U.rate + ", 💥 power " + U.power + ".</p>";
+  h += "</div>";
+
+  h += "<div class='panel'><h2>Notes for parents</h2>";
+  if(strong.length) h += "<p><b>Solid:</b> the " + strong.join(", ") + " times tables (all correct and fast).</p>";
+  if(weakT.length) h += "<p style='margin-top:6px'><b>Needs practice:</b> facts with " + weakT.join(", ") + ".</p>";
+  if(!weakT.length) h += "<p>No mistakes and every answer was quick. Time to move on to harder tables.</p>";
+  if(patterns.length) h += "<ul class='list' style='margin-top:12px'>" + patterns.map(p => "<li class='y'>" + p + "</li>").join("") + "</ul>";
+  h += "</div>";
+
+  if(wrong.length || slow.length){
+    h += "<div class='panel'><h2>Facts to remember</h2><ul class='list'>";
+    wrong.forEach(r => {
+      const q = r.a + " × ? = " + (r.a*r.b);
+      const said = r.timeout ? "ran out of time" : "chose " + r.chosen + (r.type==="product" ? whoIs(r.chosen, r) : "");
+      h += "<li class='r'><span class='fact'>" + r.a + " × " + r.b + " = " + (r.a*r.b) + "</span> <span class='note'>(" + (r.type==="missing" ? q + ", " : "") + said + ")</span></li>";
+    });
+    slow.forEach(r => {
+      h += "<li class='y'><span class='fact'>" + r.a + " × " + r.b + " = " + (r.a*r.b) + "</span> <span class='note'>(correct but took " + fmtS(r.ms) + ")</span></li>";
+    });
+    h += "</ul></div>";
+  }
+
+  if(tRows.length){
+    h += "<div class='panel'><h2>Results by times table</h2><div class='bars'>";
+    tRows.forEach(x => {
+      const col = x.rate === 1 && !x.slow ? "var(--green)" : x.rate >= .6 ? "var(--amber)" : "var(--red)";
+      h += "<div class='bar'><span>× " + x.t + "</span><div class='track'><i style='width:" + Math.round(x.rate*100) + "%;background:" + col + "'></i></div><span>" + x.ok + "/" + x.n + "</span></div>";
+    });
+    h += "</div></div>";
+  }
+
+  h += "<div class='panel'><h2>What's next</h2>";
+  if(weakFacts.length){
+    h += "<p>Tap Practise weak spots: the game will ask the " + weakFacts.length + " facts that were wrong or slow, plus their swapped versions. Once a fact is answered correctly and quickly, it turns green.</p>";
+  }else{
+    h += "<p>No weak facts right now. Add new tables or try the hard ones (7, 8, 9, 12) next time.</p>";
+  }
+  tipTables.forEach(t => { h += "<div class='tip'><b>Trick for × " + t + ":</b> " + TIPS[t] + "</div>"; });
+  h += "<p class='note' style='margin-top:10px'>Tip: one battle plus one weak-spot round a day (about 5 to 7 minutes) works better than one long session.</p>";
+  h += "<div class='row'>";
+  h += "<button class='btn warn' id='rWeak'" + (weakFacts.length ? "" : " disabled") + ">Practise weak spots</button>";
+  h += "<button class='btn primary' id='rAgain'>Play again</button>";
+  h += "</div><div class='row'>";
+  h += "<button class='btn' id='rParent'>Progress map</button>";
+  h += "<button class='btn' id='rMenu'>Main menu</button>";
+  h += "</div></div>";
+
+  $("#reportBody").innerHTML = h;
+  $("#rWeak").onclick = () => startGame("weak");
+  $("#rAgain").onclick = () => startGame(state.mode);
+  $("#rParent").onclick = () => { renderParent(); show("parent"); };
+  $("#rMenu").onclick = () => show("menu");
+}
+function explainAdj(r){
+  const ch = r.chosen;
+  let src = "";
+  if(ch === (r.a-1)*r.b) src = (r.a-1) + " × " + r.b;
+  else if(ch === (r.a+1)*r.b) src = (r.a+1) + " × " + r.b;
+  else if(ch === r.a*(r.b-1)) src = r.a + " × " + (r.b-1);
+  else src = r.a + " × " + (r.b+1);
+  return r.a + " × " + r.b + " → chose " + ch + " (that's " + src + ")";
+}
+function whoIs(v, r){
+  const opts = [[r.a-1,r.b],[r.a+1,r.b],[r.a,r.b-1],[r.a,r.b+1]];
+  for(const [x,y] of opts) if(x>0 && y>0 && x*y === v) return ", which is " + x + " × " + y;
+  return "";
+}
+
+/* parent view */
+function renderParent(){
+  let h = "<button class='btn small back' id='pBack'>← Back</button>";
+  h += "<div class='panel'><h2>Map of all 144 facts</h2>";
+  h += "<p class='note'>Rows are the first number, columns the second. Each square is coloured by the last 3 attempts.</p>";
+  h += "<div class='scroll' style='margin-top:10px'><div class='heat' role='table' aria-label='12 by 12 multiplication grid'>";
+  h += "<div class='h'>×</div>";
+  for(let b=1;b<=12;b++) h += "<div class='h'>" + b + "</div>";
+  for(let a=1;a<=12;a++){
+    h += "<div class='h'>" + a + "</div>";
+    for(let b=1;b<=12;b++){
+      const k = a+"x"+b, m = mastery(k), f = progress.facts[k];
+      const tip = f ? a + " × " + b + " = " + (a*b) + ": " + f.c + "/" + f.n + " correct" + (f.c ? ", average " + fmtS(f.ms/f.c) : "") : a + " × " + b + ": not tried yet";
+      h += "<div class='c" + m + "' title='" + tip + "'>" + (m ? a*b : "") + "</div>";
+    }
+  }
+  h += "</div></div>";
+  h += "<div class='legend'><span style='--c:var(--green)'>Known and fast</span><span style='--c:var(--amber)'>Known but slow or shaky</span><span style='--c:var(--red)'>Wrong last time</span><span style='--c:var(--grey)'>Not tried yet</span></div>";
+  h += "</div>";
+
+  const ts = tableScores();
+  h += "<div class='panel'><h2>How well each table is known</h2><div class='bars'>";
+  ts.forEach(x => {
+    const pct = x.score === null ? 0 : Math.round(x.score*100);
+    const col = x.score === null ? "var(--grey)" : x.score >= .85 ? "var(--green)" : x.score >= .5 ? "var(--amber)" : "var(--red)";
+    h += "<div class='bar'><span>× " + x.t + "</span><div class='track'><i style='width:" + pct + "%;background:" + col + "'></i></div><span>" + (x.score === null ? "–" : pct + "%") + "</span></div>";
+  });
+  h += "</div>";
+  const weakest = ts.filter(x => x.score !== null && x.n >= 3 && x.score < .85).sort((a,b)=>a.score-b.score).slice(0,2);
+  weakest.forEach(x => { h += "<div class='tip'><b>Trick for × " + x.t + ":</b> " + TIPS[x.t] + "</div>"; });
+  h += "</div>";
+
+  const S = progress.sessions.slice(-10).reverse();
+  h += "<div class='panel'><h2>Recent battles</h2>";
+  if(!S.length) h += "<p>No battles yet. Play one to start tracking progress.</p>";
+  else{
+    h += "<ul class='list sessions'>";
+    S.forEach(s => {
+      const d = new Date(s.d);
+      const ds = d.toLocaleDateString("en-GB", {day:"2-digit", month:"short"}) + " " + d.toLocaleTimeString("en-GB", {hour:"2-digit", minute:"2-digit"});
+      const acc = s.n ? Math.round(s.c/s.n*100) : 0;
+      h += "<li class='" + (acc>=90?"g":acc>=70?"y":"r") + "'><span>" + ds + (s.mode==="weak" ? ", weak-spot practice" : "") + "</span><span><b>" + s.c + "/" + s.n + "</b> (" + acc + "%)" + (s.ms ? ", " + (s.ms/1000).toFixed(1) + "s" : "") + "</span></li>";
+    });
+    h += "</ul>";
+  }
+  h += "<div class='row'><button class='btn small' id='pReset'>Erase all progress</button></div>";
+  h += "</div>";
+
+  $("#parentBody").innerHTML = h;
+  $("#pBack").onclick = () => show("menu");
+  const rb = $("#pReset");
+  rb.onclick = () => {
+    if(rb.dataset.confirm){ progress = blank(); saveProgress(); renderParent(); return; }
+    rb.dataset.confirm = "1"; rb.textContent = "Tap again to erase everything"; rb.classList.add("warn");
+  };
+}
+
+refreshMenu();
+})();
+</script>
+<a href="../" aria-label="Back to Peter's World" style="position:fixed;left:calc(10px + env(safe-area-inset-left,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:2147483000;width:48px;height:48px;border-radius:50%;background:#fff;border:3px solid #5fd3b0;display:grid;place-items:center;font-size:22px;text-decoration:none;box-shadow:0 3px 0 rgba(0,0,0,.18)">🏠</a>
+</body>
+</html>

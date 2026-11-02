@@ -1,0 +1,820 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,-apple-system,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
+<title>Stormy's Story Door</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Grandstander:wght@500;700;800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Layout: one calm column, cat + speech bubble on top, big tappable story cards below, a soft step trail as progress. Light only, chosen for a child's tablet. */
+:root {
+  --bg: #eef4f2;
+  --card: #ffffff;
+  --ink: #2e2a35;
+  --muted: #6b6574;
+  --line: #dcd7e0;
+  --teal: #2f8a86;
+  --teal-soft: #dcefec;
+  --saffron: #e9a23b;
+  --saffron-soft: #fdf1dc;
+  --rose: #e6879a;
+  --rose-soft: #fbe7ec;
+  --cat: #b4b1bd;
+  --cat-soft: #f1f0f4;
+  --display: "Grandstander", "Chalkboard SE", "Comic Sans MS", system-ui, sans-serif;
+  --body: "Atkinson Hyperlegible", "Helvetica Neue", Arial, sans-serif;
+  color-scheme: light;
+}
+html, body { min-height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.45;
+}
+.wrap {
+  max-width: 780px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 16px 40px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+h1, h2, h3 { font-family: var(--display); margin: 0; line-height: 1.12; text-wrap: balance; }
+p { margin: 0; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, textarea:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible {
+  outline: 3px solid var(--saffron); outline-offset: 2px;
+}
+
+/* top bar */
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 8px; font-family: var(--display); font-weight: 800; font-size: 20px; background: none; border: 0; padding: 0; }
+.brand svg { width: 40px; height: 34px; }
+.trail { display: flex; gap: 6px; flex-wrap: wrap; }
+.trail span {
+  font-family: var(--display); font-size: 12.5px; font-weight: 700;
+  padding: 3px 9px; border-radius: 999px; background: var(--card); color: var(--muted); border: 1.5px solid var(--line);
+}
+.trail span.done { background: var(--teal-soft); color: var(--teal); border-color: transparent; }
+.trail span.now { background: var(--saffron); color: #fff; border-color: transparent; }
+
+/* cat + bubble */
+.talk { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: end; }
+.talk .cat { width: 112px; height: 94px; }
+.talk .cat.bounce { animation: hop .5s ease; }
+@keyframes hop { 30% { transform: translateY(-10px) } 60% { transform: translateY(0) } 80% { transform: translateY(-3px) } }
+.bubble {
+  position: relative; background: var(--card); border-radius: 18px; padding: 14px 16px; min-width: 0;
+  box-shadow: 0 2px 0 var(--line);
+  display: flex; flex-direction: column; gap: 6px;
+}
+.bubble::before {
+  content: ""; position: absolute; left: -10px; bottom: 18px; width: 20px; height: 20px; background: var(--card);
+  transform: rotate(45deg); border-radius: 3px;
+}
+.bubble .q { font-family: var(--display); font-size: 22px; font-weight: 700; position: relative; }
+.bubble .sub { color: var(--muted); font-size: 15px; position: relative; }
+.bubble .react { color: var(--teal); font-family: var(--display); font-weight: 700; position: relative; }
+.speak { position: absolute; right: 10px; top: 10px; border: 0; background: var(--cat-soft); border-radius: 50%; width: 34px; height: 34px; display: grid; place-items: center; }
+.speak svg { width: 18px; height: 18px; }
+.bubble.has-speak .q { padding-right: 40px; }
+
+/* panels */
+.panel { background: var(--card); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.panel h3 { font-size: 18px; color: var(--teal); }
+.story-start { background: var(--saffron-soft); border-radius: 14px; padding: 12px 14px; font-size: 16px; }
+.story-start b { font-family: var(--display); color: #a8661a; }
+
+/* choice cards */
+.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.pick {
+  border: 2px solid var(--line); background: var(--card); border-radius: 14px;
+  padding: 12px 8px 10px; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center;
+  font-size: 15px; line-height: 1.25; min-height: 112px; transition: transform .12s ease, border-color .12s ease;
+}
+.pick .art { font-size: 36px; line-height: 1; }
+.pick:hover { transform: translateY(-2px); border-color: var(--saffron); }
+.pick[aria-pressed="true"] { border-color: var(--teal); background: var(--teal-soft); box-shadow: 0 0 0 3px var(--teal-soft); }
+.pick.own { border-style: dashed; color: var(--muted); grid-column: 1 / -1; min-height: 0; flex-direction: row; justify-content: center; font-family: var(--display); font-size: 17px; }
+.pick.own .art { font-size: 26px; }
+
+/* text entry */
+label.lbl { font-family: var(--display); font-weight: 700; font-size: 16px; display: block; margin-bottom: 4px; }
+textarea, input[type=text], select {
+  width: 100%; box-sizing: border-box; font: inherit; color: var(--ink); background: #fbfafc;
+  border: 2px solid var(--line); border-radius: 12px; padding: 10px 12px;
+}
+textarea { min-height: 96px; resize: vertical; line-height: 1.5; }
+.mic { font-size: 13.5px; color: var(--muted); display: flex; gap: 6px; align-items: center; margin-top: 6px; }
+.mic svg { width: 16px; height: 16px; flex: none; }
+.speech-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: end; }
+.speech-row select { width: auto; }
+.preview-speech { font-size: 15px; background: var(--rose-soft); border-radius: 10px; padding: 8px 10px; }
+.preview-speech mark { background: #ffe39a; color: var(--ink); border-radius: 3px; padding: 0 2px; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips button {
+  border: 1.5px solid var(--line); background: var(--cat-soft); border-radius: 999px; padding: 4px 11px; font-size: 14.5px;
+}
+.chips button:hover { border-color: var(--saffron); }
+.chips button.used { background: var(--teal-soft); border-color: var(--teal); color: var(--teal); }
+
+/* actions */
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.row.end { justify-content: space-between; }
+.btn {
+  border: 0; border-radius: 14px; padding: 12px 18px; font-family: var(--display); font-weight: 700; font-size: 17px;
+  background: var(--teal); color: #fff; box-shadow: 0 3px 0 #226662;
+}
+.btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #226662; }
+.btn:disabled { background: var(--line); color: var(--muted); box-shadow: none; cursor: not-allowed; }
+.btn.soft { background: var(--cat-soft); color: var(--ink); box-shadow: 0 3px 0 var(--line); }
+.btn.sun { background: var(--saffron); box-shadow: 0 3px 0 #b97a22; }
+.btn.small { padding: 8px 12px; font-size: 15px; }
+
+/* picture */
+.pic { border-radius: 14px; background: var(--saffron-soft); overflow: hidden; display: grid; place-items: center; min-height: 120px; }
+.pic img { width: 100%; height: auto; display: block; }
+.pic .wait { padding: 20px; font-family: var(--display); color: #a8661a; text-align: center; }
+.note { font-size: 14px; color: var(--muted); }
+
+details.mum { background: var(--rose-soft); border-radius: 12px; padding: 8px 12px; font-size: 14.5px; }
+details.mum summary { font-family: var(--display); font-weight: 700; color: #b34d63; cursor: pointer; }
+details.mum p { margin-top: 6px; }
+
+/* home */
+.hero { display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: center; }
+.hero .cat { width: 150px; height: 125px; }
+.hero h1 { font-size: 32px; font-weight: 800; }
+.hero p { color: var(--muted); margin-top: 6px; }
+.seeds { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.seed {
+  text-align: left; border: 2px solid var(--line); background: var(--card); border-radius: 16px; padding: 14px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.seed:hover { border-color: var(--saffron); }
+.seed .art { font-size: 34px; }
+.seed b { font-family: var(--display); font-size: 18px; }
+.seed span { font-size: 14px; color: var(--muted); }
+.seed .badge { align-self: flex-start; font-size: 12px; font-weight: 700; background: var(--saffron); color: #fff; padding: 2px 8px; border-radius: 6px; }
+.saved { display: flex; flex-direction: column; gap: 8px; }
+.saved-item { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: center; background: var(--cat-soft); border-radius: 12px; padding: 8px 12px; }
+.saved-item b { font-family: var(--display); }
+.saved-item small { color: var(--muted); display: block; }
+.name-row { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: center; }
+.name-row input { max-width: 260px; }
+
+/* map */
+.map { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.para { border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.para:nth-child(1) { background: var(--saffron-soft); }
+.para:nth-child(2) { background: var(--rose-soft); }
+.para:nth-child(3) { background: var(--teal-soft); }
+.para:nth-child(4) { background: var(--cat-soft); }
+.para h3 { font-size: 17px; color: var(--ink); }
+.para .num { font-family: var(--display); font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.para ul { margin: 0; padding-left: 18px; font-size: 15px; }
+.para .start { font-family: var(--display); font-size: 15.5px; }
+.para .deeper { font-size: 14.5px; font-style: italic; color: var(--muted); }
+.para .say { font-size: 15px; background: var(--card); border-radius: 8px; padding: 6px 8px; }
+.boxes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.boxes div { background: var(--cat-soft); border-radius: 10px; padding: 8px; font-size: 14px; min-width: 0; }
+.boxes b { font-family: var(--display); display: block; font-size: 13px; color: var(--teal); }
+
+/* write */
+.write-step { display: grid; grid-template-columns: 1fr 230px; gap: 12px; }
+.write-step .hint { font-size: 14px; background: var(--cat-soft); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.write-step .hint b { font-family: var(--display); color: var(--teal); }
+.checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; font-size: 15px; }
+.checklist span { display: flex; gap: 8px; align-items: center; }
+.checklist i { width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--line); display: grid; place-items: center; font-style: normal; font-size: 13px; color: #fff; flex: none; }
+.checklist .ok i { background: var(--teal); border-color: var(--teal); }
+
+.party { position: relative; overflow: hidden; text-align: center; align-items: center; }
+.party .cat { width: 170px; height: 142px; animation: hop 1s ease infinite; }
+.party .final { text-align: left; white-space: pre-wrap; background: #fbfafc; border-radius: 12px; padding: 14px; width: 100%; box-sizing: border-box; font-size: 16px; }
+.dot { position: absolute; width: 10px; height: 10px; border-radius: 3px; top: -12px; animation: fall 2.6s linear forwards; }
+@keyframes fall { to { transform: translateY(520px) rotate(360deg); opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .talk .cat.bounce, .party .cat, .dot { animation: none; }
+  .pick { transition: none; }
+}
+@media (max-width: 640px) {
+  .cards { grid-template-columns: repeat(2, 1fr); }
+  .seeds, .map, .write-step, .checklist { grid-template-columns: 1fr; }
+  .boxes { grid-template-columns: 1fr 1fr; }
+  .hero { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+  .talk .cat { width: 80px; height: 67px; }
+  .bubble .q { font-size: 19px; }
+}
+</style>
+
+<div class="wrap" id="app" aria-live="polite"></div>
+
+<script>
+(() => {
+  // ---------- cat drawing ----------
+  function catSVG(mood) {
+    const mouth = mood === "wow"
+      ? '<ellipse cx="61" cy="64" rx="3.4" ry="4" fill="#2e2a35"/>'
+      : '<path d="M56 62 q2.5 3 5 0 q2.5 3 5 0" fill="none" stroke="#2e2a35" stroke-width="2" stroke-linecap="round"/>';
+    const eyes = mood === "happy"
+      ? '<path d="M42 57 q4 -5 8 0 M72 57 q4 -5 8 0" fill="none" stroke="#2e2a35" stroke-width="2.6" stroke-linecap="round"/>'
+      : '<circle cx="46" cy="56" r="3.4" fill="#2e2a35"/><circle cx="76" cy="56" r="3.4" fill="#2e2a35"/>';
+    return `<svg viewBox="0 0 120 100" role="img" aria-label="${esc(state.cat || "Stormy")} the chubby grey cat">
+      <path d="M100 80 C116 78 118 62 110 58" fill="none" stroke="#2e2a35" stroke-width="9" stroke-linecap="round"/>
+      <path d="M100 80 C116 78 118 62 110 58" fill="none" stroke="#b4b1bd" stroke-width="4.5" stroke-linecap="round"/>
+      <path d="M16 90 C8 66 14 36 34 30 L38 12 L52 26 C58 24 64 24 70 26 L84 12 L88 30 C108 36 112 66 104 90 Z" fill="#b4b1bd" stroke="#2e2a35" stroke-width="3.5" stroke-linejoin="round"/>
+      <path d="M54 31 v7 M61 29 v8 M68 31 v7 M98 58 h-7 M100 67 h-8" stroke="#8f8b9b" stroke-width="3" stroke-linecap="round"/>
+      ${eyes}${mouth}
+      <ellipse cx="39" cy="64" rx="5" ry="3" fill="#f4a7b9"/><ellipse cx="83" cy="64" rx="5" ry="3" fill="#f4a7b9"/>
+      <path d="M30 58 h-12 M30 63 l-11 3 M92 58 h12 M92 63 l11 3" stroke="#2e2a35" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M36 90 q5 -6 10 0 M74 90 q5 -6 10 0" fill="none" stroke="#2e2a35" stroke-width="2.4" stroke-linecap="round"/>
+    </svg>`;
+  }
+  const ICON_SPEAK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="#5d5868"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="#5d5868" stroke-width="2" stroke-linecap="round"/></svg>';
+  const ICON_MIC = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="#6b6574"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4" fill="none" stroke="#6b6574" stroke-width="2" stroke-linecap="round"/></svg>';
+
+  // ---------- story content ----------
+  const SEEDS = {
+    lila: {
+      title: "Lila and the Old Door", art: "🚪", hero: "Lila", badge: "Homework",
+      blurb: "Lila finds a secret door in a busy market.",
+      start: "The sun was hot over the busy market. Lila held her little map tight. Behind a colourful carpet she found an old wooden door, and a rusty key lay on the step…",
+      worldQ: "Lila turns the rusty key… click! What is behind the door?",
+      world: [["🌸","A garden floating in the sky"],["📚","A library of talking books"],["🕰️","A room where clocks run backwards"],["🍪","A secret cookie bakery"],["🌌","A whole starry sky inside a room"],["🐉","A tiny dragon asleep on gold"]],
+      opener: "Slowly, Lila turned the rusty key."
+    },
+    cake: {
+      title: "The Missing Birthday Cake", art: "🎂", hero: "Peter",
+      blurb: "Someone ate {cat}'s birthday cake!",
+      start: "It was {cat}'s birthday. A huge strawberry cake sat on the kitchen table. But when Peter came back with the candles, the plate was empty, except for a trail of pink crumbs…",
+      worldQ: "Peter follows the crumb trail. Where does it lead?",
+      world: [["🏘️","A tiny mouse village under the sofa"],["🧺","A secret picnic in the garden"],["🧸","The attic, full of old toys"],["🔥","A magic oven that is a door"],["🍰","Down a hole into Cake Land"],["🎉","A party at the neighbour's cat"]],
+      opener: "Peter knelt down and looked at the pink crumbs."
+    },
+    moon: {
+      title: "The Moon Cookie Rocket", art: "🚀", hero: "Peter",
+      blurb: "The Moon has run out of cookies!",
+      start: "One night, a tiny paper rocket landed in Peter's garden. A note was stuck to it: “The Moon has run out of cookies. Please help!”",
+      worldQ: "Peter and {cat} climb into the rocket. Where does it take them?",
+      world: [["🏭","The Moon's cookie factory"],["🌟","A bakery made of stars"],["🌑","The dark side of the Moon"],["🟣","A wobbly planet made of jelly"],["🚂","A space train station"],["☁️","A castle on a cloud"]],
+      opener: "With a whoosh, the tiny rocket grew and grew."
+    }
+  };
+
+  const STAGES = [
+    { key: "world", short: "Door", q: s => s.worldQ, sub: "Pick a card, or tell me your own idea.",
+      cards: s => s.world,
+      help: ["What colour is it?", "What sound can you hear in there?", "What does it smell like?", "Is it giant, or tiny?", "Is it bright, or dark and spooky?"],
+      chips: ["glowing","dusty","secret","ancient","sparkling","echoing","creaky","colourful","musty","flickering"],
+      more: "Tell me more! What can you see, hear and smell?",
+      mum: "Đừng sửa câu ở bước này. Hỏi con bằng 5 giác quan: thấy gì, nghe gì, ngửi thấy gì. Con trả lời tiếng Việt cũng được, mẹ giúp gõ lại." },
+    { key: "meet", short: "Meet", q: () => "Look! {cat} is there. What is {cat} doing?", sub: "Then tell me {cat}'s very first words.",
+      cards: () => [["😴","Napping on a big cushion"],["🍪","Munching a cookie"],["💰","Guarding a treasure chest"],["🏮","Juggling tiny lanterns"],["🗺️","Reading a giant map"],["🏺","Hiding inside a pot"]],
+      help: ["Is {cat} happy to see {hero}, or scared?", "How does {cat} move? Waddle? Roll?", "What does {cat}'s fur feel like?", "Why has {cat} been waiting here?"],
+      chips: ["chubby","fluffy","plump","sleepy","curious","waddled","rolled","twitchy whiskers","tiny paws","purred"],
+      more: "What does {cat} look like? How does {cat} move?",
+      speech: { who: "{cat}", label: "{cat} says…", said: ["purred","whispered","mewed","giggled","yawned","said"] },
+      mum: "Cho con nói bằng giọng Stormy, càng buồn cười càng tốt. Câu Stormy nói sẽ là câu thoại số 1 trong bài (direct speech)." },
+    { key: "problem", short: "Uh-oh", q: () => "Everything was fine until… CRASH! What goes wrong?", sub: "Every good story needs a problem.",
+      cards: () => [["🔒","They get locked in"],["🐭","A cheeky mouse steals something"],["🐾","{cat} vanishes!"],["🌋","Everything starts to shake"],["🌑","All the lights go out"],["🛑","A grumpy guard says NO"]],
+      help: ["How does {hero} feel? Scared? Cross?", "What sound did it make?", "What will happen if they can't fix it?", "Who caused the problem, and why?"],
+      chips: ["Suddenly,","Without warning,","CRASH!","trembling","gasped","nervous","pitch-black","slammed","rumbling","froze"],
+      more: "What happens? How do {hero} and {cat} feel?",
+      mum: "Nếu con bí, chỉ cho chọn 1 trong 2 thẻ. Hỏi cảm xúc: 'Lúc đó Lila thấy thế nào?'." },
+    { key: "fix", short: "Fix it", q: () => "{cat} is too chubby to run fast. So how do they fix it?", sub: "Maybe {cat} has a special power!",
+      cards: () => [["👃","{cat}'s super-sniff nose"],["⚽","{cat} rolls like a ball"],["🎵","A purr that opens doors"],["✨","The map starts to glow"],["💡","{hero} has a clever idea"],["🦜","A new friend helps"]],
+      help: ["What is the clever part of the plan?", "Does it work the first time?", "What does {hero} say to {cat}?", "Who is the hero here?"],
+      chips: ["clever","carefully","together","bravely","Luckily,","At that moment,","squeezed","glowed","cheered","whispered"],
+      more: "How do they do it? Step by step!",
+      speech: { who: "{hero}", label: "{hero} says…", said: ["whispered","shouted","gasped","cried","called","said"] },
+      mum: "Đóng vai 2 phút: con làm Stormy, mẹ làm Lila. Bắt lấy 1 câu hay nhất làm câu thoại số 2." },
+    { key: "end", short: "Twist", q: () => "Now a surprise! What is the twist?", sub: "Then tell me how the story ends.",
+      cards: () => [["😼","{cat} planned it all along"],["🍪","The treasure is cookies!"],["🔔","The key was {cat}'s collar bell"],["🤝","The baddie just wanted a friend"],["🗣️","{hero} can now talk to cats"],["🚪","A brand new door appears"]],
+      help: ["Does {hero} take {cat} home?", "What does {hero} learn?", "What is the very last thing that happens?", "How does everyone feel at the end?"],
+      chips: ["At last,","From that day on,","smiled","grinned","delighted","wonderful","forever","waved goodbye","home","best friends"],
+      more: "How does the story end?",
+      mum: "Câu hỏi gợi twist: 'Ai đã vẽ tấm bản đồ của Lila nhỉ?'. Để con đoán trước, chỉ đưa thẻ khi con bí." }
+  ];
+  const REACTS = ["Ooh, I love that!", "Purr-fect idea!", "Wow, I did not expect that!", "That gives my whiskers a tingle!", "Meow! That's so cool.", "Great choice!"];
+  const OWN = "__own";
+
+  // ---------- state ----------
+  const KEY = "stormyStoryDoor.v1";
+  let store = { cat: "Stormy", stories: [] };
+  try { const raw = localStorage.getItem(KEY); if (raw) store = Object.assign(store, JSON.parse(raw)); } catch (e) {}
+  const state = { screen: "home", story: null, stage: 0, react: "", helpIdx: -1, cat: store.cat };
+  function save() {
+    store.cat = state.cat;
+    try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {}
+  }
+  function newStory(seed) {
+    const st = {};
+    STAGES.forEach(s => st[s.key] = { card: null, text: "", speech: "", said: s.speech ? s.speech.said[0] : "" });
+    const story = { id: Date.now().toString(36), seed, created: Date.now(), stages: st, pics: {}, plan: null, paras: ["", "", "", ""], done: false };
+    store.stories.unshift(story);
+    store.stories = store.stories.slice(0, 12);
+    save();
+    return story;
+  }
+
+  // ---------- helpers ----------
+  function esc(s) { return String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+  function fill(s) {
+    const seed = state.story ? SEEDS[state.story.seed] : SEEDS.lila;
+    return String(s).replaceAll("{cat}", state.cat || "Stormy").replaceAll("{hero}", seed.hero);
+  }
+  function seed() { return SEEDS[state.story.seed]; }
+  function cardLabel(stage, ans) {
+    if (!ans.card || ans.card === OWN) return "";
+    const c = stage.cards(seed()).find(c => c[1] === ans.card);
+    return c ? fill(c[1]) : fill(ans.card);
+  }
+  function speechLine(text, said, who) {
+    let t = String(text || "").trim().replace(/^["“”']+|["“”']+$/g, "");
+    if (!t) return "";
+    t = t.charAt(0).toUpperCase() + t.slice(1);
+    if (/[.]$/.test(t)) t = t.slice(0, -1) + ",";
+    else if (!/[!?,]$/.test(t)) t += ",";
+    return `“${t}” ${said || "said"} ${who}.`;
+  }
+  const app = document.getElementById("app");
+  function say(text) {
+    try {
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = "en-GB"; u.rate = 0.92; u.pitch = 1.25;
+      speechSynthesis.cancel(); speechSynthesis.speak(u);
+    } catch (e) {}
+  }
+
+  // ---------- Claude (optional magic) ----------
+  let sample = null;
+  let magicOff = false;
+  if (window.claude && typeof window.claude.use === "function") {
+    window.claude.use("sample").then(fn => { sample = fn; if (fn) render(); }).catch(() => {});
+  }
+  function magicReady() { return !!sample && !magicOff; }
+  function magicError(e) {
+    const code = e && e.code;
+    if (["not_granted", "sampling_disabled", "not_declared", "capability_disabled", "capability_removed"].includes(code)) {
+      magicOff = true; return `${state.cat}'s magic is switched off. That's OK, we can keep going without it!`;
+    }
+    if (code === "rate_limited") return `${state.cat} is a bit tired. Try the magic again in a little while.`;
+    if (code === "cancelled") return "";
+    return `${state.cat}'s magic wobbled. Tap the button to try again.`;
+  }
+
+  // ---------- render ----------
+  function render() {
+    if (state.screen === "home") return renderHome();
+    if (state.screen === "stage") return renderStage();
+    if (state.screen === "map") return renderMap();
+    if (state.screen === "write") return renderWrite();
+    if (state.screen === "done") return renderDone();
+  }
+
+  function topBar() {
+    const steps = STAGES.map(s => s.short).concat(["Map", "Write"]);
+    let now = state.screen === "stage" ? state.stage : state.screen === "map" ? 5 : state.screen === "write" ? 6 : 7;
+    return `<div class="top">
+      <button class="brand" data-act="home" aria-label="Back to start">${catSVG()}Story Door</button>
+      <div class="trail" aria-label="Story steps">${steps.map((t, i) => `<span class="${i < now ? "done" : i === now ? "now" : ""}">${t}</span>`).join("")}</div>
+    </div>`;
+  }
+
+  function renderHome() {
+    const saved = store.stories.filter(s => SEEDS[s.seed]);
+    app.innerHTML = `
+      <section class="hero">
+        <div class="cat">${catSVG("happy")}</div>
+        <div>
+          <h1>Hi Peter! I'm ${esc(state.cat)}.</h1>
+          <p>Let's open a door and find a story together. There are no wrong answers. Every idea is a good idea!</p>
+        </div>
+      </section>
+      <section class="panel">
+        <div class="name-row">
+          <label class="lbl" for="catname">My cat is called</label>
+          <input type="text" id="catname" value="${esc(state.cat)}" maxlength="24" autocomplete="off">
+        </div>
+      </section>
+      <section class="panel">
+        <h3>Pick a story door</h3>
+        <div class="seeds">
+          ${Object.entries(SEEDS).map(([k, s]) => `
+            <button class="seed" data-act="start" data-seed="${k}">
+              ${s.badge ? `<span class="badge">${s.badge}</span>` : ""}
+              <span class="art" aria-hidden="true">${s.art}</span>
+              <b>${esc(s.title)}</b>
+              <span>${esc(s.blurb.replaceAll("{cat}", state.cat))}</span>
+            </button>`).join("")}
+        </div>
+      </section>
+      ${saved.length ? `<section class="panel">
+        <h3>My stories</h3>
+        <div class="saved">
+          ${saved.map(s => `<div class="saved-item">
+            <div><b>${esc(SEEDS[s.seed].title)}</b><small>${new Date(s.created).toLocaleDateString()} · ${s.done ? "finished ⭐" : "in progress"}</small></div>
+            <button class="btn small" data-act="open" data-id="${s.id}">${s.done ? "Read" : "Keep going"}</button>
+            <button class="btn small soft" data-act="del" data-id="${s.id}" aria-label="Remove this story">Remove</button>
+          </div>`).join("")}
+        </div>
+      </section>` : ""}
+      <details class="mum"><summary>Dành cho mẹ</summary>
+        <p>Peter chọn thẻ hoặc tự nói ý tưởng. Trên iPad, bấm vào ô chữ rồi bấm nút micro 🎤 trên bàn phím để con nói, máy tự gõ. Sau 5 bước, app ghép ý của con thành bố cục 4 đoạn đúng với ô "Plan" trong bài tập, rồi con tự viết từng đoạn. Nút ✨ dùng Claude trong tài khoản của mẹ để vẽ tranh và sắp xếp bố cục; không có cũng vẫn chơi được.</p>
+      </details>`;
+  }
+
+  function renderStage() {
+    const s = STAGES[state.stage];
+    const a = state.story.stages[s.key];
+    const sd = seed();
+    const q = fill(s.q(sd));
+    const cards = s.cards(sd);
+    const picked = !!a.card;
+    const helpQ = state.helpIdx >= 0 ? fill(s.help[state.helpIdx % s.help.length]) : "";
+    const mood = state.react ? "happy" : state.stage === 2 ? "wow" : "";
+    const pic = state.story.pics[s.key];
+    const canNext = picked || a.text.trim().length > 0;
+    const usedChip = w => a.text.toLowerCase().includes(w.toLowerCase().replace(/[,!]$/, ""));
+    app.innerHTML = `${topBar()}
+      ${state.stage === 0 ? `<div class="story-start"><b>The story so far: </b>${esc(fill(sd.start))}</div>` : ""}
+      <section class="talk">
+        <div class="cat ${state.react ? "bounce" : ""}">${catSVG(mood)}</div>
+        <div class="bubble has-speak">
+          <button class="speak" data-act="say" aria-label="Read the question out loud">${ICON_SPEAK}</button>
+          <p class="q">${esc(q)}</p>
+          ${state.react ? `<p class="react">${esc(state.react)}</p>` : `<p class="sub">${esc(fill(s.sub))}</p>`}
+          ${helpQ ? `<p class="sub">💭 ${esc(helpQ)}</p>` : ""}
+        </div>
+      </section>
+      <section class="panel">
+        <div class="cards" role="group" aria-label="Story idea cards">
+          ${cards.map(([art, label]) => `<button class="pick" data-act="pick" data-card="${esc(label)}" aria-pressed="${a.card === label}">
+            <span class="art" aria-hidden="true">${art}</span>${esc(fill(label))}</button>`).join("")}
+          <button class="pick own" data-act="pick" data-card="${OWN}" aria-pressed="${a.card === OWN}"><span class="art" aria-hidden="true">✏️</span>My own idea!</button>
+        </div>
+      </section>
+      ${picked ? `<section class="panel">
+        <div>
+          <label class="lbl" for="more">${esc(fill(a.card === OWN ? "Tell me your idea!" : s.more))}</label>
+          <textarea id="more" placeholder="${esc(helpQ || fill(s.help[0]))}">${esc(a.text)}</textarea>
+          <p class="mic">${ICON_MIC}Shy fingers? Tap 🎤 on the keyboard and just talk.</p>
+        </div>
+        <div>
+          <span class="lbl">Wow words (tap to add)</span>
+          <div class="chips">${s.chips.map(w => `<button data-act="chip" data-w="${esc(w)}" class="${usedChip(w) ? "used" : ""}">${esc(w)}</button>`).join("")}</div>
+        </div>
+        ${s.speech ? `<div>
+          <div class="speech-row">
+            <div><label class="lbl" for="speech">${esc(fill(s.speech.label))}</label>
+            <input type="text" id="speech" value="${esc(a.speech)}" placeholder="Type the exact words…" autocomplete="off"></div>
+            <select id="said" aria-label="How they say it">${s.speech.said.map(w => `<option ${a.said === w ? "selected" : ""}>${w}</option>`).join("")}</select>
+          </div>
+          <p class="preview-speech" id="speechPrev" ${a.speech.trim() ? "" : "hidden"}>${speechPreview(a, s)}</p>
+        </div>` : ""}
+        <div class="row">
+          <button class="btn soft small" data-act="help">💭 Help me, ${esc(state.cat)}!</button>
+          ${magicReady() ? `<button class="btn sun small" data-act="draw">✨ Draw my idea</button>` : ""}
+        </div>
+        ${pic ? `<div class="pic" id="pic">${pic.svg ? `<img alt="A picture of ${esc(state.cat)}'s idea" src="data:image/svg+xml;charset=utf-8,${encodeURIComponent(pic.svg)}">` : `<p class="wait">${esc(pic.msg || "")}</p>`}</div>` : ""}
+      </section>` : ""}
+      <details class="mum"><summary>Mẹ ơi, gợi ý cho bước này</summary><p>${esc(s.mum)}</p></details>
+      <div class="row end">
+        <button class="btn soft" data-act="back">← Back</button>
+        <button class="btn" data-act="next" ${canNext ? "" : "disabled"}>${state.stage === STAGES.length - 1 ? "Make my story map →" : "Next →"}</button>
+      </div>`;
+  }
+  function speechPreview(a, s) {
+    const line = speechLine(a.speech, a.said, fill(s.speech.who));
+    return esc(line).replace(/“/g, "<mark>“</mark>").replace(/”/g, "<mark>”</mark>");
+  }
+
+  // ---------- map ----------
+  function localPlan() {
+    const st = state.story.stages, sd = seed();
+    const lab = k => cardLabel(STAGES.find(s => s.key === k), st[k]);
+    const notes = (...xs) => xs.map(x => String(x || "").trim()).filter(Boolean);
+    const sp = k => { const s = STAGES.find(x => x.key === k); return speechLine(st[k].speech, st[k].said, fill(s.speech.who)); };
+    return {
+      title: fill(sd.title),
+      cheer: `What a story, Peter! ${state.cat} can't wait to read it.`,
+      paragraphs: [
+        { label: `What ${sd.hero} finds`, notes: notes(lab("world"), st.world.text, lab("meet"), st.meet.text), starter: fill(sd.opener), wowWords: STAGES[0].chips.slice(0, 3), deeper: "What could you smell or hear at that moment?", speech: sp("meet") },
+        { label: "The problem", notes: notes(lab("problem"), st.problem.text), starter: "Suddenly,…", wowWords: ["trembling", "gasped", "slammed"], deeper: fill("How did {hero} feel inside?"), speech: "" },
+        { label: "The solution", notes: notes(lab("fix"), st.fix.text), starter: "Luckily,…", wowWords: ["clever", "carefully", "together"], deeper: "What was the cleverest part of the plan?", speech: sp("fix") },
+        { label: "The twist & ending", notes: notes(lab("end"), st.end.text), starter: "At last,…", wowWords: ["delighted", "grinned", "from that day on"], deeper: "What is the very last picture in your head?", speech: "" }
+      ],
+      planBoxes: {
+        next: notes(lab("world"), lab("meet")).join(", ") || st.world.text.slice(0, 60),
+        problem: lab("problem") || st.problem.text.slice(0, 60),
+        solve: lab("fix") || st.fix.text.slice(0, 60),
+        end: notes(lab("end"), st.end.text.slice(0, 40)).join(", ")
+      }
+    };
+  }
+  function planPrompt() {
+    const st = state.story.stages, sd = seed();
+    const lines = STAGES.map(s => {
+      const a = st[s.key];
+      let t = `- ${s.short.toUpperCase()}: card = ${cardLabel(s, a) || "(his own idea)"}; his words = "${a.text.trim() || "(none)"}"`;
+      if (s.speech && a.speech.trim()) t += `; speech line = ${speechLine(a.speech, a.said, fill(s.speech.who))}`;
+      return t;
+    }).join("\n");
+    return `You are helping Peter, a shy, imaginative 8-year-old in Year 3 who writes English well, plan the continuation of a story for homework. His companion character is a chubby grey cat called ${state.cat}.
+
+Story start (given by the teacher): ${fill(sd.start)}
+
+Peter's ideas, step by step:
+${lines}
+
+Your job: organise ONLY Peter's ideas into a 4-paragraph plan he will write himself. Do NOT write the story or full paragraphs for him. Keep his words; you may tidy spelling and grammar lightly. Use simple, warm language for an 8-year-old. Fill gaps with a question, never with your own plot.
+
+Reply with only this JSON:
+{"title": "a short fun title using his ideas",
+ "cheer": "one warm sentence from ${state.cat} praising a specific idea of his",
+ "paragraphs": [
+   {"label": "short heading", "notes": ["2-4 short notes in his words"], "starter": "a sentence starter of 3-7 words ending with …", "wowWords": ["3 vivid words that fit"], "deeper": "one question that helps him add detail", "speech": "one line of direct speech built from his words with correct speech marks “ ”, or empty string"}
+ ],
+ "planBoxes": {"next": "max 12 words", "problem": "max 12 words", "solve": "max 12 words", "end": "max 12 words"}}
+The 4 paragraphs are, in order: what ${sd.hero} does next / the problem / the solution / the twist and ending. Use his two speech lines in paragraphs 1 and 3 if he gave them.`;
+  }
+  function drawPrompt(stage) {
+    const a = state.story.stages[stage.key], sd = seed();
+    const idea = [cardLabel(stage, a), a.text.trim()].filter(Boolean).join(". ");
+    return `Draw a cute children's picture-book illustration as ONE SVG for this moment in an 8-year-old's story.
+Story so far: ${fill(sd.start)}
+This moment: ${fill(stage.q(sd))} Peter's idea: ${idea}
+Characters you may include: ${state.cat}, a chubby, round, short-haired grey cat with small pointy ears, tiny dot eyes, pink cheeks and three small stripes on the forehead${sd.hero === "Lila" ? "; Lila, a young girl in a headscarf with a small backpack" : "; Peter, a cheerful boy"}.
+Rules: viewBox="0 0 400 260", flat friendly shapes, soft warm colours, thick dark rounded outlines, a full background, no text or letters, no <script>, no <image>, no external links, no filters. Keep it under 7000 characters. Reply with only the <svg>…</svg> code.`;
+  }
+
+  function renderMap() {
+    const plan = state.story.plan;
+    app.innerHTML = `${topBar()}
+      <section class="talk">
+        <div class="cat">${catSVG(plan ? "happy" : "")}</div>
+        <div class="bubble">
+          <p class="q">${plan ? esc(plan.title) : "Let's turn your ideas into a story map!"}</p>
+          <p class="sub">${plan ? esc(plan.cheer) : "Four paragraphs, one for each part. All the ideas are yours."}</p>
+        </div>
+      </section>
+      ${plan ? `
+        <section class="panel">
+          <h3>Copy these into the “Plan what happens next” boxes</h3>
+          <div class="boxes">
+            <div><b>What might ${esc(seed().hero)} do next?</b>${esc(plan.planBoxes.next)}</div>
+            <div><b>What could the problem be?</b>${esc(plan.planBoxes.problem)}</div>
+            <div><b>How might she solve it?</b>${esc(plan.planBoxes.solve)}</div>
+            <div><b>How could the story end?</b>${esc(plan.planBoxes.end)}</div>
+          </div>
+        </section>
+        <section class="map">
+          ${plan.paragraphs.map((p, i) => `<article class="para">
+            <span class="num">Paragraph ${i + 1}</span>
+            <h3>${esc(p.label)}</h3>
+            <ul>${(p.notes || []).map(n => `<li>${esc(n)}</li>`).join("")}</ul>
+            ${p.speech ? `<p class="say">${esc(p.speech)}</p>` : ""}
+            <p class="start">Start with: ${esc(p.starter)}</p>
+            <div class="chips">${(p.wowWords || []).map(w => `<button tabindex="-1">${esc(w)}</button>`).join("")}</div>
+            <p class="deeper">💭 ${esc(p.deeper)}</p>
+          </article>`).join("")}
+        </section>` : `
+        <section class="panel">
+          <p>${esc(state.cat)} will put your ideas in the right order: what happens next, the problem, the solution and the twist ending.</p>
+          <p class="note" id="mapMsg"></p>
+        </section>`}
+      <div class="row end">
+        <button class="btn soft" data-act="back">← Back</button>
+        <div class="row">
+          ${magicReady() ? `<button class="btn sun" data-act="magicplan">${plan ? "✨ Try another map" : "✨ Make my map with magic"}</button>` : ""}
+          ${plan ? `<button class="btn" data-act="towrite">Start writing →</button>` : `<button class="btn" data-act="simpleplan">Make my map</button>`}
+        </div>
+      </div>`;
+  }
+
+  // ---------- write ----------
+  function allWow() {
+    const set = new Set();
+    STAGES.forEach(s => s.chips.forEach(w => set.add(w.toLowerCase().replace(/[,!]$/, ""))));
+    (state.story.plan?.paragraphs || []).forEach(p => (p.wowWords || []).forEach(w => set.add(String(w).toLowerCase())));
+    return [...set].filter(w => w.length > 3);
+  }
+  function checks() {
+    const p = state.story.paras;
+    const all = p.join("\n");
+    const speech = (all.match(/[“"][^“”"]{2,}[”"]/g) || []).length;
+    const low = all.toLowerCase();
+    const wow = allWow().filter(w => low.includes(w)).length;
+    const full = i => p[i].trim().split(/\s+/).filter(Boolean).length >= 15;
+    return [
+      ["What happens next", full(0)],
+      ["A problem", full(1)],
+      ["A clever solution", full(2)],
+      ["A twist ending", full(3)],
+      [`2 speech lines in “ ” (${Math.min(speech, 2)}/2)`, speech >= 2],
+      [`5 wow words (${Math.min(wow, 5)}/5)`, wow >= 5],
+      ["4 paragraphs", p.every((_, i) => full(i))]
+    ];
+  }
+  function renderWrite() {
+    const plan = state.story.plan;
+    const c = checks();
+    app.innerHTML = `${topBar()}
+      <section class="talk">
+        <div class="cat">${catSVG()}</div>
+        <div class="bubble">
+          <p class="q">Your turn to be the author!</p>
+          <p class="sub">One box is one paragraph. Look at your map on the right. Go slowly, ${esc(state.cat)} is right here.</p>
+        </div>
+      </section>
+      ${plan.paragraphs.map((p, i) => `<section class="panel">
+        <div class="write-step">
+          <div>
+            <label class="lbl" for="para${i}">Paragraph ${i + 1}: ${esc(p.label)}</label>
+            <textarea id="para${i}" data-para="${i}" placeholder="${esc(p.starter)}">${esc(state.story.paras[i])}</textarea>
+          </div>
+          <div class="hint">
+            <b>Your ideas</b>
+            ${(p.notes || []).map(n => `<span>• ${esc(n)}</span>`).join("")}
+            ${p.speech ? `<span>🗨️ ${esc(p.speech)}</span>` : ""}
+            <span>Wow: <i>${esc((p.wowWords || []).join(", "))}</i></span>
+          </div>
+        </div>
+      </section>`).join("")}
+      <section class="panel">
+        <h3>My checklist</h3>
+        <div class="checklist" id="checklist">${checklistHTML(c)}</div>
+        <p class="mic">${ICON_MIC}Tip: write speech like this: “Who are you?” whispered Lila.</p>
+      </section>
+      <div class="row end">
+        <button class="btn soft" data-act="back">← My map</button>
+        <button class="btn sun" data-act="finish">I'm done! ⭐</button>
+      </div>`;
+  }
+  function checklistHTML(c) {
+    return c.map(([t, ok]) => `<span class="${ok ? "ok" : ""}"><i aria-hidden="true">${ok ? "✓" : ""}</i>${esc(t)}</span>`).join("");
+  }
+  function storyText() {
+    const title = state.story.plan?.title || seed().title;
+    return `${title}\n\n${state.story.paras.map(p => p.trim()).filter(Boolean).join("\n\n")}`;
+  }
+  function renderDone() {
+    app.innerHTML = `${topBar()}
+      <section class="panel party" id="party">
+        <div class="cat">${catSVG("happy")}</div>
+        <h2>You did it, Peter!</h2>
+        <p>${esc(state.cat)} is doing a happy dance. Now copy your story neatly into part 4 of your worksheet.</p>
+        <div class="final" id="final">${esc(storyText())}</div>
+        <div class="row">
+          <button class="btn" data-act="copy">Copy my story</button>
+          <button class="btn soft" data-act="towrite">Change something</button>
+          <button class="btn soft" data-act="home">New story</button>
+        </div>
+        <p class="note" id="copyMsg"></p>
+      </section>`;
+    const party = document.getElementById("party");
+    if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      const cols = ["#e9a23b", "#e6879a", "#2f8a86", "#b4b1bd", "#ffe39a"];
+      for (let i = 0; i < 40; i++) {
+        const d = document.createElement("span");
+        d.className = "dot";
+        d.style.left = Math.random() * 100 + "%";
+        d.style.background = cols[i % cols.length];
+        d.style.animationDelay = (Math.random() * 1.2) + "s";
+        party.appendChild(d);
+      }
+    }
+  }
+
+  // ---------- events ----------
+  app.addEventListener("click", async e => {
+    const b = e.target.closest("[data-act]");
+    if (!b) return;
+    const act = b.dataset.act;
+    const st = state.story;
+    if (act === "home") { state.screen = "home"; state.story = null; render(); window.scrollTo(0, 0); return; }
+    if (act === "start") {
+      state.story = newStory(b.dataset.seed); state.stage = 0; state.react = ""; state.helpIdx = -1; state.screen = "stage"; render(); window.scrollTo(0, 0); return;
+    }
+    if (act === "open") {
+      state.story = store.stories.find(s => s.id === b.dataset.id); state.react = ""; state.helpIdx = -1;
+      state.screen = state.story.done ? "done" : state.story.plan ? "write" : "stage"; state.stage = 0; render(); return;
+    }
+    if (act === "del") {
+      if (b.dataset.confirm !== "1") { b.dataset.confirm = "1"; b.textContent = "Sure? Tap again"; return; }
+      store.stories = store.stories.filter(s => s.id !== b.dataset.id); save(); render(); return;
+    }
+    if (act === "say") { say(document.querySelector(".bubble .q")?.textContent || ""); return; }
+    if (act === "pick") {
+      const s = STAGES[state.stage];
+      st.stages[s.key].card = b.dataset.card;
+      state.react = b.dataset.card === OWN ? "Yes! Your own idea is the best kind." : REACTS[Math.floor(Math.random() * REACTS.length)];
+      save(); render();
+      document.getElementById("more")?.focus({ preventScroll: true });
+      return;
+    }
+    if (act === "chip") {
+      const ta = document.getElementById("more");
+      const s = STAGES[state.stage], a = st.stages[s.key];
+      const w = b.dataset.w;
+      a.text = (a.text.trim() ? a.text.trim() + " " : "") + w;
+      ta.value = a.text; b.classList.add("used"); save(); ta.focus({ preventScroll: true });
+      return;
+    }
+    if (act === "help") { state.helpIdx++; state.react = ""; render(); return; }
+    if (act === "back") {
+      if (state.screen === "stage") { if (state.stage === 0) { state.screen = "home"; state.story = null; } else state.stage--; }
+      else if (state.screen === "map") { state.screen = "stage"; state.stage = STAGES.length - 1; }
+      else if (state.screen === "write") state.screen = "map";
+      state.react = ""; state.helpIdx = -1; render(); window.scrollTo(0, 0); return;
+    }
+    if (act === "next") {
+      if (state.stage < STAGES.length - 1) state.stage++; else state.screen = "map";
+      state.react = ""; state.helpIdx = -1; render(); window.scrollTo(0, 0); return;
+    }
+    if (act === "draw") {
+      const s = STAGES[state.stage];
+      st.pics[s.key] = { msg: `${state.cat} is drawing… (this can take a little while)` };
+      render();
+      try {
+        const { text } = await sample(drawPrompt(s), { modelTier: "default", cache: false });
+        const m = text.match(/<svg[\s\S]*<\/svg>/i);
+        st.pics[s.key] = m ? { svg: m[0].replace(/<script[\s\S]*?<\/script>/gi, "") } : { msg: "Hmm, the picture got lost. Try again!" };
+      } catch (err) {
+        const msg = magicError(err);
+        if (msg) st.pics[s.key] = { msg }; else delete st.pics[s.key];
+      }
+      save(); if (state.screen === "stage") render();
+      return;
+    }
+    if (act === "simpleplan") { st.plan = localPlan(); save(); render(); return; }
+    if (act === "magicplan") {
+      b.disabled = true; b.textContent = `✨ ${state.cat} is thinking…`;
+      const msg = document.getElementById("mapMsg");
+      try {
+        const plan = await sample.json(planPrompt(), { modelTier: "default", cache: false });
+        if (!plan || !Array.isArray(plan.paragraphs) || plan.paragraphs.length < 4) throw { code: "invalid_json" };
+        plan.paragraphs = plan.paragraphs.slice(0, 4);
+        plan.planBoxes = Object.assign(localPlan().planBoxes, plan.planBoxes || {});
+        st.plan = plan; save(); render();
+      } catch (err) {
+        const text = magicError(err);
+        if (!st.plan) { st.plan = localPlan(); save(); }
+        render();
+        const n = document.querySelector(".bubble .sub");
+        if (n && text) n.textContent = text + " Here is a simple map instead.";
+      }
+      return;
+    }
+    if (act === "towrite") { state.screen = "write"; render(); window.scrollTo(0, 0); return; }
+    if (act === "finish") { st.done = true; save(); state.screen = "done"; render(); window.scrollTo(0, 0); return; }
+    if (act === "copy") {
+      const msg = document.getElementById("copyMsg");
+      try { await navigator.clipboard.writeText(storyText()); msg.textContent = "Copied! You can paste it anywhere."; }
+      catch (err) {
+        const r = document.createRange(); r.selectNodeContents(document.getElementById("final"));
+        const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+        msg.textContent = "Your story is selected. Press copy on your keyboard.";
+      }
+      return;
+    }
+  });
+
+  app.addEventListener("input", e => {
+    const t = e.target;
+    if (t.id === "catname") {
+      state.cat = t.value.trim() || "Stormy"; save();
+      const h = app.querySelector(".hero h1"); if (h) h.textContent = `Hi Peter! I'm ${state.cat}.`;
+      return;
+    }
+    if (!state.story) return;
+    if (t.id === "more") { state.story.stages[STAGES[state.stage].key].text = t.value; save(); const n = app.querySelector('[data-act="next"]'); if (n) n.disabled = !t.value.trim() && !state.story.stages[STAGES[state.stage].key].card; }
+    if (t.id === "speech") {
+      const s = STAGES[state.stage], a = state.story.stages[s.key];
+      a.speech = t.value; save();
+      const p = document.getElementById("speechPrev");
+      if (p) { p.hidden = !t.value.trim(); p.innerHTML = speechPreview(a, s); }
+    }
+    if (t.dataset.para) {
+      state.story.paras[+t.dataset.para] = t.value; save();
+      document.getElementById("checklist").innerHTML = checklistHTML(checks());
+    }
+  });
+  app.addEventListener("change", e => {
+    if (e.target.id === "said") {
+      const s = STAGES[state.stage], a = state.story.stages[s.key];
+      a.said = e.target.value; save();
+      const p = document.getElementById("speechPrev"); if (p) p.innerHTML = speechPreview(a, s);
+    }
+  });
+
+  render();
+})();
+</script>
+
+<a href="../" aria-label="Back to Peter's World" style="position:fixed;left:calc(10px + env(safe-area-inset-left,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:2147483000;width:48px;height:48px;border-radius:50%;background:#fff;border:3px solid #5fd3b0;display:grid;place-items:center;font-size:22px;text-decoration:none;box-shadow:0 3px 0 rgba(0,0,0,.18)">🏠</a>
+</body></html>

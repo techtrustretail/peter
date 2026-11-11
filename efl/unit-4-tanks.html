@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Tank Story Expedition</title>
+<style>
+:root{--sand:#f6ecd2;--ink:#2b2a22;--olive:#5b7a2e;--olive2:#3f5a1c;--gold:#f2b632;--red:#d8513b;--sky:#bfe3f2;--card:#fffdf6;--line:#d9cba3;--ok:#2f9e5b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--sand);color:var(--ink);font:17px/1.5 "Trebuchet MS",system-ui,sans-serif;min-height:100vh}
+button{font:inherit;cursor:pointer}
+.wrap{max-width:820px;margin:0 auto;padding:16px 16px 90px}
+header.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+header.top h1{font-size:24px;margin:0;flex:1;min-width:200px;letter-spacing:.5px}
+.chip{background:#fff;border:2px solid var(--line);border-radius:99px;padding:4px 12px;font-weight:700;font-size:15px}
+.btn{border:0;border-radius:14px;padding:12px 18px;font-weight:800;background:var(--olive);color:#fff;box-shadow:0 4px 0 var(--olive2)}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--olive2)}
+.btn.ghost{background:#fff;color:var(--ink);box-shadow:0 4px 0 var(--line);border:2px solid var(--line)}
+.btn.gold{background:var(--gold);color:#3a2a00;box-shadow:0 4px 0 #b8841a}
+.card{background:var(--card);border:3px solid var(--line);border-radius:20px;padding:16px;margin:12px 0}
+.garage{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.garage svg{width:300px;max-width:100%;height:auto;background:linear-gradient(#cfe8f4,#eaf5ec 70%,#c9b98a 70%);border-radius:16px;border:3px solid var(--line)}
+.rank{font-size:22px;font-weight:900}
+.region{border-radius:20px;padding:14px;margin:16px 0;border:3px solid rgba(0,0,0,.08)}
+.region h2{margin:0 0 4px;font-size:20px}
+.region p{margin:0 0 10px;font-size:15px}
+.stations{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.st{background:#fff;border:3px solid var(--line);border-radius:16px;padding:10px;text-align:left;min-height:96px;position:relative}
+.st b{display:block;font-size:15px}
+.st small{color:#6a6250}
+.st .ic{font-size:28px}
+.st.locked{opacity:.45}
+.st.done{border-color:var(--ok)}
+.st .stars{position:absolute;top:8px;right:10px;font-size:13px}
+.st.next{border-color:var(--gold);box-shadow:0 0 0 4px rgba(242,182,50,.35)}
+.bar{height:12px;background:#fff;border:2px solid var(--line);border-radius:99px;overflow:hidden;margin:8px 0 14px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--olive),#8bbf3c);transition:width .4s}
+.q{font-size:20px;font-weight:800;margin:6px 0 12px}
+.ctx{background:#fff7dd;border-left:6px solid var(--gold);padding:8px 12px;border-radius:8px;margin-bottom:12px;font-style:italic}
+.choices{display:grid;gap:10px}
+.choice{text-align:left;background:#fff;border:3px solid var(--line);border-radius:14px;padding:12px 14px;font-weight:700}
+.choice.right{border-color:var(--ok);background:#e5f6ea}
+.choice.wrong{border-color:var(--red);background:#fde9e4;animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.tip{background:#eef6ff;border:2px dashed #7aa7d8;border-radius:12px;padding:10px 12px;margin-top:12px}
+.hit{color:var(--ok);font-weight:900;font-size:20px;margin-top:12px}
+.story p{margin:0 0 10px}
+.story{font-size:18px;background:#fff;border-radius:14px;padding:14px;border:2px solid var(--line)}
+.pool,.line{display:flex;flex-wrap:wrap;gap:8px;min-height:52px;padding:8px;border-radius:12px}
+.line{background:#fff;border:3px dashed var(--line);margin-bottom:10px;flex-direction:column}
+.pool{flex-direction:column}
+.tok{background:#fff;border:2px solid var(--olive);border-radius:12px;padding:8px 12px;font-weight:700;text-align:left}
+.line .tok{background:#eef5e2}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center}
+textarea,input[type=text]{width:100%;font:inherit;border:3px solid var(--line);border-radius:12px;padding:10px;background:#fff}
+textarea{min-height:90px}
+label.f{display:block;font-weight:800;margin:12px 0 4px}
+.hint{font-size:14px;color:#6a6250;margin:2px 0 4px}
+.check{display:flex;gap:8px;align-items:flex-start;margin:6px 0;font-weight:700}
+.check input{width:22px;height:22px;flex:none;margin-top:2px}
+.bank{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.bank span{background:#fff3c9;border-radius:8px;padding:2px 8px;font-size:14px;font-weight:700}
+.modal{position:fixed;inset:0;background:rgba(30,30,20,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}
+.modal .card{max-width:440px;width:100%;text-align:center}
+.big{font-size:26px;font-weight:900;margin:4px 0}
+.pg{font-size:15px}
+.pg table{width:100%;border-collapse:collapse;font-size:14px}
+.pg td,.pg th{border-bottom:1px solid var(--line);padding:6px 4px;text-align:left;vertical-align:top}
+.pg pre{white-space:pre-wrap;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px;font:14px/1.5 system-ui}
+.speak{background:#fff;border:2px solid var(--line);border-radius:99px;padding:6px 12px;font-weight:800}
+#printArea{display:none}
+@media print{body *{visibility:hidden}#printArea,#printArea *{visibility:visible}#printArea{display:block;position:absolute;left:0;top:0;padding:20px;font-size:18px;line-height:2}}
+.smoke{animation:puff 2s infinite}
+@keyframes puff{0%{opacity:.8;transform:translate(0,0)}100%{opacity:0;transform:translate(-14px,-18px)}}
+.newpart{animation:pop 1s ease 2}
+@keyframes pop{50%{transform:scale(1.15)}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<div id="printArea"></div>
+<script>
+/* ===== Tank Story Expedition · FLE Unit 4: Other People, Other Places ===== */
+const KEY="tank-story-expedition-v1";
+let S={done:{},skills:{},miss:[],texts:{},unlockAll:false};
+try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s)S=Object.assign(S,s)}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+
+const PARTS=[
+ ["turret","Turret"],["cannon","Cannon"],["flag","Flag"],["light","Headlight"],["camo","Camo paint"],
+ ["antenna","Radio antenna"],["armour","Armour plates"],["periscope","Periscope"],["exhaust","Smoke exhaust"],["star","Star badge"],
+ ["plate","Name plate"],["muzzle","Super muzzle"],["rocket","Rocket booster"],["goldtrack","Golden tracks"],["medal","General's medal"]];
+const RANKS=[[0,"Recruit"],[3,"Private"],[6,"Corporal"],[9,"Sergeant"],[12,"Captain"],[15,"General"]];
+
+/* ---------- STORIES (short retellings for revision) ---------- */
+const ABU=["Abunuwasi was a very clever man from Kenya. People said he was <b>as cunning as a jackal</b> and <b>smarter than a tree full of monkeys</b>!",
+"He built a house with an upstairs and a downstairs. Abunuwasi lived downstairs, and he sold the upstairs to a rich, greedy merchant. For a few years both of them were happy.",
+"One day, Abunuwasi decided to move far away. He asked the merchant to buy the downstairs too. But the merchant refused. He hoped Abunuwasi would get fed up and leave, so the merchant could have the whole house for free.",
+"But Abunuwasi was too cunning for that. He gave all his friends heavy mallets, and they stood all around the house. Then he went upstairs.",
+"“Good day, my friend,” said Abunuwasi. “I can’t sell my part of the house, so these strong men are going to knock it down.”",
+"The merchant looked out of the window. If the bottom half fell down, the top half would fall too! He quickly changed his mind and bought the downstairs.",
+"Now Abunuwasi had the money he needed, and he started a new life a long, long way away."];
+const BABY=["Long ago, there was a chief who was brave and fierce. Many people were afraid of him.",
+"One day, a wise old woman said, “I know someone who is not afraid of you.” The chief was surprised. “Who is this man?” he cried. “Show him to me!”",
+"The old woman took him to her tent. Inside, a baby girl called Wasso was sitting on a blanket, playing with a stick. “It is not a man,” said the old woman. “It is Wasso.”",
+"“Come here, child!” shouted the chief. But Wasso only smiled. “You must do as I say!” he cried angrily. Wasso began to cry, but she still would not go to him.",
+"So the chief began a special dance – a dance to make people obey. Wasso stopped crying. She watched, and smiled, and laughed. The chief danced and danced until he was very tired… and Wasso fell asleep.",
+"“You see,” said the old woman. “Here is someone who is not afraid of you.” “You are right,” said the chief. “Wasso is braver than me. She is a very brave baby.”",
+"The chief was too tired to be angry any more. He lay down in the tent and fell fast asleep."];
+const SELKIE=["On a windy island in the far north, a lonely fisherman walked along the beach one moonlit night. On the rocks, he saw seal-people dancing. They had taken off their soft, silver sealskins!",
+"Quietly, the fisherman picked up one sealskin and hid it under his coat.",
+"When the dancers ran back to the waves, one young woman could not find her skin. Without it, she could not go home to the sea. She cried, but the fisherman said, “Stay with me and be my wife.”",
+"Years passed. They had three children, and she loved them very much. But every evening she stood on the shore and gazed sadly at the sea.",
+"One day, her youngest son found something hidden in the roof. “Mother, what is this soft, silver coat?” he asked. Her eyes shone like stars.",
+"She hugged her children tightly. Then she ran to the water, pulled on her sealskin and became a seal again. With one last look, she swam away.",
+"People on the island say that every year a grey seal comes to the shore to watch the children play."];
+
+/* ---------- helpers to write questions fast ---------- */
+const mc=(skill,q,choices,a,tip,ctx)=>({t:"mc",skill,q,choices,a,tip,ctx});
+const ord=(skill,q,items,tip)=>({t:"order",skill,q,items,tip});
+const read=(title,paras,note)=>({t:"read",title,paras,note});
+const write=(key,q,fields,checks,bank,note)=>({t:"write",key,q,fields,checks,bank,note});
+
+const REGIONS=[
+ {id:"r1",name:"Savanna Base",sub:"Week 1 · Kenya & Eritrea · Abunuwasi’s House",bg:"#f7d9a0",emoji:"🦒"},
+ {id:"r2",name:"Desert Canyon",sub:"Week 2 · Native American story · The Brave Baby",bg:"#f3b896",emoji:"🏜️"},
+ {id:"r3",name:"Northern Sea Fort",sub:"Week 3 · The Selkie Wife · Write YOUR story",bg:"#b9dbe8",emoji:"🌊"}];
+
+const STATIONS=[
+/* ===== REGION 1 ===== */
+{r:"r1",ic:"🔭",title:"Story Scout",goal:"Find clues and make inferences",steps:[
+ read("Abunuwasi’s House – a story from Kenya",ABU,"Read it once. Tap 🔊 to listen too."),
+ mc("info","Where is the story set?",["In Kenya, in Africa","In Scotland","On a ship at sea"],0,"Look at the very first sentence."),
+ mc("info","Who lived DOWNSTAIRS?",["The merchant","Abunuwasi","Abunuwasi’s friends"],1,"Read paragraph 2 again: “Abunuwasi lived …”"),
+ mc("infer","Why did the merchant refuse to buy the downstairs?",["He had no money","He hoped to get the whole house for free","He did not like the house"],1,"Find the sentence that starts “He hoped…”"),
+ mc("infer","The writer says Abunuwasi was “as cunning as a jackal”. What does that tell us?",["He was clever and tricky","He was hairy and wild","He was slow and lazy"],0,"A jackal in stories is a sneaky, clever animal."),
+ mc("clue","Which CLUE shows the merchant was scared?",["“He looked out of the window.”","“He quickly changed his mind.”","“For a few years both of them were happy.”"],1,"Scared people act fast! Which clue shows speed?"),
+ mc("infer","Were the men REALLY going to knock the house down?",["Yes, they were angry","Probably not – it was Abunuwasi’s trick","Yes, the merchant asked them to"],1,"Abunuwasi was ‘too cunning’. Was it a plan or real?"),
+ mc("culture","Traditional stories like this were first…",["told out loud, maybe around a camp fire","written on computers","only shown on TV"],0,"Very old stories were passed on by storytellers speaking.")]},
+{r:"r1",ic:"🗺️",title:"Five-Stage Map",goal:"Opening, build-up, problem, resolution, ending",steps:[
+ read("The 5 stages of a story",["<b>1. Opening</b> – meet the characters and the setting.","<b>2. Build-up</b> – what happens before the big problem.","<b>3. Problem</b> – something goes wrong (the most exciting part!).","<b>4. Resolution</b> – the problem is solved.","<b>5. Ending</b> – how it all finishes."],"Like a tank mission: start, drive, DANGER!, fix it, home safe."),
+ ord("stages","Put the 5 stages in order (tap them).",["Opening","Build-up","Problem","Resolution","Ending"],"Opening → Build-up → Problem → Resolution → Ending"),
+ ord("stages","Put Abunuwasi’s story in order.",["Abunuwasi builds a house and sells the upstairs","He wants to move away and sell the downstairs","The greedy merchant refuses","Abunuwasi brings friends with mallets","He starts a new life far away"],"Who, where → what happens → what goes wrong → how it is fixed → the end."),
+ mc("stages","“The greedy merchant refuses to buy.” Which stage is this?",["Opening","Problem","Ending"],1,"Something goes wrong for Abunuwasi."),
+ mc("stages","“The merchant quickly buys the downstairs.” Which stage?",["Resolution","Build-up","Opening"],0,"The problem gets solved here."),
+ mc("figur","“Smarter than a tree full of monkeys” is a funny comparison. Why does the writer use it?",["To help us imagine how clever he is","To tell us he lives in a tree","To show he likes monkeys"],0,"Figurative language paints a picture in our heads."),
+ mc("figur","Which is figurative language?",["The tank was as loud as thunder.","The tank has two tracks.","The tank is green."],0,"Look for a comparison: as … as …")]},
+{r:"r1",ic:"🔧",title:"Grammar Garage",goal:"Quantifiers and homophones",steps:[
+ read("Quantifiers & homophones",["<b>Quantifiers</b> tell us how much or how many: <i>all, some, many, few, both, neither, each</i>.","<b>Homophones</b> sound the same but mean different things: <i>see / sea, no / know, there / their, to / two / too, new / knew</i>."],"Tip: ‘know’ has a silent k – it is about your brain!"),
+ mc("quant","Abunuwasi and the merchant shared the house. ___ of them were happy.",["Both","Neither","Few"],0,"Two people, and they were happy → ‘both’."),
+ mc("quant","He gave ___ his friends a heavy mallet. Nobody was left out.",["all","few","neither"],0,"Nobody left out = every one of them."),
+ mc("quant","Only two tanks came back. There were very ___ tanks left.",["few","many","all"],0,"A small number = few."),
+ mc("quant","The merchant and his son did not want to pay. ___ of them wanted to pay.",["Neither","Both","All"],0,"Two people and ‘not’ → neither."),
+ mc("homo","I don’t ___ where the tank is.",["no","know","now"],1,"‘know’ (with a k) is about knowing in your brain."),
+ mc("homo","The tank drove down to the ___.",["see","sea"],1,"The big blue water is the ‘sea’ (it has an ‘a’ like ‘water’)."),
+ mc("homo","The soldiers parked ___ tanks over ___.",["their / there","there / their","they’re / their"],0,"their = belongs to them · there = a place"),
+ mc("homo","This tank is ___ big to fit in the garage.",["to","two","too"],2,"too = more than enough (it has extra o’s!)"),
+ mc("homo","Abunuwasi ___ he would get a ___ house.",["new / knew","knew / new","knew / knew"],1,"knew = past of know · new = not old")]},
+{r:"r1",ic:"✏️",title:"Speech & ’ Workshop",goal:"Apostrophes for possession · direct speech",steps:[
+ read("Two power tools",["<b>Apostrophe for possession:</b> the tank’s cannon (one tank) · the soldiers’ boots (many soldiers) · the men’s boots.","<b>NO apostrophe for plurals:</b> three tanks ✔  three tank’s ✘","<b>Direct speech:</b> the exact words go inside speech marks, with the comma or ! or ? INSIDE:","“Good day, my friend,” said Abunuwasi."],"Rule of thumb: ’s means ‘belongs to’."),
+ mc("apos","Which is correct?",["the merchants house","the merchant’s house","the merchant’s’ house"],1,"The house belongs to the merchant → merchant’s."),
+ mc("apos","I can see three ___ in the desert.",["tanks","tank’s","tanks’"],0,"Just more than one – no belonging → no apostrophe!"),
+ mc("apos","The ___ shoes are under their beds. (lots of girls)",["girl’s","girls’","girls"],1,"Many girls own the shoes → girls’ (apostrophe after the s)."),
+ mc("apos","Which sentence is correct?",["It’s Michael’s birthday.","Its Michaels birthday.","It’s Michaels’ birthday."],0,"It’s = it is · Michael’s = belongs to Michael."),
+ mc("speech","Which is punctuated correctly?",["“Good day, my friend,” said Abunuwasi.","“Good day, my friend.” said Abunuwasi.","Good day, my friend, “said Abunuwasi.”"],0,"Comma INSIDE the speech marks, then ‘said …’"),
+ mc("speech","Which words are SPOKEN? → You’ve broken my best pen said Abbie crossly",["said Abbie crossly","You’ve broken my best pen","Abbie crossly"],1,"Spoken words = what Abbie actually says out loud."),
+ mc("speech","Choose the correct one.",["“Fire!” shouted the captain.","“Fire”! shouted the captain.","“Fire! shouted the captain.”"],0,"The ! stays inside the speech marks."),
+ mc("speech","Choose the correct one.",["“Where is my tank?” asked Sam.","“Where is my tank”? asked Sam.","“Where is my tank,” asked Sam?"],0,"Question mark INSIDE the speech marks.")]},
+{r:"r1",ic:"💥",boss:true,title:"BOSS: Savanna Showdown",goal:"Mixed review + character profile",steps:[
+ mc("infer","How did the merchant probably feel when he saw the men with mallets?",["Worried","Bored","Sleepy"],0,"His top half might fall down!"),
+ mc("stages","Abunuwasi starts a new life far away. Stage?",["Ending","Problem","Build-up"],0,"How the story finishes."),
+ mc("homo","There are ___ tanks on the hill. (2)",["to","two","too"],1,"two = the number 2"),
+ mc("apos","The ___ tracks are muddy. (one tank)",["tank’s","tanks’","tanks"],0,"One tank owns the tracks → tank’s"),
+ mc("quant","___ of the two soldiers was scared. They were both brave!",["Neither","Both","All"],0,"Two people, none scared → neither"),
+ mc("speech","Choose the correct one.",["“I have a plan,” said Abunuwasi.","“I have a plan.” said Abunuwasi.","I have a plan, “said Abunuwasi.”"],0,"Comma inside, then ‘said’."),
+ write("profile","Character profile: Abunuwasi 🕵️",[
+   {k:"looks",label:"What is he like? (2–3 adjectives)",hint:"cunning, clever, patient, sneaky…"},
+   {k:"clue",label:"Which detail in the story shows it?",hint:"He gave his friends mallets… / He tricked the merchant…"},
+   {k:"opening",label:"Write a NEW opening sentence for the story.",hint:"Far away in Kenya, under a hot orange sun, …"}],
+   ["I started each sentence with a capital letter","I ended with a full stop","I used a detail from the story as a clue"],
+   ["cunning","clever","greedy","patient","sly","determined","under the hot sun","in a busy town"])]},
+/* ===== REGION 2 ===== */
+{r:"r2",ic:"🔭",title:"Story Scout 2",goal:"Inference and prediction",steps:[
+ read("The Brave Baby – a Native American story",BABY,"Read it once. Tap 🔊 to listen too."),
+ mc("info","Why were people afraid of the chief?",["He was brave and fierce","He was a baby","He danced all day"],0,"Look at the first sentence."),
+ mc("infer","Why did the chief expect to see a MAN in the tent?",["He thought only a big, strong man could be unafraid of him","The old woman said it was a man","He saw a man through the door"],0,"He could not imagine a baby being brave!"),
+ mc("info","How did Wasso behave when she first saw the chief?",["She cried","She only smiled","She ran away"],1,"Paragraph 4: “But Wasso only …”"),
+ mc("info","When did Wasso start to cry?",["When the chief shouted at her","When the chief danced","When she fell asleep"],0,"She cried after he shouted angrily."),
+ mc("infer","How did the chief feel at the end?",["Still very angry","Tired, and he liked the brave baby","Scared of Wasso"],1,"“too tired to be angry any more”"),
+ mc("predict","PREDICT: What might happen when the chief wakes up?",["He will be kinder and play with Wasso","He will shout at Wasso again","He will forget Wasso"],0,"Clue: he said Wasso was braver than him – he respects her now."),
+ mc("develop","How does the chief CHANGE from the start to the end?",["From fierce and angry → calm and admiring","From kind → angry","He doesn’t change"],0,"Compare the first and last paragraphs.")]},
+{r:"r2",ic:"🎨",title:"Word Power Paint",goal:"Shades of meaning · better words",steps:[
+ read("Shades of meaning",["Some words are close, but not the same – like shades of one colour.","<b>warm → hot → boiling</b>","<b>cross → angry → furious</b>","<b>said → shouted → roared</b>"],"Pick the word that fits EXACTLY."),
+ ord("shades","Order from weakest to strongest.",["cross","angry","furious"],"cross (a little) → angry → furious (VERY!)"),
+ ord("shades","Order from coolest to hottest.",["warm","hot","boiling"],"warm → hot → boiling"),
+ ord("shades","Order from smallest to biggest.",["big","huge","enormous"],"big → huge → enormous"),
+ mc("shades","“Come here, child!” ___ the chief. (He was very loud.)",["whispered","shouted","said"],1,"Loud = shouted."),
+ mc("overused","Replace the overused word: The tank was <u>big</u>.",["The tank was massive.","The tank was nice.","The tank was good."],0,"A precise word paints a clearer picture."),
+ mc("overused","Replace ‘nice’: We had a <u>nice</u> adventure.",["thrilling","nice","ok"],0,"Choose a WOW word!"),
+ mc("adverb","Which adverb shows the tank moved VERY quietly?",["noisily","silently","quickly"],1,"silent = no sound at all"),
+ mc("adverb","The chief danced ___ until he was exhausted. (lots and lots)",["wildly","slightly","calmly"],0,"Lots of big dancing = wildly.")]},
+{r:"r2",ic:"⏳",title:"Time Machine",goal:"Past, present and future verbs",steps:[
+ read("Past · Present · Future",["<b>Past:</b> The chief <u>was</u> brave. Wasso <u>laughed</u>.","<b>Present:</b> “Wasso <u>is</u> braver than me.”","<b>Future:</b> “I <u>will</u> never give up!”","Stories are usually told in the PAST. Speech is often present or future."],""),
+ mc("tense","Yesterday the chief ___ for a long time.",["dances","danced","will dance"],1,"Yesterday → past → -ed"),
+ mc("tense","Tomorrow Wasso ___ with the chief.",["played","plays","will play"],2,"Tomorrow → future → will"),
+ mc("tense","Look! The tank ___ up the hill right now.",["is driving","drove","will drive"],0,"Right now → present"),
+ mc("tense","“The chief was brave and fierce.” What tense?",["Past","Present","Future"],0,"was = past"),
+ mc("tense","“Wasso is braver than me,” said the chief. The spoken words are in…",["the present tense","the past tense","the future tense"],0,"is = present"),
+ mc("tense","Which verb is the past of ‘fall’?",["falled","fell","fallen down"],1,"fall → fell (irregular!)"),
+ ord("tense","Build a FUTURE sentence.",["I","will","drive","my","tank","tomorrow."],"I will drive my tank tomorrow.")]},
+{r:"r2",ic:"🥁",title:"Spelling Drill",goal:"Syllables · plurals · tricky words",steps:[
+ read("Spelling tricks",["Clap the <b>syllables</b>: blan-ket (2) · sur-prised (2) · ad-ven-ture (3).","Look for the <b>root word</b>: play<u>ing</u> → play · <u>un</u>happy → happy.","<b>Plurals:</b> tank → tanks · box → box<u>es</u> · baby → bab<u>ies</u> · wolf → wol<u>ves</u> · child → children"],"Say it slowly, clap it, then spell each part."),
+ mc("syll","How many syllables in ‘blanket’?",["1","2","3"],1,"blan – ket"),
+ mc("syll","How many syllables in ‘adventure’?",["2","3","4"],1,"ad – ven – ture"),
+ mc("syll","How many syllables in ‘Abunuwasi’?",["3","4","5"],2,"A – bu – nu – wa – si"),
+ mc("spell","Which spelling is correct?",["suprised","surprised","surprized"],1,"sur – prised (two r’s!)"),
+ mc("spell","Which spelling is correct?",["shoutting","shouting","shoting"],1,"shout + ing (no double t)"),
+ mc("spell","Which spelling is correct?",["someone","sumone","somone"],0,"some + one"),
+ mc("plural","One baby, two ___.",["babys","babies","baby’s"],1,"consonant + y → ies"),
+ mc("plural","One box, three ___.",["boxs","boxes","box’s"],1,"x → add es"),
+ mc("plural","One wolf, many ___.",["wolfs","wolves","wolfes"],1,"f → ves")]},
+{r:"r2",ic:"💥",boss:true,title:"BOSS: Canyon Clash",goal:"Mixed review + upgrade a sentence",steps:[
+ mc("shades","Strongest word?",["cross","furious","angry"],1,"furious = VERY angry"),
+ mc("tense","Last week the soldiers ___ a new tank.",["build","built","will build"],1,"Last week → past"),
+ mc("plural","One child, two ___.",["childs","children","childrens"],1,"child → children"),
+ mc("homo","The chief ___ the baby was brave.",["new","knew"],1,"knew = past of know"),
+ mc("predict","Wasso is not scared of the fierce chief. What does this suggest about her?",["She is brave","She is unkind","She is lost"],0,"That’s why the story is called The Brave Baby!"),
+ write("upgrade","Upgrade the sentence 🛠️  “The chief was angry with the little girl.”",[
+   {k:"upgrade",label:"Your super sentence",hint:"The proud chief was as furious as a storm with the tiny, smiling Wasso."},
+   {k:"ending",label:"New ending: what happens when Wasso and the chief wake up? (4 sentences, include speech)",hint:"When the sun rose, Wasso … “Good morning, little one,” said the chief…"}],
+   ["I added an extra adjective for the chief","I used a stronger word than ‘angry’","I used a simile (as … as / like …)","I put speech inside “ ”","I used the past tense for the story parts"],
+   ["proud","courageous","furious","fierce","tiny","fearless","as furious as a storm","like a roaring lion","gently","suddenly"])]},
+/* ===== REGION 3 ===== */
+{r:"r3",ic:"🔭",title:"Story Scout 3",goal:"Read The Selkie Wife · find the stages",steps:[
+ read("The Selkie Wife – a story from the northern islands",SELKIE,"A selkie is a seal that can become a person. Tap 🔊 to listen."),
+ mc("info","Where is the story set?",["On a windy island in the far north","In a hot desert","In a big city"],0,"First sentence!"),
+ mc("infer","Why couldn’t the young woman go home?",["The fisherman hid her sealskin","She was too tired","She lost her shoes"],0,"Without her skin, she couldn’t go back to the sea."),
+ mc("clue","Which clue shows she missed the sea?",["“she gazed sadly at the sea”","“They had three children”","“a lonely fisherman”"],0,"Look for a feeling word."),
+ mc("stages","“The son finds the sealskin in the roof.” Which stage?",["Resolution","Opening","Build-up"],0,"This solves her problem – she can go home."),
+ mc("stages","“The fisherman hides the sealskin.” Which stage?",["Problem","Ending","Resolution"],0,"Something goes wrong for the selkie."),
+ mc("figur","“Her eyes shone like stars.” This is a…",["simile","question","plural"],0,"‘like’ → simile"),
+ mc("culture","What tells us the story comes from a place near the sea?",["Fishermen, seals, beaches and waves","Camels and sand","Tanks and roads"],0,"The setting reflects the place the story comes from.")]},
+{r:"r3",ic:"🧱",title:"Paragraph Bricks",goal:"Organise events into paragraphs",steps:[
+ read("When do I start a new paragraph?",["Start a new paragraph when there is a new <b>TIME</b>, new <b>PLACE</b>, new <b>PERSON</b> or a new <b>SPEAKER</b>.","Time openers help: <i>One moonlit night… · Years passed… · Suddenly… · In the end…</i>"],"TiPToP: Time, Place, Topic, Person."),
+ ord("para","Put the Selkie paragraphs in order.",["One night, a fisherman sees seal-people dancing.","He hides one sealskin.","The selkie can’t go home and becomes his wife.","Years later, her son finds the hidden skin.","She swims away – but visits every year."],"Follow the time: night → hiding → years later → the end."),
+ mc("para","“Years passed.” Why does the writer start a new paragraph here?",["The TIME changes","A new animal appears","Nothing changes"],0,"Time jump → new paragraph."),
+ mc("para","A new person starts talking. What should you do?",["Start a new line / paragraph","Keep writing on the same line","Stop the story"],0,"New speaker → new line."),
+ mc("para","Which is a good TIME opener for the problem part?",["Suddenly,","The end.","Hello,"],0,"‘Suddenly’ makes the problem exciting!"),
+ mc("para","Which opener fits the ENDING?",["In the end,","Once upon a time,","Meanwhile,"],0,"In the end = finishing.")]},
+{r:"r3",ic:"🧭",title:"Mission Planner",goal:"Plan your own 5-stage story",steps:[
+ read("Plan your story",["You will write YOUR OWN traditional-style story. A tank can be in it – or not! It’s your choice.","Ideas: <i>a clever tank driver tricks a greedy general</i> · <i>a tiny tank is braver than the big ones</i> · <i>a magic tank that can become a submarine</i>.","Notes are enough – short words, no full sentences needed."],"A few notes for each stage are enough to get started."),
+ write("plan","Character & setting 🗺️",[
+   {k:"char",label:"Main character: name + 3 words to describe them",hint:"Tiny Tom, a small tank – brave, clever, cheeky"},
+   {k:"setting",label:"Setting: where and when?",hint:"a dusty desert long ago, at sunrise"}],
+   ["My character has a name","I wrote where the story happens"],["brave","clever","greedy","wise","sandy desert","snowy mountain","deep jungle","long ago"]),
+ write("plan5","Stage notes 📝",[
+   {k:"s1",label:"1. Opening – who, where?",hint:"Tiny Tom lives at the desert base…"},
+   {k:"s2",label:"2. Build-up – what happens first?",hint:"The big tanks laugh at Tom…"},
+   {k:"s3",label:"3. Problem – what goes wrong?",hint:"A sandstorm traps the big tanks…"},
+   {k:"s4",label:"4. Resolution – how is it solved?",hint:"Tom is small enough to squeeze through…"},
+   {k:"s5",label:"5. Ending – how does it finish?",hint:"The big tanks say sorry; Tom gets a medal…"}],
+   ["The problem is clear","The resolution fixes THAT problem","My ending finishes the story"],[])]},
+{r:"r3",ic:"🖊️",title:"Write the Story",goal:"Write it in paragraphs (type, then copy on paper)",steps:[
+ write("story","Write your story ✍️ (one or two paragraphs per stage)",[
+   {k:"p1",label:"1. Opening",hint:"Start with a time opener: Long ago, in a … there lived …",plan:"s1"},
+   {k:"p2",label:"2. Build-up",hint:"One morning, …",plan:"s2"},
+   {k:"p3",label:"3. Problem",hint:"Suddenly, … (add some speech “…”)",plan:"s3"},
+   {k:"p4",label:"4. Resolution",hint:"Luckily, … / Just in time, …",plan:"s4"},
+   {k:"p5",label:"5. Ending",hint:"In the end, …",plan:"s5"}],
+   ["Capital letters at the start of sentences ✔","Full stops ✔","At least one speech “ ” with a comma or ! inside ✔","At least 2 WOW words ✔","Past tense for the story ✔"],
+   ["Long ago,","One morning,","Suddenly,","Luckily,","In the end,","as fast as lightning","fearless","enormous","furious","whispered","roared","crept"],"Write as much as you can. Then tap 🖨️ to print and copy it neatly on paper.")]},
+{r:"r3",ic:"🏆",boss:true,title:"FINAL BOSS: Review Rally",goal:"Read aloud · improve · be a fair reviewer",steps:[
+ {t:"listen"},
+ mc("review","When you check a story, what should you look at FIRST?",["Does the story make sense and are events in order?","Is the handwriting pretty?","Is it very long?"],0,"Sense and order first, then paragraphs, punctuation and words."),
+ mc("review","Your friend reads their story to you. What is a respectful comment?",["“I loved the problem part! Maybe add a speech line in the ending.”","“That’s boring.”","“Mine is better.”"],0,"Kind + helpful = one thing you like + one idea."),
+ mc("review","Someone gives you feedback. What should you do?",["Listen politely and ask if you’re not sure","Get cross","Ignore it"],0,"Feedback helps your writing level up!"),
+ mc("stages","Does the resolution need to connect to the problem?",["Yes – it must solve THAT problem","No – anything can happen"],0,"A sandstorm problem needs a sandstorm solution."),
+ write("review","My 2 stars and 1 wish ⭐⭐🌠",[
+   {k:"star1",label:"⭐ One thing I’m pleased with",hint:"I’m proud of my problem part because …"},
+   {k:"star2",label:"⭐ Another thing I did well",hint:"I used the WOW word …"},
+   {k:"wish",label:"🌠 One thing I could improve",hint:"Next time I will add more speech / check my apostrophes …"}],
+   ["I read my story aloud (or listened to it)","I fixed at least one thing"],[])]}
+];
+STATIONS.forEach((s,i)=>{s.id="s"+(i+1);s.part=i});
+
+const SKILL_VI={info:"Tìm thông tin trong truyện",infer:"Suy luận (inference)",clue:"Chỉ ra dẫn chứng (clue)",culture:"Truyện phản ánh văn hoá",stages:"5 phần của truyện",figur:"Ngôn ngữ hình ảnh",quant:"Quantifiers",homo:"Homophones",apos:"Dấu ’ sở hữu",speech:"Lời thoại trực tiếp “ ”",predict:"Dự đoán",develop:"Nhân vật thay đổi",shades:"Sắc thái từ",overused:"Thay từ nhàm",adverb:"Trạng từ",tense:"Thì quá khứ/hiện tại/tương lai",syll:"Âm tiết",spell:"Chính tả",plural:"Số nhiều",para:"Chia đoạn văn",review:"Tự sửa & nhận xét bài"};
+
+/* ---------- sound + speech ---------- */
+let AC=null;
+function beep(ok){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.connect(g);g.connect(AC.destination);
+ o.type=ok?"triangle":"sine";o.frequency.setValueAtTime(ok?520:240,AC.currentTime);if(ok)o.frequency.linearRampToValueAtTime(880,AC.currentTime+.15);
+ g.gain.setValueAtTime(.18,AC.currentTime);g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+.3);o.start();o.stop(AC.currentTime+.32)}catch(e){}}
+function speak(t){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t.replace(/<[^>]+>/g,""));u.lang="en-GB";u.rate=.92;
+ const v=speechSynthesis.getVoices().find(v=>/en-GB/i.test(v.lang));if(v)u.voice=v;speechSynthesis.speak(u)}catch(e){}}
+function stopSpeak(){try{speechSynthesis.cancel()}catch(e){}}
+
+/* ---------- tank drawing ---------- */
+function tankSVG(n,highlight){
+ const has=k=>PARTS.findIndex(p=>p[0]===k)<n;
+ const hl=k=>highlight===k?' class="newpart" style="transform-box:fill-box;transform-origin:center"':'';
+ const camo=has("camo");
+ return `<svg viewBox="0 0 300 180" role="img" aria-label="Your tank">
+ ${has("medal")?`<g${hl("medal")}><circle cx="40" cy="30" r="16" fill="#f2b632" stroke="#b8841a" stroke-width="3"/><text x="40" y="36" font-size="16" text-anchor="middle">★</text></g>`:""}
+ ${has("exhaust")?`<g${hl("exhaust")}><rect x="40" y="76" width="10" height="16" fill="#555"/><circle class="smoke" cx="44" cy="70" r="7" fill="#bbb"/></g>`:""}
+ ${has("rocket")?`<g${hl("rocket")}><rect x="14" y="88" width="34" height="14" rx="6" fill="#d8513b"/><polygon points="14,90 2,95 14,100" fill="#f2b632"/></g>`:""}
+ ${has("flag")?`<g${hl("flag")}><line x1="118" y1="58" x2="118" y2="18" stroke="#444" stroke-width="3"/><polygon points="118,18 146,26 118,34" fill="#d8513b"/></g>`:""}
+ ${has("antenna")?`<g${hl("antenna")}><line x1="178" y1="58" x2="190" y2="14" stroke="#333" stroke-width="2"/><circle cx="190" cy="14" r="4" fill="#d8513b"/></g>`:""}
+ ${has("periscope")?`<g${hl("periscope")}><rect x="140" y="40" width="10" height="18" fill="#4a4a4a"/><rect x="140" y="38" width="18" height="8" rx="2" fill="#4a4a4a"/></g>`:""}
+ ${has("cannon")?`<g${hl("cannon")}><rect x="196" y="66" width="76" height="10" rx="3" fill="#3f5a1c"/></g>`:""}
+ ${has("muzzle")?`<g${hl("muzzle")}><rect x="268" y="61" width="14" height="20" rx="3" fill="#2b2a22"/></g>`:""}
+ ${has("turret")?`<g${hl("turret")}><rect x="100" y="54" width="102" height="36" rx="16" fill="${camo?"#6d7f3a":"#5b7a2e"}" stroke="#3f5a1c" stroke-width="3"/>
+   ${camo?`<ellipse cx="125" cy="66" rx="12" ry="6" fill="#8a7a3a"/><ellipse cx="170" cy="78" rx="14" ry="6" fill="#3e4f1e"/>`:""}</g>`:""}
+ ${has("star")?`<g${hl("star")}><polygon points="150,60 154,70 165,70 156,76 160,86 150,80 140,86 144,76 135,70 146,70" fill="#fff" stroke="#f2b632" stroke-width="2"/></g>`:""}
+ <rect x="42" y="88" width="216" height="32" rx="8" fill="${camo?"#6d7f3a":"#5b7a2e"}" stroke="#3f5a1c" stroke-width="3"/>
+ ${camo?`<ellipse cx="80" cy="100" rx="18" ry="7" fill="#8a7a3a"/><ellipse cx="150" cy="108" rx="20" ry="6" fill="#3e4f1e"/><ellipse cx="215" cy="98" rx="16" ry="6" fill="#8a7a3a"/>`:""}
+ ${has("plate")?`<g${hl("plate")}><rect x="118" y="94" width="64" height="18" rx="4" fill="#fffdf6" stroke="#2b2a22"/><text x="150" y="108" font-size="12" font-weight="900" text-anchor="middle" fill="#2b2a22">PETER</text></g>`:""}
+ ${has("light")?`<g${hl("light")}><circle cx="256" cy="98" r="7" fill="#ffe680" stroke="#b8841a" stroke-width="2"/><polygon points="262,94 298,84 298,112 262,102" fill="rgba(255,230,128,.45)"/></g>`:""}
+ <rect x="36" y="118" width="228" height="38" rx="19" fill="${has("goldtrack")?"#b8841a":"#333"}"/>
+ ${[60,96,132,168,204,240].map(x=>`<circle cx="${x}" cy="137" r="12" fill="${has("goldtrack")?"#f2b632":"#777"}" stroke="#222" stroke-width="2"/>`).join("")}
+ ${has("armour")?`<g${hl("armour")}><rect x="34" y="112" width="232" height="14" rx="4" fill="#4b6324" stroke="#2f4214" stroke-width="2"/>${[60,110,160,210,250].map(x=>`<circle cx="${x}" cy="119" r="2.5" fill="#cfd8b0"/>`).join("")}</g>`:""}
+ ${highlight==="goldtrack"?`<rect x="36" y="118" width="228" height="38" rx="19" fill="none" stroke="#f2b632" stroke-width="4" class="newpart" style="transform-box:fill-box;transform-origin:center"/>`:""}
+ </svg>`;
+}
+function partsCount(){return STATIONS.filter(s=>S.done[s.id]).length}
+function rank(n){let r=RANKS[0][1];RANKS.forEach(([k,v])=>{if(n>=k)r=v});return r}
+function unlocked(i){return S.unlockAll||i===0||!!S.done[STATIONS[i-1].id]}
+
+/* ---------- screens ---------- */
+const app=document.getElementById("app");
+function esc(t){return String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+
+function home(){
+ stopSpeak();
+ const n=partsCount(), nextIdx=STATIONS.findIndex(s=>!S.done[s.id]);
+ let h=`<header class="top"><h1>🪖 Tank Story Expedition</h1><span class="chip">🔩 ${n}/15 parts</span><button class="btn ghost" onclick="parents()">👨‍👩‍👦 Parents</button></header>
+ <div class="card garage">${tankSVG(n)}<div><div class="hint">Commander Peter · Rank</div><div class="rank">${rank(n)}</div>
+ <p style="margin:6px 0">Finish a station → win a new tank part.<br>One station a day (10–15 minutes). No timer, no rush! 🙂</p>
+ ${nextIdx>=0?`<button class="btn gold" onclick="play(${nextIdx})">▶ Next mission: ${STATIONS[nextIdx].ic} ${esc(STATIONS[nextIdx].title)}</button>`:`<b>🎖️ Mission complete, General Peter!</b>`}</div></div>`;
+ REGIONS.forEach(R=>{
+  h+=`<section class="region" style="background:${R.bg}"><h2>${R.emoji} ${R.name}</h2><p>${R.sub}</p><div class="stations">`;
+  STATIONS.forEach((s,i)=>{if(s.r!==R.id)return;const ok=unlocked(i),d=S.done[s.id];
+   h+=`<button class="st ${ok?"":"locked"} ${d?"done":""} ${i===nextIdx?"next":""}" ${ok?`onclick="play(${i})"`:"disabled"}>
+   <span class="ic">${ok?s.ic:"🔒"}</span>${d?`<span class="stars">${"⭐".repeat(d)}</span>`:""}<b>${i+1}. ${esc(s.title)}</b><small>${esc(s.goal)}</small><br><small>🔩 ${PARTS[s.part][1]}</small></button>`});
+  h+=`</div></section>`});
+ app.innerHTML=h;window.scrollTo(0,0);
+}
+
+let cur=null;
+function play(i){stopSpeak();cur={i,st:STATIONS[i],k:0,first:0,tot:0};step()}
+function prog(){const s=cur.st;return `<header class="top"><button class="btn ghost" onclick="home()">⬅ Base</button><h1 style="font-size:20px">${s.ic} ${esc(s.title)}</h1><span class="chip">${cur.k+1}/${s.steps.length}</span></header>
+ <div class="bar"><i style="width:${(cur.k/s.steps.length)*100}%"></i></div>`}
+function next(){cur.k++;if(cur.k>=cur.st.steps.length)finish();else step()}
+function step(){
+ const p=cur.st.steps[cur.k];stopSpeak();window.scrollTo(0,0);
+ if(p.t==="read")return rRead(p);if(p.t==="mc")return rMC(p);if(p.t==="order")return rOrder(p);if(p.t==="write")return rWrite(p);if(p.t==="listen")return rListen();
+}
+function rRead(p){
+ app.innerHTML=prog()+`<div class="card"><div class="q">📜 ${p.title}</div>
+ <div class="row" style="margin:0 0 10px"><button class="speak" id="sp">🔊 Listen</button><button class="speak" onclick="stopSpeak()">⏹ Stop</button></div>
+ <div class="story">${p.paras.map(x=>`<p>${x}</p>`).join("")}</div>${p.note?`<div class="tip">💡 ${p.note}</div>`:""}
+ <div class="row"><button class="btn" onclick="next()">I’ve read it ➜</button></div></div>`;
+ document.getElementById("sp").onclick=()=>speak(p.paras.join(" "));
+}
+function logSkill(skill,ok,q,picked){S.skills[skill]=S.skills[skill]||[0,0];S.skills[skill][1]++;if(ok)S.skills[skill][0]++;
+ if(!ok){S.miss.push({d:new Date().toISOString().slice(0,10),st:cur.st.title,skill,q:q.replace(/<[^>]+>/g,""),picked});if(S.miss.length>80)S.miss.shift()}save()}
+function rMC(p){
+ let tried=false,done=false;
+ app.innerHTML=prog()+`<div class="card">${p.ctx?`<div class="ctx">${p.ctx}</div>`:""}<div class="q">${p.q}</div>
+ <div class="choices">${p.choices.map((c,j)=>`<button class="choice" data-j="${j}">${c}</button>`).join("")}</div><div id="fb"></div></div>`;
+ cur.tot++;
+ app.querySelectorAll(".choice").forEach(b=>b.onclick=()=>{
+  if(done)return;const j=+b.dataset.j;
+  if(j===p.a){done=true;b.classList.add("right");beep(true);if(!tried)cur.first++;if(!tried)logSkill(p.skill,true,p.q);
+   document.getElementById("fb").innerHTML=`<div class="hit">${["💥 Direct hit!","🎯 Bullseye!","⭐ Great shot, Commander!","🚀 Brilliant!"][Math.floor(Math.random()*4)]}</div><div class="row"><button class="btn" id="nx">Next ➜</button></div>`;
+   document.getElementById("nx").onclick=next;
+  }else{beep(false);b.classList.add("wrong");b.disabled=true;if(!tried){tried=true;logSkill(p.skill,false,p.q,p.choices[j].replace(/<[^>]+>/g,""))}
+   document.getElementById("fb").innerHTML=`<div class="tip">🧭 Not quite – try again! <b>Hint:</b> ${p.tip}</div>`}
+ });
+}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}
+ if(a.every((x,i)=>x===arguments[0][i])&&a.length>1)[a[0],a[1]]=[a[1],a[0]];return a}
+function rOrder(p){
+ let tried=false,pick=[];const pool=shuffle(p.items);cur.tot++;
+ function draw(){
+  app.innerHTML=prog()+`<div class="card"><div class="q">${p.q}</div>
+  <div class="hint">Your order:</div><div class="line">${pick.map((x,j)=>`<button class="tok" data-u="${j}">${j+1}. ${x}</button>`).join("")||'<span class="hint">Tap the cards below…</span>'}</div>
+  <div class="pool">${pool.filter(x=>!pick.includes(x)).map(x=>`<button class="tok" data-p="${esc(x)}">${x}</button>`).join("")}</div>
+  <div id="fb"></div><div class="row">${pick.length===p.items.length?'<button class="btn" id="ck">Check ✔</button>':""}<button class="btn ghost" id="rs">↺ Reset</button></div></div>`;
+  app.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{pick.push(pool.find(x=>esc(x)===b.dataset.p&&!pick.includes(x)));draw()});
+  app.querySelectorAll("[data-u]").forEach(b=>b.onclick=()=>{pick.splice(+b.dataset.u,1);draw()});
+  document.getElementById("rs").onclick=()=>{pick=[];draw()};
+  const ck=document.getElementById("ck");if(ck)ck.onclick=()=>{
+   if(pick.every((x,j)=>x===p.items[j])){beep(true);if(!tried){cur.first++;logSkill(p.skill,true,p.q)}
+    document.getElementById("fb").innerHTML=`<div class="hit">💥 Perfect order!</div>`;ck.outerHTML='<button class="btn" id="nx">Next ➜</button>';document.getElementById("nx").onclick=next;
+    app.querySelectorAll("[data-u]").forEach(b=>b.onclick=null);
+   }else{beep(false);if(!tried){tried=true;logSkill(p.skill,false,p.q,pick.join(" → "))}
+    const ok=pick.filter((x,j)=>x===p.items[j]).length;pick=pick.slice(0,pick.findIndex((x,j)=>x!==p.items[j]));draw();
+    document.getElementById("fb").innerHTML=`<div class="tip">🧭 ${ok} card(s) were in the right place – I kept the good start. <b>Hint:</b> ${p.tip}</div>`}
+  };
+ }
+ draw();
+}
+function words(t){return (t||"").trim().split(/\s+/).filter(Boolean).length}
+function rWrite(p){
+ const T=S.texts[p.key]=S.texts[p.key]||{};const plan=S.texts.plan5||{};
+ app.innerHTML=prog()+`<div class="card"><div class="q">${p.q}</div>${p.note?`<div class="tip">💡 ${p.note}</div>`:""}
+ ${p.bank.length?`<div class="hint">WOW word bank (tap to add):</div><div class="bank">${p.bank.map(w=>`<span data-w="${esc(w)}" role="button" tabindex="0">${w}</span>`).join("")}</div>`:""}
+ ${p.fields.map(f=>`<label class="f" for="f_${f.k}">${f.label}</label>${f.plan&&plan[f.plan]?`<div class="hint">📝 Your plan: ${esc(plan[f.plan])}</div>`:""}<div class="hint">e.g. ${esc(f.hint)}</div><textarea id="f_${f.k}" data-k="${f.k}">${esc(T[f.k]||"")}</textarea>`).join("")}
+ <div class="card" style="background:#fff;margin-top:14px"><b>✅ Self-check (tick when done)</b>${p.checks.map((c,j)=>`<label class="check"><input type="checkbox" data-c="${j}">${c}</label>`).join("")}</div>
+ <div id="fb"></div><div class="row"><button class="btn" id="go">Save & continue ➜</button><button class="speak" id="rd">🔊 Read my writing</button>${p.key==="story"?'<button class="speak" id="pr">🖨️ Print to copy on paper</button>':""}</div></div>`;
+ let last=null;
+ app.querySelectorAll("textarea").forEach(t=>{t.onfocus=()=>last=t;t.oninput=()=>{T[t.dataset.k]=t.value;save()}});
+ app.querySelectorAll("[data-w]").forEach(s=>s.onclick=()=>{const t=last||app.querySelector("textarea");t.value=(t.value+(t.value&&!/\s$/.test(t.value)?" ":"")+s.dataset.w+" ");T[t.dataset.k]=t.value;save();t.focus()});
+ document.getElementById("rd").onclick=()=>speak(p.fields.map(f=>T[f.k]||"").join(". "));
+ const pr=document.getElementById("pr");if(pr)pr.onclick=()=>{document.getElementById("printArea").innerHTML=`<h2>My story – by Peter</h2>`+p.fields.map(f=>`<p><i>${f.label}</i><br>${esc(T[f.k]||"")}</p>`).join("");window.print()};
+ document.getElementById("go").onclick=()=>{
+  const empty=p.fields.filter(f=>words(T[f.k])<2);const unticked=[...app.querySelectorAll("[data-c]")].filter(c=>!c.checked).length;
+  if(empty.length){document.getElementById("fb").innerHTML=`<div class="tip">✏️ Just a little more: write something for <b>${empty.map(f=>f.label.split("(")[0]).join(", ")}</b>. Short notes are OK!</div>`;return}
+  if(unticked){document.getElementById("fb").innerHTML=`<div class="tip">🔍 Commander check! Read your writing once more and tick the boxes. Fix anything you spot. 👍</div>`;return}
+  beep(true);S.texts[p.key].when=new Date().toISOString().slice(0,10);save();next()};
+}
+function rListen(){
+ const st=S.texts.story||{};const txt=["p1","p2","p3","p4","p5"].map(k=>st[k]||"").filter(Boolean);
+ app.innerHTML=prog()+`<div class="card"><div class="q">🎧 Listen to YOUR story</div>
+ <p>Tap 🔊 and listen like a reader. Does it make sense? Are the events in order? Then read it aloud yourself – with expression, like a storyteller!</p>
+ <div class="row" style="margin:0 0 10px"><button class="speak" id="sp">🔊 Listen</button><button class="speak" onclick="stopSpeak()">⏹ Stop</button></div>
+ <div class="story">${txt.length?txt.map(x=>`<p>${esc(x)}</p>`).join(""):"<p>(Your story from Station 14 will appear here.)</p>"}</div>
+ <div class="row"><button class="btn" onclick="next()">I listened and read it aloud ➜</button></div></div>`;
+ document.getElementById("sp").onclick=()=>speak(txt.join(" "));
+}
+function finish(){
+ const s=cur.st;const r=cur.tot?cur.first/cur.tot:1;const stars=r>=.85?3:r>=.6?2:1;
+ const firstTime=!S.done[s.id];S.done[s.id]=Math.max(S.done[s.id]||0,stars);save();
+ const n=partsCount();const part=PARTS[s.part];
+ home();
+ const m=document.createElement("div");m.className="modal";
+ m.innerHTML=`<div class="card"><div class="big">${s.boss?"🏆 BOSS DEFEATED!":"🎉 Mission complete!"}</div><div style="font-size:28px">${"⭐".repeat(stars)}</div>
+ ${tankSVG(n,firstTime?part[0]:null)}
+ <p>${firstTime?`New part unlocked: <b>🔩 ${part[1]}</b>`:"You replayed a mission – great practice!"}<br>Rank: <b>${rank(n)}</b></p>
+ ${stars<3?'<p class="hint">Play again any time to polish your stars ⭐</p>':""}
+ <button class="btn gold" id="ok">Back to base</button></div>`;
+ document.body.appendChild(m);document.getElementById("ok").onclick=()=>{m.remove();home()};beep(true);setTimeout(()=>beep(true),180);
+}
+
+/* ---------- parents' corner (Vietnamese) ---------- */
+function parents(){
+ stopSpeak();
+ const rows=Object.entries(S.skills).map(([k,[c,t]])=>({k,c,t,p:Math.round(100*c/t)})).sort((a,b)=>a.p-b.p);
+ const lv=p=>p<60?"🔴":p<85?"🟡":"🟢";
+ const T=S.texts;const block=(title,o,keys)=>o&&keys.some(k=>o[k])?`<h3>${title}${o.when?` <small>(${o.when})</small>`:""}</h3><pre>${keys.filter(k=>o[k]).map(k=>esc(o[k])).join("\n\n")}</pre>`:"";
+ const code="TANK-U4|"+JSON.stringify({done:S.done,skills:S.skills});
+ app.innerHTML=`<header class="top"><button class="btn ghost" onclick="home()">⬅ Về game</button><h1>Góc bố mẹ</h1></header>
+ <div class="card pg"><b>Mục tiêu:</b> ôn FLE Unit 4 “Other People, Other Places” theo Parent Guide: Tuần 1 (trạm 1–5), Tuần 2 (trạm 6–10), Tuần 3 (trạm 11–15).
+ Mỗi ngày 1 trạm, 10–15 phút. Con được thử lại không giới hạn; sao chỉ tính câu đúng ngay lần đầu.<br>
+ <b>Tiến độ:</b> ${partsCount()}/15 trạm · cấp bậc ${rank(partsCount())}</div>
+ <div class="card pg"><b>Kỹ năng (đúng ngay lần đầu)</b>${rows.length?`<table><tr><th>Kỹ năng</th><th>Đúng</th><th>Mức</th></tr>${rows.map(r=>`<tr><td>${SKILL_VI[r.k]||r.k}</td><td>${r.c}/${r.t} (${r.p}%)</td><td>${lv(r.p)}</td></tr>`).join("")}</table>`:"<p>Chưa có dữ liệu.</p>"}</div>
+ <div class="card pg"><b>Câu con chọn sai lần đầu (mới nhất trước)</b>${S.miss.length?`<table><tr><th>Ngày</th><th>Câu hỏi</th><th>Con chọn</th></tr>${S.miss.slice().reverse().slice(0,25).map(m=>`<tr><td>${m.d}</td><td>${esc(m.q)}</td><td>${esc(m.picked||"")}</td></tr>`).join("")}</table>`:"<p>Chưa có.</p>"}</div>
+ <div class="card pg"><b>Bài viết của con</b> <span class="hint">— bố mẹ đọc, khen 2 ⭐ + 1 điều ước, rồi cho con chép đẹp ra giấy.</span>
+ ${block("Hồ sơ nhân vật Abunuwasi",T.profile,["looks","clue","opening"])}${block("Câu nâng cấp + kết mới (Brave Baby)",T.upgrade,["upgrade","ending"])}
+ ${block("Kế hoạch truyện",Object.assign({},T.plan||{},T.plan5||{}),["char","setting","s1","s2","s3","s4","s5"])}${block("Truyện của con",T.story,["p1","p2","p3","p4","p5"])}${block("Con tự nhận xét",T.review,["star1","star2","wish"])}
+ ${!T.profile&&!T.upgrade&&!T.story?"<p>Chưa có bài viết.</p>":""}</div>
+ <div class="card pg"><b>Gợi ý hỏi con (từ Parent Guide)</b><ul><li>What makes you think that? Which word or detail helped you?</li><li>What happens first, next and last?</li><li>Which word would be more precise here?</li><li>What is one thing you are pleased with, and one thing you could improve?</li></ul></div>
+ <div class="card pg"><b>Mã kết quả</b> <span class="hint">(gửi cho Claude để cập nhật bảng điểm yếu)</span><textarea readonly style="min-height:70px">${esc(code)}</textarea>
+ <div class="row"><button class="btn ghost" id="cp">📋 Copy mã</button><button class="btn ghost" id="ua">${S.unlockAll?"🔒 Khoá lại theo thứ tự":"🔓 Mở tất cả trạm"}</button><button class="btn ghost" id="rs" style="color:#b33">Xoá tiến độ</button></div></div>`;
+ document.getElementById("cp").onclick=()=>{try{navigator.clipboard.writeText(code)}catch(e){}document.getElementById("cp").textContent="✔ Đã copy"};
+ document.getElementById("ua").onclick=()=>{S.unlockAll=!S.unlockAll;save();parents()};
+ document.getElementById("rs").onclick=()=>{if(confirm("Xoá toàn bộ tiến độ và bài viết của con trên máy này?")){S={done:{},skills:{},miss:[],texts:{},unlockAll:false};save();home()}};
+ window.scrollTo(0,0);
+}
+home();
+</script>
+<a href="../" aria-label="Back to Peter's World" style="position:fixed;left:calc(10px + env(safe-area-inset-left,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:2147483000;width:48px;height:48px;border-radius:50%;background:#fff;border:3px solid #5fd3b0;display:grid;place-items:center;font-size:22px;text-decoration:none;box-shadow:0 3px 0 rgba(0,0,0,.18)">🏠</a>
+</body>
+</html>

@@ -82,7 +82,8 @@ label.f{display:block;font-weight:800;margin:12px 0 4px}
 <script>
 /* ===== Tank Story Expedition · FLE Unit 4: Other People, Other Places ===== */
 const KEY="tank-story-expedition-v1";
-let S={done:{},skills:{},miss:[],texts:{},unlockAll:false};
+const FRESH=()=>({done:{},skills:{},miss:[],texts:{},unlockAll:false,log:[],medals:0,skin:0});
+let S=FRESH();
 try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s)S=Object.assign(S,s)}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 
@@ -285,6 +286,92 @@ STATIONS.forEach((s,i)=>{s.id="s"+(i+1);s.part=i});
 
 const SKILL_VI={info:"Tìm thông tin trong truyện",infer:"Suy luận (inference)",clue:"Chỉ ra dẫn chứng (clue)",culture:"Truyện phản ánh văn hoá",stages:"5 phần của truyện",figur:"Ngôn ngữ hình ảnh",quant:"Quantifiers",homo:"Homophones",apos:"Dấu ’ sở hữu",speech:"Lời thoại trực tiếp “ ”",predict:"Dự đoán",develop:"Nhân vật thay đổi",shades:"Sắc thái từ",overused:"Thay từ nhàm",adverb:"Trạng từ",tense:"Thì quá khứ/hiện tại/tương lai",syll:"Âm tiết",spell:"Chính tả",plural:"Số nhiều",para:"Chia đoạn văn",review:"Tự sửa & nhận xét bài"};
 
+/* ---------- TRAINING CAMP: extra practice bank per skill ---------- */
+const BANK={
+ apos:[mc("apos","The ___ wheels are shiny. (one tank)",["tank’s","tanks","tanks’"],0,"One tank owns the wheels → tank’s"),
+  mc("apos","Which is correct?",["the soldiers’ helmets (many soldiers)","the soldier’s’ helmets","the soldiers helmet’s"],0,"Many soldiers → soldiers’"),
+  mc("apos","I have four ___.",["apples","apple’s","apples’"],0,"Just plural – no apostrophe!"),
+  mc("apos","This is ___ phone.",["Mums","Mum’s","Mums’"],1,"The phone belongs to Mum → Mum’s"),
+  mc("apos","The ___ toys are everywhere. (children)",["childrens’","children’s","childrens"],1,"children + ’s → children’s"),
+  mc("apos","Which sentence is correct?",["The cat licked its paw.","The cat licked it’s paw."],0,"its = belongs to it · it’s = it is")],
+ homo:[mc("homo","I ___ how to drive a tank!",["no","know","now"],1,"know = in your brain (silent k)"),
+  mc("homo","“___, you can’t come in!” said the guard.",["No","Know"],0,"no = the opposite of yes"),
+  mc("homo","The soldiers ate ___ lunch.",["there","their","they’re"],1,"their = belongs to them"),
+  mc("homo","Put the tank over ___.",["their","there"],1,"there = a place"),
+  mc("homo","I want to come ___!",["to","two","too"],2,"too = also"),
+  mc("homo","Can you ___ the ship on the ___?",["sea / see","see / sea"],1,"see with your eyes · the sea is water"),
+  mc("homo","I got a ___ tank for my birthday.",["new","knew"],0,"new = not old")],
+ speech:[mc("speech","Choose the correct one.",["“Let’s go!” shouted Tom.","“Let’s go”! shouted Tom.","“Let’s go! shouted Tom.”"],0,"! inside the speech marks"),
+  mc("speech","Choose the correct one.",["“I am hungry,” said Wasso.","“I am hungry.” said Wasso.","I am hungry, “said Wasso.”"],0,"Comma inside, then said …"),
+  mc("speech","Choose the correct one.",["“Are you ready?” asked the captain.","“Are you ready”? asked the captain."],0,"? inside the speech marks"),
+  mc("speech","Which words are SPOKEN? → Stop the tank cried Sam",["Stop the tank","cried Sam","Sam"],0,"Spoken = what Sam actually says")],
+ quant:[mc("quant","___ of my two hands are cold.",["Both","Neither","Few"],0,"Two, and yes → both"),
+  mc("quant","There were so ___ tanks that I couldn’t count them!",["few","many","neither"],1,"Lots → many"),
+  mc("quant","Only a ___ sweets were left – just three.",["few","many","all"],0,"Small number → a few"),
+  mc("quant","___ of the twins likes broccoli. They both hate it!",["Neither","Both","All"],0,"Two, and no → neither")],
+ tense:[mc("tense","Last night I ___ a tank film.",["watch","watched","will watch"],1,"Last night → past"),
+  mc("tense","Next week we ___ to the museum.",["went","go","will go"],2,"Next week → future"),
+  mc("tense","Past of ‘run’?",["runned","ran","running"],1,"run → ran (irregular)"),
+  mc("tense","Past of ‘see’?",["saw","seed","seen it"],0,"see → saw"),
+  mc("tense","Which is FUTURE?",["I will win the battle.","I won the battle.","I am winning."],0,"will → future")],
+ plural:[mc("plural","One bus, two ___.",["buss","buses","bus’s"],1,"s → add es"),
+  mc("plural","One party, three ___.",["partys","parties","party’s"],1,"consonant + y → ies"),
+  mc("plural","One knife, two ___.",["knifes","knives"],1,"fe → ves"),
+  mc("plural","One mouse, two ___.",["mouses","mice"],1,"irregular!"),
+  mc("plural","One toy, many ___.",["toies","toys"],1,"vowel + y → just add s")],
+ spell:[mc("spell","Which spelling is correct?",["beautiful","beatiful","beautifull"],0,"beau – ti – ful (one l)"),
+  mc("spell","Which spelling is correct?",["becuase","because","becos"],1,"be – cause"),
+  mc("spell","Which spelling is correct?",["running","runing","runnig"],0,"short vowel → double n"),
+  mc("spell","Which spelling is correct?",["afraid","afrayd","affraid"],0,"a – fraid")],
+ syll:[mc("syll","How many syllables in ‘tank’?",["1","2","3"],0,"tank (one clap)"),
+  mc("syll","How many syllables in ‘soldier’?",["1","2","3"],1,"sol – dier"),
+  mc("syll","How many syllables in ‘dangerous’?",["2","3","4"],1,"dan – ger – ous"),
+  mc("syll","How many syllables in ‘helicopter’?",["3","4","5"],1,"he – li – cop – ter")],
+ shades:[ord("shades","Weakest to strongest.",["sleepy","tired","exhausted"],"sleepy → tired → exhausted (MOST tired)"),
+  mc("shades","Strongest word?",["chilly","cold","freezing"],2,"freezing = very, very cold"),
+  mc("shades","Quietest word?",["whispered","said","yelled"],0,"whisper = very quiet"),
+  mc("shades","Biggest word?",["large","gigantic","big"],1,"gigantic = super big")],
+ overused:[mc("overused","Replace ‘said’: “Help!” ___ the soldier.",["screamed","said","talked"],0,"Help! is loud and scared"),
+  mc("overused","Replace ‘good’: It was a ___ battle plan.",["brilliant","good","ok"],0,"WOW word!"),
+  mc("overused","Replace ‘went’: The tank ___ through the mud.",["went","rumbled","was"],1,"rumbled = we can hear it!")],
+ adverb:[mc("adverb","The baby slept ___. (very calm)",["peacefully","angrily","loudly"],0,"calm sleep = peacefully"),
+  mc("adverb","The tank raced ___ to the finish.",["slowly","speedily","sadly"],1,"raced = fast"),
+  mc("adverb","Which word is an adverb?",["quickly","quick","quickness"],0,"many adverbs end in -ly")],
+ stages:[mc("stages","“A tiny tank lives at the desert base.” Stage?",["Opening","Problem","Ending"],0,"Meet the character + setting"),
+  mc("stages","“Suddenly a sandstorm traps the big tanks!” Stage?",["Problem","Opening","Ending"],0,"Something goes wrong"),
+  mc("stages","“The tiny tank pulls them out.” Stage?",["Resolution","Build-up","Opening"],0,"The problem is solved"),
+  ord("stages","Order the stages.",["Opening","Build-up","Problem","Resolution","Ending"],"O → B → P → R → E")],
+ infer:[mc("infer","Tom’s hands were shaking and he couldn’t speak. How did he feel?",["Nervous","Bored","Sleepy"],0,"Shaking hands = nervous"),
+  mc("infer","Mia grinned and jumped up and down. How did she feel?",["Excited","Sad","Angry"],0,"Grinning + jumping = excited"),
+  mc("infer","The road was wet and people held umbrellas. What happened?",["It rained","It snowed in the desert","Nothing"],0,"Clues: wet + umbrellas")],
+ clue:[mc("clue","Which clue shows the chief was tired?",["“He lay down and fell fast asleep.”","“The chief was brave.”"],0,"Find the action that shows tiredness"),
+  mc("clue","Which clue shows Abunuwasi was clever?",["He made a plan with mallets","He lived downstairs"],0,"A clever plan!")],
+ figur:[mc("figur","Which is a simile?",["as fast as a cheetah","a fast car","very fast"],0,"as … as … / like …"),
+  mc("figur","“The tank roared like a lion.” This helps us imagine…",["how loud the tank was","the colour of the tank"],0,"lion roar = LOUD")],
+ predict:[mc("predict","Dark clouds fill the sky. What will probably happen next?",["It will rain","The sun will get hotter"],0,"Use the clue: dark clouds")],
+ para:[mc("para","When do you start a new paragraph?",["New time, place, person or speaker","After every word","Never"],0,"TiPToP!"),
+  mc("para","Best opener for the ending?",["Finally,","Suddenly,","Once upon a time,"],0,"Finally = the end")]
+};
+const SKINS=[["#5b7a2e","Army green",0],["#c49a52","Desert sand",3],["#cfd9df","Arctic snow",6],["#3d7be0","Ocean blue",9],["#e0a82e","Royal gold",12]];
+const TIP_VI={apos:"chơi 'dán nhãn đồ trong nhà': Mum’s phone, Dad’s car, the dogs’ bowls",homo:"đọc–che–viết 4 cặp know/no, there/their, to/too, sea/see; đặt câu với từng từ",speech:"đọc truyện tranh, chép lại 3 câu thoại có “ ” và dấu phẩy",quant:"đếm đồ vật trong nhà và nói câu some/many/few/both/neither",tense:"kể 1 việc hôm qua – hôm nay – ngày mai",plural:"lập bảng số nhiều -s/-es/-ies/-ves",spell:"5 từ/tuần: đọc–che–viết–kiểm",syll:"vỗ tay đếm âm tiết tên đồ vật",shades:"xếp 3 từ từ yếu đến mạnh (warm/hot/boiling)",overused:"thay 'said/big/nice' bằng WOW word khi viết",adverb:"chơi đố hành động: đi slowly / quickly",stages:"kể lại 1 phim con thích theo 5 phần",infer:"hỏi 'What makes you think that?' khi đọc sách",clue:"bắt con chỉ ra câu trong sách làm dẫn chứng",figur:"thi nghĩ simile 'as … as a …'",predict:"dừng giữa truyện, hỏi 'What happens next? Why?'",para:"đánh dấu chỗ xuống đoạn trong truyện con viết",info:"đọc lại đoạn văn, gạch chân thông tin",culture:"hỏi con truyện cho thấy gì về nơi nó ra đời",develop:"so sánh nhân vật ở đầu và cuối truyện",review:"cho con tự đọc to bài viết và nói 2 sao 1 điều ước"};
+function skillStats(){return Object.entries(S.skills).map(([k,[c,t]])=>({k,c,t,p:Math.round(100*c/t)}))}
+function weakSkills(){const missed={};S.miss.slice(-30).forEach(m=>missed[m.skill]=(missed[m.skill]||0)+1);
+ return skillStats().filter(r=>r.p<85||missed[r.k]).sort((a,b)=>(a.p-b.p)||((missed[b.k]||0)-(missed[a.k]||0))).map(r=>r.k)}
+function allQ(){const out=[];STATIONS.forEach(s=>s.steps.forEach(p=>{if(p.t==="mc"||p.t==="order")out.push(p)}));return out}
+function buildCamp(){
+ let weak=weakSkills().slice(0,3);
+ if(!weak.length)weak=Object.keys(BANK).sort(()=>Math.random()-.5).slice(0,3);
+ const steps=[];const missedQs=new Set(S.miss.slice(-30).map(m=>m.q));
+ weak.forEach(k=>{
+  const bank=(BANK[k]||[]).slice().sort(()=>Math.random()-.5).slice(0,3);
+  const redo=allQ().filter(p=>p.skill===k&&missedQs.has(p.q.replace(/<[^>]+>/g,""))).slice(0,1);
+  steps.push(...bank,...redo)});
+ if(steps.length<4)steps.push(...allQ().filter(p=>weak.includes(p.skill)).sort(()=>Math.random()-.5).slice(0,4));
+ return {id:"camp",camp:true,ic:"🏕️",title:"Training Camp",goal:weak.map(k=>SKILL_EN[k]||k).join(" · "),weak,
+  steps:[{t:"read",title:"Training Camp 🏕️",paras:["Today the drill sergeant trains you on:",...weak.map(k=>"🎯 <b>"+(SKILL_EN[k]||k)+"</b>")],note:"Every training round wins a 🎖️ medal. Medals unlock new tank paint!"},...steps.slice(0,10)]};
+}
+const SKILL_EN={info:"Finding information",infer:"Inference",clue:"Finding clues",culture:"Stories & culture",stages:"Story stages",figur:"Figurative language",quant:"Quantifiers",homo:"Homophones",apos:"Apostrophes",speech:"Direct speech",predict:"Predicting",develop:"Character change",shades:"Shades of meaning",overused:"Better words",adverb:"Adverbs",tense:"Verb tenses",syll:"Syllables",spell:"Spelling",plural:"Plurals",para:"Paragraphs",review:"Reviewing writing"};
+
 /* ---------- sound + speech ---------- */
 let AC=null;
 function beep(ok){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.connect(g);g.connect(AC.destination);
@@ -308,10 +395,10 @@ function tankSVG(n,highlight){
  ${has("periscope")?`<g${hl("periscope")}><rect x="140" y="40" width="10" height="18" fill="#4a4a4a"/><rect x="140" y="38" width="18" height="8" rx="2" fill="#4a4a4a"/></g>`:""}
  ${has("cannon")?`<g${hl("cannon")}><rect x="196" y="66" width="76" height="10" rx="3" fill="#3f5a1c"/></g>`:""}
  ${has("muzzle")?`<g${hl("muzzle")}><rect x="268" y="61" width="14" height="20" rx="3" fill="#2b2a22"/></g>`:""}
- ${has("turret")?`<g${hl("turret")}><rect x="100" y="54" width="102" height="36" rx="16" fill="${camo?"#6d7f3a":"#5b7a2e"}" stroke="#3f5a1c" stroke-width="3"/>
+ ${has("turret")?`<g${hl("turret")}><rect x="100" y="54" width="102" height="36" rx="16" fill="${SKINS[S.skin||0][0]}" stroke="#3f5a1c" stroke-width="3"/>
    ${camo?`<ellipse cx="125" cy="66" rx="12" ry="6" fill="#8a7a3a"/><ellipse cx="170" cy="78" rx="14" ry="6" fill="#3e4f1e"/>`:""}</g>`:""}
  ${has("star")?`<g${hl("star")}><polygon points="150,60 154,70 165,70 156,76 160,86 150,80 140,86 144,76 135,70 146,70" fill="#fff" stroke="#f2b632" stroke-width="2"/></g>`:""}
- <rect x="42" y="88" width="216" height="32" rx="8" fill="${camo?"#6d7f3a":"#5b7a2e"}" stroke="#3f5a1c" stroke-width="3"/>
+ <rect x="42" y="88" width="216" height="32" rx="8" fill="${SKINS[S.skin||0][0]}" stroke="#3f5a1c" stroke-width="3"/>
  ${camo?`<ellipse cx="80" cy="100" rx="18" ry="7" fill="#8a7a3a"/><ellipse cx="150" cy="108" rx="20" ry="6" fill="#3e4f1e"/><ellipse cx="215" cy="98" rx="16" ry="6" fill="#8a7a3a"/>`:""}
  ${has("plate")?`<g${hl("plate")}><rect x="118" y="94" width="64" height="18" rx="4" fill="#fffdf6" stroke="#2b2a22"/><text x="150" y="108" font-size="12" font-weight="900" text-anchor="middle" fill="#2b2a22">PETER</text></g>`:""}
  ${has("light")?`<g${hl("light")}><circle cx="256" cy="98" r="7" fill="#ffe680" stroke="#b8841a" stroke-width="2"/><polygon points="262,94 298,84 298,112 262,102" fill="rgba(255,230,128,.45)"/></g>`:""}
@@ -336,6 +423,11 @@ function home(){
  <div class="card garage">${tankSVG(n)}<div><div class="hint">Commander Peter · Rank</div><div class="rank">${rank(n)}</div>
  <p style="margin:6px 0">Finish a station → win a new tank part.<br>One station a day (10–15 minutes). No timer, no rush! 🙂</p>
  ${nextIdx>=0?`<button class="btn gold" onclick="play(${nextIdx})">▶ Next mission: ${STATIONS[nextIdx].ic} ${esc(STATIONS[nextIdx].title)}</button>`:`<b>🎖️ Mission complete, General Peter!</b>`}</div></div>`;
+ const weak=weakSkills().slice(0,3);
+ if(n>0)h+=`<div class="card" style="background:#eef6e4"><b style="font-size:19px">🏕️ Training Camp</b> <span class="chip">🎖️ ${S.medals||0} medals</span>
+  <p style="margin:6px 0">${weak.length?`The sergeant picked your trickiest skills: <b>${weak.map(k=>SKILL_EN[k]||k).join(", ")}</b>. Train them to win medals!`:"All skills look strong! Do a surprise challenge for a medal."}</p>
+  <button class="btn" onclick="play('camp')">🎯 Start training (5 min)</button>
+  <div class="row" style="margin-top:10px"><span class="hint">🎨 Tank paint:</span>${SKINS.map((k,j)=>(S.medals||0)>=k[2]?`<button title="${k[1]}" onclick="S.skin=${j};save();home()" style="width:30px;height:30px;border-radius:50%;background:${k[0]};border:3px solid ${S.skin==j?"#2b2a22":"#fff"}"></button>`:`<span title="${k[2]} medals" style="width:30px;height:30px;border-radius:50%;background:#ddd;display:inline-grid;place-items:center;font-size:13px">🔒</span>`).join("")}</div></div>`;
  REGIONS.forEach(R=>{
   h+=`<section class="region" style="background:${R.bg}"><h2>${R.emoji} ${R.name}</h2><p>${R.sub}</p><div class="stations">`;
   STATIONS.forEach((s,i)=>{if(s.r!==R.id)return;const ok=unlocked(i),d=S.done[s.id];
@@ -346,7 +438,7 @@ function home(){
 }
 
 let cur=null;
-function play(i){stopSpeak();cur={i,st:STATIONS[i],k:0,first:0,tot:0};step()}
+function play(i){stopSpeak();cur={i,st:i==="camp"?buildCamp():STATIONS[i],k:0,first:0,tot:0,per:{}};step()}
 function prog(){const s=cur.st;return `<header class="top"><button class="btn ghost" onclick="home()">⬅ Base</button><h1 style="font-size:20px">${s.ic} ${esc(s.title)}</h1><span class="chip">${cur.k+1}/${s.steps.length}</span></header>
  <div class="bar"><i style="width:${(cur.k/s.steps.length)*100}%"></i></div>`}
 function next(){cur.k++;if(cur.k>=cur.st.steps.length)finish();else step()}
@@ -361,7 +453,7 @@ function rRead(p){
  <div class="row"><button class="btn" onclick="next()">I’ve read it ➜</button></div></div>`;
  document.getElementById("sp").onclick=()=>speak(p.paras.join(" "));
 }
-function logSkill(skill,ok,q,picked){S.skills[skill]=S.skills[skill]||[0,0];S.skills[skill][1]++;if(ok)S.skills[skill][0]++;
+function logSkill(skill,ok,q,picked){cur.per[skill]=cur.per[skill]||[0,0];cur.per[skill][1]++;if(ok)cur.per[skill][0]++;S.skills[skill]=S.skills[skill]||[0,0];S.skills[skill][1]++;if(ok)S.skills[skill][0]++;
  if(!ok){S.miss.push({d:new Date().toISOString().slice(0,10),st:cur.st.title,skill,q:q.replace(/<[^>]+>/g,""),picked});if(S.miss.length>80)S.miss.shift()}save()}
 function rMC(p){
  let tried=false,done=false;
@@ -430,6 +522,13 @@ function rListen(){
 }
 function finish(){
  const s=cur.st;const r=cur.tot?cur.first/cur.tot:1;const stars=r>=.85?3:r>=.6?2:1;
+ const now=new Date();const when=now.toISOString().slice(0,19);
+ if(cur.tot)S.log.push({when,game:"tank-u4-"+s.id,score:cur.first,max:cur.tot,per:cur.per});if(S.log.length>300)S.log.shift();
+ if(s.camp){S.medals=(S.medals||0)+1;save();const sk=SKINS.find(x=>x[2]===S.medals);home();
+  const m=document.createElement("div");m.className="modal";
+  m.innerHTML=`<div class="card"><div class="big">🏕️ Training complete!</div><div style="font-size:40px">🎖️</div><p>You won a medal! Total: <b>${S.medals}</b> 🎖️</p>
+  ${sk?`<p>🎨 New tank paint unlocked: <b>${sk[1]}</b>!</p>`:`<p class="hint">${(SKINS.find(x=>x[2]>S.medals)||[0,0,0])[2]?`${SKINS.find(x=>x[2]>S.medals)[2]-S.medals} more medal(s) to unlock new paint!`:"All paints unlocked!"}</p>`}
+  <button class="btn gold" id="ok">Back to base</button></div>`;document.body.appendChild(m);document.getElementById("ok").onclick=()=>{m.remove();home()};beep(true);return}
  const firstTime=!S.done[s.id];S.done[s.id]=Math.max(S.done[s.id]||0,stars);save();
  const n=partsCount();const part=PARTS[s.part];
  home();
@@ -448,11 +547,20 @@ function parents(){
  const rows=Object.entries(S.skills).map(([k,[c,t]])=>({k,c,t,p:Math.round(100*c/t)})).sort((a,b)=>a.p-b.p);
  const lv=p=>p<60?"🔴":p<85?"🟡":"🟢";
  const T=S.texts;const block=(title,o,keys)=>o&&keys.some(k=>o[k])?`<h3>${title}${o.when?` <small>(${o.when})</small>`:""}</h3><pre>${keys.filter(k=>o[k]).map(k=>esc(o[k])).join("\n\n")}</pre>`:"";
- const code="TANK-U4|"+JSON.stringify({done:S.done,skills:S.skills});
+ const code=S.log.map(l=>["QQ","EFL",l.game,l.when,l.score+"/"+l.max,Object.entries(l.per).map(([k,[a,b]])=>"u4-"+k+":"+a+"/"+b).join(";")].join("|")).join("\n")||"(chưa có lượt chơi)";
+ const st=skillStats();const strong=st.filter(r=>r.t>=3&&r.p>=85).sort((a,b)=>b.p-a.p||b.t-a.t).slice(0,3);const weakR=weakSkills().slice(0,3).map(k=>st.find(r=>r.k===k));
+ const week=S.log.filter(l=>Date.now()-new Date(l.when)<7*864e5);
+ const report=`<div class="card pg" style="border-color:#5b7a2e"><b>📊 Báo cáo nhanh</b> <span class="hint">(tự cập nhật sau mỗi lượt chơi)</span>
+ <p>7 ngày qua: <b>${week.length}</b> lượt chơi · ${week.filter(l=>l.game.endsWith("camp")).length} lượt Trại huấn luyện · huy chương 🎖️ ${S.medals||0}</p>
+ <p><b>💪 Điểm mạnh:</b> ${strong.length?strong.map(r=>`${SKILL_VI[r.k]} (${r.p}%)`).join(", "):"chưa đủ dữ liệu (cần ≥ 3 câu/kỹ năng)"}</p>
+ <p><b>🎯 Cần luyện:</b> ${weakR.length?weakR.map(r=>`${SKILL_VI[r.k]} (${r.p}%)`).join(", "):"chưa có điểm yếu rõ"}</p>
+ ${weakR.length?`<p><b>🏠 Hoạt động 5–10 phút ở nhà:</b></p><ul>${weakR.map(r=>`<li>${SKILL_VI[r.k]}: ${TIP_VI[r.k]||""}</li>`).join("")}</ul>`:""}
+ <p class="hint">Trại huấn luyện trong game đã tự chọn các kỹ năng “cần luyện” này cho con. Muốn bài mới sâu hơn: copy “Mã kết quả” bên dưới gửi Claude.</p></div>`;
  app.innerHTML=`<header class="top"><button class="btn ghost" onclick="home()">⬅ Về game</button><h1>Góc bố mẹ</h1></header>
  <div class="card pg"><b>Mục tiêu:</b> ôn FLE Unit 4 “Other People, Other Places” theo Parent Guide: Tuần 1 (trạm 1–5), Tuần 2 (trạm 6–10), Tuần 3 (trạm 11–15).
  Mỗi ngày 1 trạm, 10–15 phút. Con được thử lại không giới hạn; sao chỉ tính câu đúng ngay lần đầu.<br>
  <b>Tiến độ:</b> ${partsCount()}/15 trạm · cấp bậc ${rank(partsCount())}</div>
+ ${report}
  <div class="card pg"><b>Kỹ năng (đúng ngay lần đầu)</b>${rows.length?`<table><tr><th>Kỹ năng</th><th>Đúng</th><th>Mức</th></tr>${rows.map(r=>`<tr><td>${SKILL_VI[r.k]||r.k}</td><td>${r.c}/${r.t} (${r.p}%)</td><td>${lv(r.p)}</td></tr>`).join("")}</table>`:"<p>Chưa có dữ liệu.</p>"}</div>
  <div class="card pg"><b>Câu con chọn sai lần đầu (mới nhất trước)</b>${S.miss.length?`<table><tr><th>Ngày</th><th>Câu hỏi</th><th>Con chọn</th></tr>${S.miss.slice().reverse().slice(0,25).map(m=>`<tr><td>${m.d}</td><td>${esc(m.q)}</td><td>${esc(m.picked||"")}</td></tr>`).join("")}</table>`:"<p>Chưa có.</p>"}</div>
  <div class="card pg"><b>Bài viết của con</b> <span class="hint">— bố mẹ đọc, khen 2 ⭐ + 1 điều ước, rồi cho con chép đẹp ra giấy.</span>
@@ -464,7 +572,7 @@ function parents(){
  <div class="row"><button class="btn ghost" id="cp">📋 Copy mã</button><button class="btn ghost" id="ua">${S.unlockAll?"🔒 Khoá lại theo thứ tự":"🔓 Mở tất cả trạm"}</button><button class="btn ghost" id="rs" style="color:#b33">Xoá tiến độ</button></div></div>`;
  document.getElementById("cp").onclick=()=>{try{navigator.clipboard.writeText(code)}catch(e){}document.getElementById("cp").textContent="✔ Đã copy"};
  document.getElementById("ua").onclick=()=>{S.unlockAll=!S.unlockAll;save();parents()};
- document.getElementById("rs").onclick=()=>{if(confirm("Xoá toàn bộ tiến độ và bài viết của con trên máy này?")){S={done:{},skills:{},miss:[],texts:{},unlockAll:false};save();home()}};
+ document.getElementById("rs").onclick=()=>{if(confirm("Xoá toàn bộ tiến độ và bài viết của con trên máy này?")){S=FRESH();save();home()}};
  window.scrollTo(0,0);
 }
 home();

@@ -86,6 +86,14 @@ const FRESH=()=>({done:{},skills:{},miss:[],texts:{},unlockAll:false,log:[],meda
 let S=FRESH();
 try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s)S=Object.assign(S,s)}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+/* Auto-send results to the parents' private Google Form (Sheet). Fill FORM_ID + ENTRY to switch on. */
+const FORM_ID="", ENTRY="";
+function send(obj){S.outbox=S.outbox||[];S.outbox.push(JSON.stringify(obj));if(S.outbox.length>200)S.outbox.shift();save();flush()}
+function flush(){if(!FORM_ID||!ENTRY||!(S.outbox||[]).length||!navigator.onLine)return;
+ const batch=S.outbox.slice();const fd=new URLSearchParams();fd.append("entry."+ENTRY,batch.join("\n"));
+ fetch("https://docs.google.com/forms/d/e/"+FORM_ID+"/formResponse",{method:"POST",mode:"no-cors",body:fd})
+  .then(()=>{S.outbox=S.outbox.slice(batch.length);save()}).catch(()=>{})}
+window.addEventListener("online",flush);setTimeout(flush,1500);
 
 const PARTS=[
  ["turret","Turret"],["cannon","Cannon"],["flag","Flag"],["light","Headlight"],["camo","Camo paint"],
@@ -523,7 +531,9 @@ function rListen(){
 function finish(){
  const s=cur.st;const r=cur.tot?cur.first/cur.tot:1;const stars=r>=.85?3:r>=.6?2:1;
  const now=new Date();const when=now.toISOString().slice(0,19);
- if(cur.tot)S.log.push({when,game:"tank-u4-"+s.id,score:cur.first,max:cur.tot,per:cur.per});if(S.log.length>300)S.log.shift();
+ if(cur.tot)S.log.push({when,game:"tank-u4-"+s.id,score:cur.first,max:cur.tot,per:cur.per});
+ const wr={};s.steps.forEach(p=>{if(p.t==="write"&&S.texts[p.key])wr[p.key]=S.texts[p.key]});
+ send({when,game:"tank-u4-"+s.id,title:s.title,score:cur.first,max:cur.tot,per:cur.per,miss:S.miss.filter(m=>m.st===s.title).slice(-6),writing:wr});if(S.log.length>300)S.log.shift();
  if(s.camp){S.medals=(S.medals||0)+1;save();const sk=SKINS.find(x=>x[2]===S.medals);home();
   const m=document.createElement("div");m.className="modal";
   m.innerHTML=`<div class="card"><div class="big">🏕️ Training complete!</div><div style="font-size:40px">🎖️</div><p>You won a medal! Total: <b>${S.medals}</b> 🎖️</p>

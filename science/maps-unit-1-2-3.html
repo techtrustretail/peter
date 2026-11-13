@@ -5,279 +5,525 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Stormy's Science Maps</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#EFFAF4; --paper:#FFFFFF; --ink:#3B2A22; --soft:#8A7468; --choc:#5A3A2E;
-  --c1:#3BAA7C; --c2:#E2557F; --c3:#3C86D6; --c4:#E0A800; --c5:#7B5BD6;
-  --t1:#DDF6EA; --t2:#FFE3EC; --t3:#DFF0FF; --t4:#FFF4CC; --t5:#EEE6FF;
+  --bg:#F3FBF6; --paper:#FFFFFF; --ink:#3B2A22; --soft:#7A6457;
+  --choc:#5A3A2E;
+  --c1:#DDF6EA; --c1b:#2E9B6E; --c2:#FFE3EC; --c2b:#D9446F; --c3:#DFF0FF; --c3b:#2F78C8;
+  --c4:#FFF4CC; --c4b:#B38600; --c5:#EEE6FF; --c5b:#6E4FD0;
+  --tip:#FFF8EE; --tipb:#E8A04A; --vn:#8A7468;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --bg:#1E1814; --paper:#2A221D; --ink:#F6EDE6; --soft:#C9B8AC; --choc:#F1D9C8;
-    --t1:#1F3A31; --t2:#3F2430; --t3:#1F2F42; --t4:#3B3418; --t5:#2F2742;
+    --c1:#1F3A31; --c2:#3F2430; --c3:#1F2F42; --c4:#3B3418; --c5:#2F2742;
+    --c1b:#5FD3A2; --c2b:#F27DA0; --c3b:#6FB0F0; --c4b:#E6C04A; --c5b:#A891F0;
+    --tip:#3A2E20; --vn:#B9A497;
   }
 }
 :root[data-theme="dark"]{
   --bg:#1E1814; --paper:#2A221D; --ink:#F6EDE6; --soft:#C9B8AC; --choc:#F1D9C8;
-  --t1:#1F3A31; --t2:#3F2430; --t3:#1F2F42; --t4:#3B3418; --t5:#2F2742;
+  --c1:#1F3A31; --c2:#3F2430; --c3:#1F2F42; --c4:#3B3418; --c5:#2F2742;
+  --c1b:#5FD3A2; --c2b:#F27DA0; --c3b:#6FB0F0; --c4b:#E6C04A; --c5b:#A891F0;
+  --tip:#3A2E20; --vn:#B9A497;
 }
 *{box-sizing:border-box}
 html,body{margin:0}
-body{background:var(--bg) radial-gradient(circle at 10% 10%,rgba(255,255,255,.6) 0 60px,transparent 61px);color:var(--ink);font:600 18px/1.3 "Baloo 2",system-ui,sans-serif}
-header{max-width:1200px;margin:0 auto;padding:16px 16px 4px;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}
-h1{margin:0;font:800 clamp(26px,4vw,36px)/1 "Baloo 2";color:var(--choc)}
+body{background:var(--bg);color:var(--ink);font:500 16px/1.45 Nunito,system-ui,sans-serif}
+header{max-width:1240px;margin:0 auto;padding:20px 16px 8px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;justify-content:space-between}
+h1{font:800 clamp(26px,4vw,38px)/1.1 "Baloo 2",sans-serif;margin:0;color:var(--choc)}
+h1 small{display:block;font:700 15px Nunito,sans-serif;color:var(--soft);margin-top:4px}
 .tabs{display:flex;flex-wrap:wrap;gap:8px}
-.tabs button{font:800 18px "Baloo 2";border:3px solid var(--choc);background:var(--paper);color:var(--choc);padding:4px 16px;border-radius:999px;cursor:pointer}
-.tabs button[aria-selected="true"]{background:var(--choc);color:var(--paper);transform:scale(1.06)}
-.hint{max-width:1200px;margin:0 auto;padding:0 16px;color:var(--soft);font-size:16px}
-main{max-width:1200px;margin:0 auto;padding:6px 16px 30px}
+.tabs button{font:800 15px Nunito,sans-serif;border:2px solid var(--choc);background:var(--paper);color:var(--choc);padding:8px 14px;border-radius:999px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--choc);color:var(--paper)}
+.tabs .print{border-style:dashed}
+main{max-width:1240px;margin:0 auto;padding:8px 16px 40px}
 .unit{display:none}.unit.on{display:block}
-.map{position:relative;display:grid;grid-template-columns:repeat(3,1fr);grid-template-areas:"b1 b2 b3" "b4 c b5";gap:40px 34px;padding:10px 0}
+.map{position:relative;display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-areas:"b1 b2 b3" "b4 c b5" "tip tip tip";gap:34px 30px;padding:10px 0}
 .wires{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
-.wires path{fill:none;stroke-width:7;stroke-linecap:round;stroke-dasharray:2 14;animation:flow 1.2s linear infinite}
-@keyframes flow{to{stroke-dashoffset:-32}}
-.center{grid-area:c;align-self:center;justify-self:center;width:230px;height:230px;border-radius:50%;background:var(--choc);color:#FFF8F0;display:grid;place-content:center;text-align:center;position:relative;z-index:1;box-shadow:0 0 0 10px rgba(90,58,46,.15);animation:pulse 3s ease-in-out infinite}
-@keyframes pulse{50%{box-shadow:0 0 0 22px rgba(90,58,46,.06)}}
-.center .big{font-size:70px;line-height:1}
-.center h2{margin:4px 0 0;font:800 30px/1 "Baloo 2"}
-.center small{font-size:16px;color:#E9D6C8}
-.br{position:relative;z-index:1;background:var(--paper);border:4px solid var(--c);border-radius:32px;padding:12px 12px 14px;text-align:center;cursor:pointer;transition:transform .2s;box-shadow:0 6px 0 var(--c)}
-.br:hover{transform:translateY(-4px) rotate(-1deg)}
-.br .pic{font-size:54px;line-height:1.1;display:inline-block;animation:bob 2.6s ease-in-out infinite}
-.br:nth-child(odd) .pic{animation-delay:-1.3s}
-@keyframes bob{50%{transform:translateY(-7px) rotate(4deg)}}
-.br h3{margin:2px 0 8px;font:800 26px/1 "Baloo 2";color:var(--c)}
-.leaves{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
-.leaf{background:var(--t);border-radius:18px;padding:6px 10px;min-width:74px}
-.leaf i{display:block;font-style:normal;font-size:34px;line-height:1.1}
-.leaf span{font-size:16px;font-weight:800;line-height:1.1;display:block}
-.chain{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:4px;font-size:40px;line-height:1}
-.chain b{font-size:28px;color:var(--c)}
-.chain small{display:block;font-size:14px;text-align:center}
-.tap{position:absolute;top:8px;right:12px;font-size:22px;animation:bob 1.6s infinite}
-.k1{--c:var(--c1);--t:var(--t1)}.k2{--c:var(--c2);--t:var(--t2)}.k3{--c:var(--c3);--t:var(--t3)}.k4{--c:var(--c4);--t:var(--t4)}.k5{--c:var(--c5);--t:var(--t5)}
+.wires path{fill:none;stroke-width:5;stroke-linecap:round;opacity:.75}
+.center{grid-area:c;align-self:center;justify-self:center;width:100%;max-width:330px;text-align:center;background:#5A3A2E;color:#FFF8F0;border-radius:40px;padding:22px 18px;position:relative;z-index:1;box-shadow:0 8px 0 rgba(0,0,0,.12)}
+.center .big{font-size:58px;line-height:1}
+.center h2{font:800 28px/1.1 "Baloo 2",sans-serif;margin:8px 0 4px}
+.center p{margin:0;font-weight:700}
+.center .vn{color:#E9D6C8}
+.center b{color:#BDEFD9}
+.card{position:relative;z-index:1;background:var(--paper);border:3px solid var(--bc);border-radius:24px;overflow:hidden;box-shadow:0 5px 0 var(--bc)}
+.card h3{margin:0;padding:10px 14px;background:var(--bg2);font:800 20px/1.15 "Baloo 2",sans-serif;display:flex;gap:10px;align-items:center}
+.card h3 .n{flex:none;width:30px;height:30px;border-radius:50%;background:var(--bc);color:#fff;display:grid;place-items:center;font:800 16px Nunito}
+.card .body{padding:10px 14px 14px}
+.card ul{margin:0;padding-left:18px}
+.card li{margin:3px 0}
+.card li::marker{color:var(--bc)}
+b{color:var(--bc);font-weight:800}
+.vn{color:var(--vn);font-size:.86em;font-weight:600}
+.k1{--bg2:var(--c1);--bc:var(--c1b)}.k2{--bg2:var(--c2);--bc:var(--c2b)}.k3{--bg2:var(--c3);--bc:var(--c3b)}.k4{--bg2:var(--c4);--bc:var(--c4b)}.k5{--bg2:var(--c5);--bc:var(--c5b)}
 .b1{grid-area:b1}.b2{grid-area:b2}.b3{grid-area:b3}.b4{grid-area:b4}.b5{grid-area:b5}
-/* particle animation */
-.parts{display:flex;justify-content:center;gap:14px}
-.parts>div{text-align:center;line-height:1.1}
-.parts svg{width:110px;height:110px;background:var(--t);border-radius:20px;display:block;margin:0 auto 4px}
-.solid circle{animation:jig .35s ease-in-out infinite alternate}
-.solid circle:nth-child(even){animation-delay:-.17s}
-@keyframes jig{to{transform:translate(2px,-2px)}}
-.liquid circle{animation:slide 3s ease-in-out infinite alternate}
-.liquid circle:nth-child(2n){animation-duration:2.3s}
-.liquid circle:nth-child(3n){animation-duration:3.7s;animation-direction:alternate-reverse}
-@keyframes slide{to{transform:translate(9px,7px)}}
-.stormy{margin:26px auto 0;max-width:760px;display:flex;gap:12px;align-items:center}
-.stormy .cat{font-size:60px;animation:bob 2s infinite}
-.stormy .say{background:var(--paper);border:3px solid var(--choc);border-radius:24px;padding:10px 16px;font-size:20px;position:relative}
-.stormy .say:before{content:"";position:absolute;left:-14px;top:24px;border:7px solid transparent;border-right-color:var(--choc)}
-/* popup */
-dialog{border:5px solid var(--c,#5A3A2E);border-radius:30px;padding:20px 22px;max-width:min(440px,92vw);background:var(--paper);color:var(--ink);text-align:center}
-dialog::backdrop{background:rgba(40,25,20,.45)}
-dialog .pic{font-size:70px;line-height:1}
-dialog h3{margin:4px 0;font:800 30px "Baloo 2";color:var(--c)}
-dialog p{font-size:21px;margin:8px 0}
-dialog .vn{font-size:16px;color:var(--soft)}
-dialog .btns{display:flex;gap:10px;justify-content:center;margin-top:10px}
-dialog button{font:800 18px "Baloo 2";border:none;border-radius:999px;padding:6px 18px;cursor:pointer;background:var(--c);color:#fff}
-dialog button.ghost{background:var(--t);color:var(--ink)}
-.all{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.all .br{cursor:default}
-@media (max-width:820px){
-  .map{grid-template-columns:1fr 1fr;grid-template-areas:"c c" "b1 b2" "b3 b4" "b5 b5";gap:16px}
-  .wires{display:none}
-  .center{width:190px;height:190px}
-  .all{grid-template-columns:1fr}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.chip{background:var(--bg2);border-radius:999px;padding:3px 10px;font-weight:800;font-size:14px}
+.row{display:flex;align-items:center;flex-wrap:wrap;gap:4px 6px;font-weight:800;margin:6px 0;font-size:15px}
+.row .e{font-size:24px}.row .ar{color:var(--bc);font-size:20px}
+.mini{width:100%;border-collapse:collapse;margin:6px 0;font-size:14px}
+.mini td,.mini th{border:2px solid var(--bg2);padding:4px 6px;text-align:left;vertical-align:top}
+.mini th{background:var(--bg2)}
+.ex{background:var(--bg2);border-radius:12px;padding:6px 10px;margin-top:8px;font-size:14.5px}
+.ex:before{content:"🔎 Example: ";font-weight:800;color:var(--bc)}
+.tip{grid-area:tip;background:var(--tip);border:3px dashed var(--tipb);border-radius:24px;padding:12px 18px;display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:start}
+.tip .cat{font-size:44px;line-height:1}
+.tip h4{margin:0;font:800 20px "Baloo 2",sans-serif;color:var(--choc)}
+.tip ul{margin:4px 0 0;padding-left:18px;columns:2;column-gap:28px}
+.tip li{break-inside:avoid;margin:3px 0}
+.part{display:flex;gap:14px;flex-wrap:wrap;margin:6px 0}
+.part figure{margin:0;text-align:center;font-weight:800;font-size:14px}
+.part svg{width:96px;height:96px;display:block;background:var(--bg2);border-radius:14px}
+.deep{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:26px}
+.panel{background:var(--paper);border:3px solid var(--choc);border-radius:24px;padding:14px 16px}
+.panel h3{margin:0 0 8px;font:800 22px "Baloo 2",sans-serif;color:var(--choc)}
+.words{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:14.5px}
+.words dt{font-weight:800;color:var(--choc)}
+.words dd{margin:0}
+details{border-bottom:2px dashed var(--c1);padding:6px 0;font-size:15px}
+details summary{cursor:pointer;font-weight:700;list-style:none}
+details summary::before{content:"❓ ";}
+details[open] summary::before{content:"✅ ";}
+details .ans{margin:4px 0 2px 26px;color:var(--c1b);font-weight:800}
+.big-pic{background:var(--paper);border:3px solid var(--choc);border-radius:24px;padding:16px;margin-top:6px}
+.big-pic h2{font:800 26px "Baloo 2",sans-serif;margin:0 0 8px;color:var(--choc)}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.trio>div{border-radius:18px;padding:12px 14px;background:var(--bg2);border:2px solid var(--bc)}
+.trio h3{margin:0 0 4px;font:800 20px "Baloo 2",sans-serif}
+.foot{color:var(--soft);font-size:14px;margin-top:18px;text-align:center}
+@media (max-width:900px){
+  .map{grid-template-columns:1fr;grid-template-areas:"c" "b1" "b2" "b3" "b4" "b5" "tip";gap:18px}
+  .wires{display:none}.center{max-width:none}
+  .tip ul{columns:1}.trio,.deep{grid-template-columns:1fr}
 }
-@media (max-width:480px){
-  .map{grid-template-columns:1fr;grid-template-areas:"c" "b1" "b2" "b3" "b4" "b5"}
-}
-@media (prefers-reduced-motion:reduce){*{animation:none!important}}
 @media print{
   @page{size:A4 landscape;margin:8mm}
-  body{background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;font-size:14px}
-  .tabs,.hint,.tap,.stormy .cat{display:none}
+  body{background:#fff;font-size:11px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  header .tabs,.foot{display:none}
+  header{padding:0 0 4px}h1{font-size:20px}h1 small{font-size:11px}
   .unit{display:block!important;break-after:page}
-  #u0{display:none!important}
-  .map{grid-template-columns:repeat(3,1fr);grid-template-areas:"b1 b2 b3" "b4 c b5";gap:18px}
+  .map{grid-template-columns:1fr 1fr 1fr;grid-template-areas:"b1 b2 b3" "b4 c b5" "tip tip tip";gap:12px 14px}
   .wires{display:block}
-  .br{box-shadow:none;padding:8px}
-  .br .pic{font-size:38px}.leaf i{font-size:26px}
-  .center{width:170px;height:170px;box-shadow:none}
-  .stormy{margin-top:10px}
+  .card h3{font-size:14px;padding:5px 9px}.card .body{padding:5px 9px 7px}
+  .center{padding:10px}.center .big{font-size:34px}.center h2{font-size:19px}
+  .tip{padding:6px 12px}.tip .cat{font-size:28px}.tip h4{font-size:14px}
+  .row .e{font-size:16px}.part svg{width:60px;height:60px}
+  .card,.center{box-shadow:none}
+  .deep{break-before:page;grid-template-columns:1fr 1fr}
+  details .ans{display:block}
+  details:not([open]) > :not(summary){display:block}
 }
 </style>
 </head>
 <body>
 <header>
-  <h1>☁️🐱 Stormy's Science Maps</h1>
-  <nav class="tabs">
-    <button data-u="u1">🦴 Unit 1</button>
-    <button data-u="u2">⚡ Unit 2</button>
-    <button data-u="u3">🧊 Unit 3</button>
-    <button data-u="u0">🌟 All</button>
-    <button onclick="print()">🖨️</button>
+  <h1>☁️🐱 Stormy's Science Maps <small>Review Units 1 · 2 · 3 — Cambridge Primary Science 4 <span class="vn">(Ôn tập Unit 1–3)</span></small></h1>
+  <nav class="tabs" role="tablist">
+    <button role="tab" data-u="u1">🦴 Unit 1</button>
+    <button role="tab" data-u="u2">⚡ Unit 2</button>
+    <button role="tab" data-u="u3">🧊 Unit 3</button>
+    <button role="tab" data-u="u0">🗺️ Big picture</button>
+    <button class="print" onclick="window.print()">🖨️ Print</button>
   </nav>
 </header>
-<p class="hint">👆 Tap a bubble to learn more and hear it! <span style="font-size:14px">(Bấm vào từng ô để xem giải thích và nghe đọc)</span></p>
 
 <main>
-<!-- UNIT 1 -->
+<!-- ================= UNIT 1 ================= -->
 <section class="unit" id="u1">
-<div class="map"><svg class="wires" aria-hidden="true"></svg>
-  <div class="center"><div class="big">🦴</div><h2>Living<br>Things</h2><small>Unit 1</small></div>
+<div class="map">
+  <svg class="wires" aria-hidden="true"></svg>
+  <div class="center"><div class="big">🦴💪</div><h2>Unit 1<br>Living Things</h2><p>My body, animals<br>&amp; staying healthy</p><p class="vn">Cơ thể, động vật &amp; sức khoẻ</p></div>
 
-  <div class="br k1 b1" data-pop="bones"><span class="tap">👆</span><div class="pic">💀</div><h3>Bones</h3>
-    <div class="leaves"><div class="leaf"><i>🧠</i><span>skull</span></div><div class="leaf"><i>🫁</i><span>rib cage</span></div><div class="leaf"><i>🐍</i><span>spine</span></div><div class="leaf"><i>🦵</i><span>leg bones</span></div></div></div>
+  <div class="card k1 b1"><h3><span class="n">1</span>🦴 Bones &amp; skeleton <span class="vn">(1.1)</span></h3><div class="body">
+    <ul>
+      <li>A <b>skeleton</b> = a strong <b>frame</b> of <b>bones</b> that supports the body <b>from the inside</b>. <span class="vn">(bộ xương)</span></li>
+      <li>Humans have <b>206 bones</b> of different sizes and shapes.</li>
+      <li>Bones are <b>hard</b> and <b>strong</b> but <b>light</b> → animals can move easily.</li>
+      <li>Skeletons of dinosaurs tell us about animals that lived long ago 🦕.</li>
+    </ul>
+    <div class="chips"><span class="chip">💀 skull <span class="vn">sọ</span></span><span class="chip">😬 jaw <span class="vn">hàm</span></span><span class="chip">🐍 spine <span class="vn">cột sống</span></span><span class="chip">🫁 rib cage <span class="vn">lồng ngực</span></span><span class="chip">🦵 hip <span class="vn">hông</span></span><span class="chip">💪 upper / lower arm bones</span><span class="chip">🦿 thigh bone, lower leg bones</span></div>
+    <ul><li>A <b>model</b> helps us see how something looks or works. A model is <b>not the same</b> as the real thing (e.g. a straw skeleton cannot move or grow).</li></ul>
+  </div></div>
 
-  <div class="br k2 b2" data-pop="jobs"><span class="tap">👆</span><div class="pic">🛡️</div><h3>4 Jobs</h3>
-    <div class="leaves"><div class="leaf"><i>🛡️</i><span>protect</span></div><div class="leaf"><i>🏛️</i><span>support</span></div><div class="leaf"><i>🏃</i><span>move</span></div><div class="leaf"><i>📏</i><span>grow</span></div></div></div>
+  <div class="card k2 b2"><h3><span class="n">2</span>🛡️ Why we need a skeleton <span class="vn">(1.2)</span></h3><div class="body">
+    <table class="mini">
+      <tr><th>Job (function)</th><th>How</th></tr>
+      <tr><td>1. <b>Protect</b> organs</td><td>skull → <b>brain</b> 🧠 · rib cage → <b>heart</b> ❤️ &amp; <b>lungs</b> 🫁</td></tr>
+      <tr><td>2. <b>Support</b> &amp; give <b>shape</b></td><td>holds the body up, we can't squash it</td></tr>
+      <tr><td>3. Help us <b>move</b></td><td>muscles are joined to bones</td></tr>
+      <tr><td>4. Help us <b>grow</b></td><td>we get bigger because our skeleton grows; an adult's has stopped</td></tr>
+    </table>
+    <ul><li><b>Organs</b> = parts inside the body that keep us alive. <span class="vn">(cơ quan)</span></li>
+    <li>Measure bones with a tape measure in <b>cm</b> (standard unit). Hand lengths are not good — everyone's hand is a different size.</li></ul>
+    <div class="ex">Baby 5 cm → Gita 11 cm → sister 18 cm. Older = longer foot, so an 18-year-old brother ≈ <b>25 cm</b>.</div>
+  </div></div>
 
-  <div class="br k3 b3" data-pop="muscles"><span class="tap">👆</span><div class="pic">💪</div><h3>Muscles</h3>
-    <div class="leaves"><div class="leaf"><i>🤏</i><span>contract<br>= shorter</span></div><div class="leaf"><i>🙌</i><span>relax<br>= longer</span></div><div class="leaf"><i>👯</i><span>work in<br>pairs</span></div></div></div>
+  <div class="card k3 b3"><h3><span class="n">3</span>💪 Muscles &amp; movement <span class="vn">(1.3)</span></h3><div class="body">
+    <ul>
+      <li>Bones cannot bend. <b>Muscles</b> (under the skin, joined to bones) make us move.</li>
+      <li>Muscles <b>pull</b> bones — they never push.</li>
+      <li>Muscles always work in <b>pairs</b>.</li>
+    </ul>
+    <table class="mini"><tr><th>contracts <span class="vn">co lại</span></th><th>relaxes <span class="vn">duỗi ra</span></th></tr>
+    <tr><td>gets <b>shorter</b> &amp; <b>fatter</b> → pulls the bone</td><td>gets <b>longer</b> &amp; <b>thinner</b> → back to normal size, rests</td></tr></table>
+    <div class="ex">Arm lifts: front muscle (biceps) <b>contracts</b>, back muscle (triceps) <b>relaxes</b>. Arm drops: the opposite.</div>
+    <ul><li>Moving keeps us healthy: heart &amp; lungs work better, stronger muscles &amp; bones, think better, good mood 😊. Sitting still too long is not good.</li></ul>
+  </div></div>
 
-  <div class="br k4 b4" data-pop="animals"><span class="tap">👆</span><div class="pic">🐟</div><h3>Animals</h3>
-    <div class="leaves"><div class="leaf"><i>🐱</i><span>backbone<br>vertebrate</span></div><div class="leaf"><i>🪱</i><span>no backbone<br>invertebrate</span></div><div class="leaf"><i>🦗</i><span>hard outside<br>exoskeleton</span></div></div></div>
+  <div class="card k4 b4"><h3><span class="n">4</span>🐟🦗 Different skeletons <span class="vn">(1.4)</span></h3><div class="body">
+    <p style="margin:0 0 4px"><b>Vertebrates</b> = animals <b>with a backbone</b>, skeleton inside. 5 groups:</p>
+    <table class="mini">
+      <tr><td>🐟 fish</td><td>live in water, fins, scales</td></tr>
+      <tr><td>🐸 amphibians</td><td>water &amp; land, smooth wet skin</td></tr>
+      <tr><td>🦎 reptiles</td><td>dry scales (snake, lizard, crocodile)</td></tr>
+      <tr><td>🦅 birds</td><td>feathers, wings</td></tr>
+      <tr><td>🐱 mammals</td><td>hair or fur (dolphin, whale too!)</td></tr>
+    </table>
+    <p style="margin:6px 0 2px"><b>Invertebrates</b> = <b>no backbone</b>:</p>
+    <ul><li><b>Exoskeleton</b> = hard skin/shell on the <b>outside</b>; protects &amp; supports: 🦗 locust, grasshopper, 🪲 beetle, 🦀 crab, 🕷️ spider</li>
+    <li>Soft body, no exoskeleton: 🪱 earthworm, 🪼 jellyfish, 🐌 snail</li>
+    <li><b>Identification key</b> = yes/no questions that lead to the animal's name.</li></ul>
+  </div></div>
 
-  <div class="br k5 b5" data-pop="medicine"><span class="tap">👆</span><div class="pic">💊</div><h3>Medicines</h3>
-    <div class="leaves"><div class="leaf"><i>🦠</i><span>germs<br>make us ill</span></div><div class="leaf"><i>💉</i><span>vaccination<br>stops it</span></div><div class="leaf"><i>👩‍⚕️</i><span>only from<br>an adult</span></div></div></div>
+  <div class="card k5 b5"><h3><span class="n">5</span>💊 Medicines &amp; diseases <span class="vn">(1.5)</span></h3><div class="body">
+    <ul>
+      <li><b>Medicines</b> make us better when ill; some <b>prevent</b> illness.</li>
+      <li><b>Safely:</b> only from a doctor, nurse or your adult · read &amp; follow the <b>instructions</b> · right amount (too much is <b>harmful</b>) · never take a friend's medicine · don't take extra if you forget.</li>
+      <li><b>Ways:</b> 💧 liquid / tablets · 💉 <b>injection</b> · 🌬️ <b>inhaler</b> (asthma) · 🧴 <b>cream</b> (skin, insect bites) · 🏥 <b>drip</b> (straight into the blood in hospital)</li>
+      <li><b>Infectious disease</b> = caused by tiny living things called <b>germs</b> that <b>infect</b> (get into) the body.</li>
+      <li>People (flu, measles, malaria), animals (🐔 bird flu) and plants (🌾 leaf blast on rice) can all get them.</li>
+      <li><b>Vaccination</b> = injection that <b>prevents</b> a disease. Farmers vaccinate chickens against bird flu and wear gloves.</li>
+    </ul>
+  </div></div>
+
+  <div class="tip"><div class="cat">🐱</div><div><h4>Stormy's memory tricks</h4><ul>
+    <li><b>C</b>ontract = <b>C</b>rush shorter · <b>R</b>elax = <b>R</b>eturn longer</li>
+    <li><b>Vert</b>ebrate = has a backbone · <b>In</b>vertebrate = <b>no</b> backbone</li>
+    <li><b>Exo</b> = outside, like a knight's armour 🛡️</li>
+    <li>Skull → brain · Rib cage → heart &amp; lungs</li>
+    <li>4 jobs = <b>P</b>rotect, <b>S</b>upport, <b>M</b>ove, <b>G</b>row → "<b>P</b>eter <b>S</b>kis <b>M</b>any <b>G</b>reat slopes" ⛷️</li>
+    <li>Germs → infectious disease · Vaccination → prevents it</li>
+  </ul></div></div>
 </div>
-<div class="stormy"><div class="cat">🐱</div><div class="say">Muscles <b>pull</b>, never push! One <b>contracts</b> 🤏, the other <b>relaxes</b> 🙌.</div></div>
+
+<div class="deep">
+  <div class="panel"><h3>📖 Key words</h3><dl class="words">
+    <dt>skeleton</dt><dd>frame of bones that supports the body <span class="vn">bộ xương</span></dd>
+    <dt>organs</dt><dd>parts inside the body, e.g. brain, heart, lungs <span class="vn">cơ quan</span></dd>
+    <dt>function</dt><dd>the job something does <span class="vn">chức năng</span></dd>
+    <dt>model</dt><dd>shows how something looks or works <span class="vn">mô hình</span></dd>
+    <dt>muscle</dt><dd>part of the body that pulls bones to move <span class="vn">cơ</span></dd>
+    <dt>contract / relax</dt><dd>get shorter / get longer <span class="vn">co / duỗi</span></dd>
+    <dt>vertebrate</dt><dd>animal with a backbone <span class="vn">động vật có xương sống</span></dd>
+    <dt>invertebrate</dt><dd>animal without a backbone <span class="vn">không xương sống</span></dd>
+    <dt>exoskeleton</dt><dd>hard covering outside the body <span class="vn">bộ xương ngoài</span></dd>
+    <dt>germs</dt><dd>tiny living things that cause disease <span class="vn">vi trùng</span></dd>
+    <dt>infectious disease</dt><dd>illness caused by germs <span class="vn">bệnh truyền nhiễm</span></dd>
+    <dt>vaccination</dt><dd>injection that prevents a disease <span class="vn">tiêm phòng</span></dd>
+    <dt>instructions</dt><dd>tell us how to take medicine <span class="vn">hướng dẫn</span></dd>
+  </dl></div>
+  <div class="panel"><h3>📝 Test questions <span class="vn">(bấm để xem đáp án)</span></h3>
+    <details><summary>Which bone protects the brain?</summary><div class="ans">The skull.</div></details>
+    <details><summary>Which bones protect the heart and lungs?</summary><div class="ans">The rib cage.</div></details>
+    <details><summary>Baby brother 5 cm, Gita 11 cm, sister 18 cm. Who has the longest foot? What does it tell you?</summary><div class="ans">The sister. We grow because our skeleton grows.</div></details>
+    <details><summary>Gita's brother is 18. Predict his foot: 15 cm, 25 cm or 40 cm?</summary><div class="ans">25 cm (longer than 18 cm, but 40 cm is too long).</div></details>
+    <details><summary>When a muscle ___, it gets shorter.</summary><div class="ans">contracts</div></details>
+    <details><summary>When a muscle ___, it returns to normal size. Muscles work in ___.</summary><div class="ans">relaxes · pairs</div></details>
+    <details><summary>Fish, worm, grasshopper: which is a vertebrate? Why?</summary><div class="ans">The fish, because it has a backbone.</div></details>
+    <details><summary>What is an exoskeleton? Which animal has one?</summary><div class="ans">A hard covering on the outside of the body. The grasshopper.</div></details>
+    <details><summary>They cause infectious diseases. / Injections that stop some diseases.</summary><div class="ans">germs · vaccinations</div></details>
+    <details><summary>True or false: If you take more medicine, you get better faster.</summary><div class="ans">False — too much medicine is harmful.</div></details>
+  </div>
+</div>
 </section>
 
-<!-- UNIT 2 -->
+<!-- ================= UNIT 2 ================= -->
 <section class="unit" id="u2">
-<div class="map"><svg class="wires" aria-hidden="true"></svg>
-  <div class="center"><div class="big">⚡</div><h2>Energy</h2><small>Unit 2</small></div>
+<div class="map">
+  <svg class="wires" aria-hidden="true"></svg>
+  <div class="center"><div class="big">⚡☀️</div><h2>Unit 2<br>Energy</h2><p>Energy makes things<br><b>move</b> or <b>change</b></p><p class="vn">Năng lượng làm vật chuyển động hoặc thay đổi</p></div>
 
-  <div class="br k1 b1" data-pop="forms"><span class="tap">👆</span><div class="pic">🌈</div><h3>5 Forms</h3>
-    <div class="leaves"><div class="leaf"><i>💡</i><span>light</span></div><div class="leaf"><i>🔥</i><span>heat</span></div><div class="leaf"><i>🔊</i><span>sound</span></div><div class="leaf"><i>🏃</i><span>movement</span></div><div class="leaf"><i>🔌</i><span>electrical</span></div></div></div>
+  <div class="card k1 b1"><h3><span class="n">1</span>🌈 Energy around us <span class="vn">(2.1)</span></h3><div class="body">
+    <p style="margin:0 0 4px">Forms of energy <span class="vn">(các dạng năng lượng)</span>:</p>
+    <div class="chips"><span class="chip">💡 light</span><span class="chip">🔥 heat</span><span class="chip">🔊 sound</span><span class="chip">🏃 movement</span><span class="chip">🔌 electrical</span></div>
+    <ul>
+      <li>Energy makes things <b>move</b>, <b>change</b> or <b>work</b>.</li>
+      <li>The <b>Sun</b> ☀️ is a <b>source</b> of energy — it is <b>not</b> a form of energy.</li>
+      <li>We <b>cannot make</b> energy and it does not disappear. It can only <b>move</b> or <b>change form</b>.</li>
+      <li>Things that are still can have energy stored (food, a battery, a log of wood).</li>
+      <li>All living things need energy.</li>
+    </ul>
+  </div></div>
 
-  <div class="br k2 b2" data-pop="transfer"><span class="tap">👆</span><div class="pic">➡️</div><h3>Transfer</h3>
-    <div class="chain">☀️<b>→</b>👕<b>→</b>✅</div><div class="chain" style="font-size:18px;margin-bottom:6px">Sun dries the clothes</div>
-    <div class="chain">♨️<b>→</b>🥄<b>→</b>🔴</div><div class="chain" style="font-size:18px">hot water → spoon → bead</div></div>
+  <div class="card k2 b2"><h3><span class="n">2</span>➡️ Energy transfers <span class="vn">(2.2)</span></h3><div class="body">
+    <ul><li><b>Transfer</b> = energy <b>moves</b> from one thing to another. <span class="vn">(truyền năng lượng)</span></li>
+    <li>An <b>energy chain</b> uses arrows to show where energy goes.</li></ul>
+    <div class="row"><span class="e">☀️</span>Sun <span class="ar">→</span><span class="e">👕</span>wet clothes <span class="ar">→</span>water dries</div>
+    <div class="row"><span class="e">♨️</span>hot water <span class="ar">→</span><span class="e">🥄</span>spoon <span class="ar">→</span>petroleum jelly <span class="ar">→</span><span class="e">🔴</span>bead falls</div>
+    <div class="row"><span class="e">✋</span>warm hand <span class="ar">→</span><span class="e">🧊</span>ice melts</div>
+    <ul><li>Some heat always escapes to the <b>surroundings</b> (air around) → that's why hot water cools down.</li>
+    <li>Transfers: kicking a ball ⚽, hitting a drum 🥁, Sun drying clothes. A log lying still = <b>not</b> a transfer.</li></ul>
+  </div></div>
 
-  <div class="br k3 b3" data-pop="change"><span class="tap">👆</span><div class="pic">🔄</div><h3>Change</h3>
-    <div class="leaves"><div class="leaf"><i>🙌→🔥</i><span>rub hands</span></div><div class="leaf"><i>🔌→💡</i><span>lamp</span></div><div class="leaf"><i>🍌→🏃</i><span>food</span></div></div></div>
+  <div class="card k3 b3"><h3><span class="n">3</span>🔄 Energy changes <span class="vn">(2.3)</span></h3><div class="body">
+    <p style="margin:0 0 4px">Energy can <b>change form</b> when it is transferred:</p>
+    <table class="mini">
+      <tr><th>Thing</th><th>Energy in</th><th>Energy out</th></tr>
+      <tr><td>🙌 rubbing hands</td><td>movement</td><td>heat + sound</td></tr>
+      <tr><td>💡 lamp</td><td>electrical</td><td>light + heat</td></tr>
+      <tr><td>💻 computer / TV</td><td>electrical</td><td>light + sound</td></tr>
+      <tr><td>🥁 drum</td><td>movement</td><td>sound</td></tr>
+      <tr><td>🍌 eating a banana</td><td>food (stored)</td><td>movement + heat</td></tr>
+    </table>
+    <div class="ex">Draw it: movement energy → 🙌 → heat energy + sound energy</div>
+  </div></div>
 
-  <div class="br k4 b4" data-pop="food"><span class="tap">👆</span><div class="pic">🌿</div><h3>Food chain</h3>
-    <div class="chain">☀️<b>→</b>🌿<b>→</b>🐇<b>→</b>🦅</div>
-    <div class="leaves" style="margin-top:6px"><div class="leaf"><i>🌿</i><span>producer</span></div><div class="leaf"><i>🐇</i><span>herbivore<br>prey</span></div><div class="leaf"><i>🦅</i><span>carnivore<br>predator</span></div><div class="leaf"><i>🐻</i><span>omnivore</span></div></div></div>
+  <div class="card k4 b4"><h3><span class="n">4</span>🌿 Energy &amp; living things <span class="vn">(2.4)</span></h3><div class="body">
+    <ul><li>Plants use energy from the Sun to <b>make their own food</b> → <b>producers</b>.</li>
+    <li>Animals cannot make food; they eat plants or animals → <b>consumers</b>.</li>
+    <li>A <b>food chain</b> always starts with a plant. Arrow → = "is eaten by" (energy goes this way).</li></ul>
+    <div class="row"><span class="e">🌿</span>plant <span class="ar">→</span><span class="e">🐇</span>rabbit <span class="ar">→</span><span class="e">🦅</span>eagle</div>
+    <div class="row"><span class="e">🌾</span>grass <span class="ar">→</span><span class="e">🦌</span>deer <span class="ar">→</span><span class="e">🐯</span>tiger</div>
+    <table class="mini">
+      <tr><td>🐇 <b>herbivore</b></td><td>eats only plants</td></tr>
+      <tr><td>🦅 <b>carnivore</b></td><td>eats only animals</td></tr>
+      <tr><td>🐻 <b>omnivore</b></td><td>eats plants <b>and</b> animals</td></tr>
+      <tr><td>🐯 <b>predator</b> / 🦌 <b>prey</b></td><td>hunts / is hunted</td></tr>
+    </table>
+  </div></div>
 
-  <div class="br k5 b5" data-pop="fair"><span class="tap">👆</span><div class="pic">🔬</div><h3>Fair test</h3>
-    <div class="leaves"><div class="leaf"><i>🔧</i><span>change<br>1 thing</span></div><div class="leaf"><i>⏱️</i><span>measure<br>1 thing</span></div><div class="leaf"><i>🔒</i><span>keep the<br>rest same</span></div></div></div>
+  <div class="card k5 b5"><h3><span class="n">5</span>🔬 Think like a scientist</h3><div class="body">
+    <p style="margin:0 0 4px"><b>Fair test</b>: the bead &amp; spoon investigation</p>
+    <table class="mini">
+      <tr><td>🔧 We <b>change</b></td><td>temperature of the water</td></tr>
+      <tr><td>📏 We <b>measure</b></td><td><b>time</b> for the bead to fall</td></tr>
+      <tr><td>🔒 Keep the <b>same</b></td><td>spoon, amount of jelly, bead</td></tr>
+    </table>
+    <ul><li><b>Pattern</b>: the hotter the water, the <b>faster</b> the bead falls.</li>
+    <li>Metal spoon → bead falls quickly; plastic spoon → bead does not fall (plastic does not transfer heat well).</li>
+    <li><b>Read a graph</b>: find 40 °C on the bottom, go up to the line, read the time on the side.</li></ul>
+  </div></div>
+
+  <div class="tip"><div class="cat">🐱</div><div><h4>Stormy's memory tricks</h4><ul>
+    <li>5 forms: <b>L</b>ight, <b>H</b>eat, <b>S</b>ound, <b>M</b>ovement, <b>E</b>lectrical → "<b>L</b>ittle <b>H</b>appy <b>S</b>tormy <b>M</b>akes <b>E</b>nergy"</li>
+    <li>Sun = <b>source</b> (where energy comes from), not a form</li>
+    <li>Transfer = energy <b>moves</b> · Change = energy <b>changes form</b></li>
+    <li>Food chain always <b>starts with a plant</b> 🌿</li>
+    <li><b>Omni</b>vore = "all" → plants AND animals</li>
+    <li>Change 1 thing · measure 1 thing · keep the rest the same</li>
+  </ul></div></div>
 </div>
-<div class="stormy"><div class="cat">🐱</div><div class="say">The Sun ☀️ is a <b>source</b> of energy, not a form! We can't <b>make</b> energy, only move or change it.</div></div>
+
+<div class="deep">
+  <div class="panel"><h3>📖 Key words</h3><dl class="words">
+    <dt>energy</dt><dd>makes things move or change <span class="vn">năng lượng</span></dd>
+    <dt>form</dt><dd>a type of energy: light, heat, sound… <span class="vn">dạng</span></dd>
+    <dt>source</dt><dd>where energy comes from, e.g. the Sun <span class="vn">nguồn</span></dd>
+    <dt>transfer</dt><dd>energy moves from one thing to another <span class="vn">truyền</span></dd>
+    <dt>energy chain</dt><dd>arrows showing where energy goes <span class="vn">chuỗi năng lượng</span></dd>
+    <dt>surroundings</dt><dd>the air and things around <span class="vn">môi trường xung quanh</span></dd>
+    <dt>producer</dt><dd>a plant that makes its own food <span class="vn">sinh vật sản xuất</span></dd>
+    <dt>consumer</dt><dd>an animal that eats other living things <span class="vn">sinh vật tiêu thụ</span></dd>
+    <dt>herbivore / carnivore</dt><dd>eats plants / eats animals <span class="vn">ăn cỏ / ăn thịt</span></dd>
+    <dt>omnivore</dt><dd>eats plants and animals <span class="vn">ăn tạp</span></dd>
+    <dt>predator / prey</dt><dd>hunts / is hunted <span class="vn">kẻ săn mồi / con mồi</span></dd>
+    <dt>fair test</dt><dd>change one thing, keep the rest the same <span class="vn">thí nghiệm công bằng</span></dd>
+  </dl></div>
+  <div class="panel"><h3>📝 Test questions <span class="vn">(bấm để xem đáp án)</span></h3>
+    <details><summary>Which is NOT a form of energy: heat, light, the Sun, sound?</summary><div class="ans">The Sun (it is a source).</div></details>
+    <details><summary>Which is NOT an energy transfer: kicking a ball, clothes drying in the Sun, a log of wood, hitting a drum?</summary><div class="ans">A log of wood.</div></details>
+    <details><summary>Which is NOT true: energy makes things move · we can make energy · energy can change form · living things need energy?</summary><div class="ans">"We can make energy."</div></details>
+    <details><summary>Why do plants use energy from the Sun?</summary><div class="ans">To make food.</div></details>
+    <details><summary>Bead &amp; spoon test: what form of energy was transferred?</summary><div class="ans">Heat energy.</div></details>
+    <details><summary>Which factor did the group measure? Which did they change?</summary><div class="ans">Measured: time. Changed: temperature of the water.</div></details>
+    <details><summary>The water did not stay hot. Why?</summary><div class="ans">Heat energy was transferred to the surroundings.</div></details>
+    <details><summary>Draw the energy chain for the bead test.</summary><div class="ans">hot water → spoon → petroleum jelly → bead</div></details>
+    <details><summary>Rubbing hands: what energy change happens?</summary><div class="ans">Movement energy → heat energy (and sound).</div></details>
+    <details><summary>Plant, rabbit, eagle: name the producer, herbivore, carnivore, predator and prey.</summary><div class="ans">Producer: plant · Herbivore: rabbit · Carnivore: eagle · Predator: eagle · Prey: rabbit</div></details>
+    <details><summary>What is an omnivore?</summary><div class="ans">An animal that eats both plants and animals.</div></details>
+  </div>
+</div>
 </section>
 
-<!-- UNIT 3 -->
+<!-- ================= UNIT 3 ================= -->
 <section class="unit" id="u3">
-<div class="map"><svg class="wires" aria-hidden="true"></svg>
-  <div class="center"><div class="big">🧊</div><h2>Materials</h2><small>Unit 3</small></div>
+<div class="map">
+  <svg class="wires" aria-hidden="true"></svg>
+  <div class="center"><div class="big">🧊🍦</div><h2>Unit 3<br>Materials</h2><p>Everything is made of<br>tiny <b>particles</b></p><p class="vn">Mọi thứ đều được tạo từ hạt rất nhỏ</p></div>
 
-  <div class="br k1 b1" data-pop="particles"><span class="tap">👆</span><div class="pic">🔵</div><h3>Particles</h3>
-    <div class="leaves"><div class="leaf"><i>🔬</i><span>tiny, tiny<br>bits</span></div><div class="leaf"><i>🌍</i><span>everything<br>is made of them</span></div><div class="leaf"><i>💃</i><span>always<br>moving</span></div></div></div>
+  <div class="card k1 b1"><h3><span class="n">1</span>🧱 Materials, substances, particles <span class="vn">(3.1)</span></h3><div class="body">
+    <ul>
+      <li><b>Matter</b> = everything around us.</li>
+      <li><b>Material</b> = a type of matter; most are <b>mixtures</b>: wood, glass, plastic, rubber.</li>
+      <li><b>Substance</b> = one <b>pure</b> solid, liquid or gas, not a mixture: salt 🧂, pure water 💧, oxygen.</li>
+      <li><b>Particle</b> = a very tiny bit. All matter is made of particles. Most are too small to see. They are <b>always moving</b> and have <b>spaces</b> between them. <span class="vn">(hạt)</span></li>
+    </ul>
+    <div class="ex">Glass is a <b>material</b>: sand + soda ash + limestone are heated → liquid glass → shaped → cools and goes hard.</div>
+    <div class="ex">Drops of food dye spread in still water → water particles move!</div>
+  </div></div>
 
-  <div class="br k2 b2" data-pop="solidliquid"><span class="tap">👆</span><div class="pic">🧊💧</div><h3>Solid &amp; Liquid</h3>
-    <div class="parts">
-      <div><svg class="solid" viewBox="0 0 100 100"><g fill="#E2557F"><circle cx="22" cy="22" r="10"/><circle cx="44" cy="22" r="10"/><circle cx="66" cy="22" r="10"/><circle cx="88" cy="22" r="0"/><circle cx="22" cy="44" r="10"/><circle cx="44" cy="44" r="10"/><circle cx="66" cy="44" r="10"/><circle cx="22" cy="66" r="10"/><circle cx="44" cy="66" r="10"/><circle cx="66" cy="66" r="10"/><circle cx="22" cy="88" r="0"/><circle cx="78" cy="78" r="0"/></g><g transform="translate(11 11)"></g></svg><b>solid</b><br><small>keeps shape</small></div>
-      <div><svg class="liquid" viewBox="0 0 100 100"><g fill="#3C86D6"><circle cx="18" cy="40" r="10"/><circle cx="44" cy="30" r="10"/><circle cx="72" cy="40" r="10"/><circle cx="28" cy="68" r="10"/><circle cx="56" cy="60" r="10"/><circle cx="80" cy="74" r="10"/><circle cx="46" cy="86" r="9"/></g></svg><b>liquid</b><br><small>flows</small></div>
-    </div></div>
+  <div class="card k2 b2"><h3><span class="n">2</span>🔵 The particle model <span class="vn">(3.1–3.2)</span></h3><div class="body">
+    <div class="part">
+      <figure><svg viewBox="0 0 96 96" aria-label="solid particles"><g fill="var(--c2b)">
+        <circle cx="20" cy="20" r="9"/><circle cx="40" cy="20" r="9"/><circle cx="60" cy="20" r="9"/><circle cx="80" cy="20" r="9"/>
+        <circle cx="20" cy="40" r="9"/><circle cx="40" cy="40" r="9"/><circle cx="60" cy="40" r="9"/><circle cx="80" cy="40" r="9"/>
+        <circle cx="20" cy="60" r="9"/><circle cx="40" cy="60" r="9"/><circle cx="60" cy="60" r="9"/><circle cx="80" cy="60" r="9"/>
+        <circle cx="20" cy="80" r="9"/><circle cx="40" cy="80" r="9"/><circle cx="60" cy="80" r="9"/><circle cx="80" cy="80" r="9"/></g></svg>SOLID 🧊</figure>
+      <figure><svg viewBox="0 0 96 96" aria-label="liquid particles"><g fill="var(--c3b)">
+        <circle cx="16" cy="44" r="9"/><circle cx="38" cy="36" r="9"/><circle cx="66" cy="42" r="9"/><circle cx="84" cy="60" r="9"/>
+        <circle cx="22" cy="68" r="9"/><circle cx="46" cy="60" r="9"/><circle cx="62" cy="80" r="9"/><circle cx="18" cy="88" r="7"/>
+        <circle cx="84" cy="84" r="9"/><circle cx="40" cy="84" r="9"/></g></svg>LIQUID 💧</figure>
+    </div>
+    <table class="mini">
+      <tr><th>Solid</th><th>Liquid</th></tr>
+      <tr><td>packed <b>tightly</b> in a <b>regular pattern</b></td><td>close but <b>no</b> pattern</td></tr>
+      <tr><td>very small spaces</td><td>bigger spaces</td></tr>
+      <tr><td>particles stay in a <b>fixed</b> place</td><td>particles <b>slide past</b> each other</td></tr>
+      <tr><td><b>keeps its shape</b> unless pushed or squeezed</td><td><b>flows</b>, can be poured, takes the <b>shape of its container</b>, spreads out on a flat surface</td></tr>
+    </table>
+    <ul><li>A <b>property</b> describes what a material is like or how it behaves.</li></ul>
+  </div></div>
 
-  <div class="br k3 b3" data-pop="powder"><span class="tap">👆</span><div class="pic">🏖️</div><h3>Powders</h3>
-    <div class="leaves"><div class="leaf"><i>🏖️</i><span>sand</span></div><div class="leaf"><i>🍚</i><span>flour</span></div><div class="leaf"><i>🧂</i><span>salt</span></div></div>
-    <div class="chain" style="font-size:18px;margin-top:6px">pour like liquid, but are <b style="font-size:20px">&nbsp;SOLID</b></div></div>
+  <div class="card k3 b3"><h3><span class="n">3</span>🏖️ Solids that pour <span class="vn">(3.2)</span></h3><div class="body">
+    <ul>
+      <li><b>Powders</b> — sand, flour, salt, sugar — are <b>solids</b> that can <b>pour</b> and take the shape of their container, like a liquid.</li>
+      <li>Why? They are lots of tiny <b>grains</b> with <b>air</b> (space) between them, so the grains can <b>move</b> and <b>flow</b> past each other.</li>
+      <li>But each grain is still a solid made of millions of particles.</li>
+    </ul>
+    <div class="ex">Time 100 ml of each powder flowing through a funnel. Look for a <b>pattern</b> between grain size and speed, then use it to <b>predict</b> a new powder.</div>
+    <ul><li><b>Reliable</b> results = repeat the test and get the same or similar answer.</li>
+    <li>Use <b>standard units</b> (seconds) so you can compare with other groups.</li></ul>
+  </div></div>
 
-  <div class="br k4 b4" data-pop="melt"><span class="tap">👆</span><div class="pic">🍦</div><h3>Melt &amp; Freeze</h3>
-    <div class="chain">🧊<b>🔥→</b>💧</div><div class="chain" style="font-size:18px">melting</div>
-    <div class="chain">💧<b>❄️→</b>🧊</div><div class="chain" style="font-size:18px">solidifying (freezing)</div>
-    <div class="chain" style="font-size:18px">↩️ can change back</div></div>
+  <div class="card k4 b4"><h3><span class="n">4</span>🍫 Melting &amp; solidifying <span class="vn">(3.3)</span></h3><div class="body">
+    <div class="row"><span class="e">🧊</span>solid <span class="ar">— heating 🔥 → <u>melting</u> →</span> liquid<span class="e">💧</span></div>
+    <div class="row"><span class="e">💧</span>liquid <span class="ar">— cooling ❄️ → <u>solidifying</u> →</span> solid<span class="e">🧊</span></div>
+    <ul>
+      <li>This is a <b>change of state</b>. Solidifying is also called <b>freezing</b>.</li>
+      <li><b>Heating</b>: particles gain energy → move <b>faster</b> and <b>further apart</b> → solid melts.</li>
+      <li><b>Cooling</b>: particles lose energy → move <b>slower</b> and <b>closer</b> → liquid solidifies.</li>
+      <li>Change of state is a <b>physical process</b>: the substance stays the <b>same</b> (ice and water are both water) and can change back.</li>
+      <li>Different solids melt at different speeds (🧊 ice, 🍫 chocolate, 🧈 butter). Metals like gold need very high temperatures.</li>
+    </ul>
+    <div class="ex">Ice cream: liquid mix 🥛 → freezer ❄️ → solid ice cream 🍦 = solidifying.</div>
+  </div></div>
 
-  <div class="br k5 b5" data-pop="react"><span class="tap">👆</span><div class="pic">✨</div><h3>New stuff!</h3>
-    <div class="chain">🔩<b>+</b>💧<b>+</b>💨<b>→</b>🟤</div><div class="chain" style="font-size:18px">iron + water + air = rust</div>
-    <div class="chain">🪵<b>🔥→</b>⚱️</div><div class="chain" style="font-size:18px">wood burns to ash · 🚫↩️ can't go back</div></div>
+  <div class="card k5 b5"><h3><span class="n">5</span>🧪 Chemical reactions <span class="vn">(3.4)</span></h3><div class="body">
+    <ul>
+      <li>Some substances <b>react</b> together and make a <b>NEW substance</b> = <b>chemical reaction</b>. Most cannot be changed back.</li>
+      <li>🔥 <b>Burning</b> wood: wood + air → <b>ash</b> + gases</li>
+      <li>🧱 Cement + sand + water + limestone → <b>concrete</b></li>
+      <li>🔩 <b>Rusting</b>: iron/steel + <b>water</b> + <b>air</b> (oxygen) → reddish-brown <b>rust</b></li>
+      <li>Rust makes metal <b>weak</b> → damages cars, bridges, buildings.</li>
+      <li>Stop rust: paint 🎨, oil or grease 🛢️, plastic coating → keeps water and air away.</li>
+    </ul>
+    <div class="ex">Wire wool in: water only (covered, lid) · water + air · air only. Rust is <b>quickest</b> with water + air. Oil on water stops air → rust is slower.</div>
+  </div></div>
+
+  <div class="tip"><div class="cat">🐱</div><div><h4>Stormy's memory tricks</h4><ul>
+    <li>Solid = soldiers standing in rows 💂 · Liquid = kids at playtime 🏃</li>
+    <li><b>Melt</b> = solid → liquid (heat) · <b>Solidify</b> = liquid → <b>solid</b> (cool)</li>
+    <li>Change of state = <b>same</b> stuff, can go back ↩️ (physical)</li>
+    <li>Chemical reaction = <b>new</b> stuff ✨, can't go back</li>
+    <li>Rust needs <b>W</b>ater + <b>A</b>ir → "rust needs a <b>WA</b>sh"</li>
+    <li>Flour pours but it is still a <b>solid</b>!</li>
+  </ul></div></div>
 </div>
-<div class="stormy"><div class="cat">🐱</div><div class="say">Melting = <b>same</b> stuff, can go back ↩️. Rust and burning = <b>new</b> stuff ✨, can't go back!</div></div>
+
+<div class="deep">
+  <div class="panel"><h3>📖 Key words</h3><dl class="words">
+    <dt>matter</dt><dd>everything around us <span class="vn">vật chất</span></dd>
+    <dt>material</dt><dd>a type of matter, often a mixture <span class="vn">vật liệu</span></dd>
+    <dt>substance</dt><dd>a pure solid, liquid or gas <span class="vn">chất</span></dd>
+    <dt>particle</dt><dd>a very tiny bit of something <span class="vn">hạt</span></dd>
+    <dt>particle model</dt><dd>explains how solids and liquids are different <span class="vn">mô hình hạt</span></dd>
+    <dt>property</dt><dd>what a material is like or how it behaves <span class="vn">tính chất</span></dd>
+    <dt>powder</dt><dd>a solid made of tiny grains that can pour <span class="vn">bột</span></dd>
+    <dt>change of state</dt><dd>solid ↔ liquid by heating or cooling <span class="vn">chuyển thể</span></dd>
+    <dt>melting</dt><dd>solid → liquid <span class="vn">nóng chảy</span></dd>
+    <dt>solidifying / freezing</dt><dd>liquid → solid <span class="vn">đông đặc</span></dd>
+    <dt>physical process</dt><dd>only the form changes, same substance <span class="vn">quá trình vật lý</span></dd>
+    <dt>chemical reaction</dt><dd>a new substance forms <span class="vn">phản ứng hoá học</span></dd>
+    <dt>rust</dt><dd>reddish-brown substance on iron <span class="vn">gỉ sét</span></dd>
+    <dt>reliable</dt><dd>same result when you repeat <span class="vn">đáng tin cậy</span></dd>
+  </dl></div>
+  <div class="panel"><h3>📝 Test questions <span class="vn">(bấm để xem đáp án)</span></h3>
+    <details><summary>All materials consist of ___.</summary><div class="ans">particles</div></details>
+    <details><summary>Heating causes a solid to change into a ___. This is called a ___.</summary><div class="ans">liquid · change of state</div></details>
+    <details><summary>Solid or liquid? Particles are close together but not in a fixed pattern.</summary><div class="ans">Liquid</div></details>
+    <details><summary>Solid or liquid? Does not change shape. / Spreads out over a surface.</summary><div class="ans">Solid · Liquid</div></details>
+    <details><summary>Forms when a liquid is cooled? Forms when a solid is heated?</summary><div class="ans">Solid · Liquid</div></details>
+    <details><summary>Ice cream: what state was the milk at the start? After the freezer?</summary><div class="ans">Liquid → solid</div></details>
+    <details><summary>Why did the milk change state? Name the process.</summary><div class="ans">It was cooled (lost heat). Solidifying / freezing.</div></details>
+    <details><summary>Why pour the mixture into a container before freezing?</summary><div class="ans">A liquid takes the shape of its container, so the ice cream gets that shape.</div></details>
+    <details><summary>Flour can be poured. Is it a solid or a liquid? Why can it pour?</summary><div class="ans">A solid. It is tiny grains with air between them, so the grains can move and flow.</div></details>
+    <details><summary>In which conditions does rust form quickest?</summary><div class="ans">Water + air.</div></details>
+    <details><summary>Why does rust take longer in water covered with oil?</summary><div class="ans">The oil stops air reaching the metal.</div></details>
+    <details><summary>A nail and wire wool were used. Why was this not a fair test?</summary><div class="ans">They used different metal objects; only one thing should change.</div></details>
+    <details><summary>Rusting is a chemical reaction. Why?</summary><div class="ans">A new substance (rust) forms and it cannot be changed back.</div></details>
+  </div>
+</div>
 </section>
 
-<!-- ALL -->
+<!-- ================= BIG PICTURE ================= -->
 <section class="unit" id="u0">
-<div class="all">
-  <div class="br k1"><div class="pic">🦴</div><h3>Unit 1 · Living Things</h3><div class="leaves"><div class="leaf"><i>💀</i><span>bones</span></div><div class="leaf"><i>🛡️</i><span>4 jobs</span></div><div class="leaf"><i>💪</i><span>muscles</span></div><div class="leaf"><i>🐟</i><span>animals</span></div><div class="leaf"><i>💊</i><span>medicines</span></div></div></div>
-  <div class="br k3"><div class="pic">⚡</div><h3>Unit 2 · Energy</h3><div class="leaves"><div class="leaf"><i>🌈</i><span>5 forms</span></div><div class="leaf"><i>➡️</i><span>transfer</span></div><div class="leaf"><i>🔄</i><span>change</span></div><div class="leaf"><i>🌿</i><span>food chain</span></div><div class="leaf"><i>🔬</i><span>fair test</span></div></div></div>
-  <div class="br k2"><div class="pic">🧊</div><h3>Unit 3 · Materials</h3><div class="leaves"><div class="leaf"><i>🔵</i><span>particles</span></div><div class="leaf"><i>💧</i><span>solid/liquid</span></div><div class="leaf"><i>🏖️</i><span>powders</span></div><div class="leaf"><i>🍦</i><span>melt</span></div><div class="leaf"><i>✨</i><span>new stuff</span></div></div></div>
-</div>
-<div class="stormy"><div class="cat">🐱</div><div class="say">🍌 Food gives <b>energy</b> to your <b>muscles</b> 💪 · 🔥 Heat gives <b>energy</b> to particles, so ice <b>melts</b> 🧊→💧</div></div>
+  <div class="big-pic">
+    <h2>🗺️ The big picture — one line for each lesson</h2>
+    <div class="trio">
+      <div class="k1"><h3>🦴 Unit 1 Living Things</h3><ul>
+        <li>1.1 Bones form a skeleton (206 bones)</li><li>1.2 Skeleton: protect, support, move, grow</li><li>1.3 Muscles pull in pairs (contract / relax)</li><li>1.4 Vertebrates vs invertebrates, exoskeleton, keys</li><li>1.5 Medicines, germs, vaccinations</li></ul></div>
+      <div class="k3"><h3>⚡ Unit 2 Energy</h3><ul>
+        <li>2.1 Forms: light, heat, sound, movement, electrical</li><li>2.2 Energy transfers &amp; energy chains</li><li>2.3 Energy changes form</li><li>2.4 Food chains: producer → consumers</li></ul></div>
+      <div class="k2"><h3>🧊 Unit 3 Materials</h3><ul>
+        <li>3.1 Matter, materials, substances, particles</li><li>3.2 Solids keep shape, liquids flow, powders pour</li><li>3.3 Melting &amp; solidifying (physical)</li><li>3.4 Chemical reactions: rust, burning (new substance)</li></ul></div>
+    </div>
+    <p style="margin:14px 0 0"><b style="color:var(--choc)">🔗 Links between units:</b> Muscles need <b>energy</b> from food (Unit 1 + 2) · Heating gives particles <b>energy</b>, so solids melt (Unit 2 + 3) · Bones are hard <b>solids</b>, that's why they protect us (Unit 1 + 3).</p>
+  </div>
 </section>
+
+<p class="foot">Made for Peter by Stormy ☁️🐱 · Read one branch a day, cover it, and tell Mum what you remember!</p>
 </main>
 
-<dialog id="pop"><div class="pic" id="pPic"></div><h3 id="pTitle"></h3><p id="pText"></p><p class="vn" id="pVn"></p>
-  <div class="btns"><button id="pSay">🔊 Listen</button><button class="ghost" id="pClose">✖ Close</button></div></dialog>
-
 <script>
-const POP={
- bones:["💀","Bones","Our skeleton has 206 bones. The skeleton is a strong frame inside our body.","Bộ xương có 206 xương, là khung cứng bên trong cơ thể."],
- jobs:["🛡️","4 Jobs","The skull protects the brain. The rib cage protects the heart and lungs. The skeleton also supports us, helps us move and helps us grow.","Hộp sọ bảo vệ não, lồng ngực bảo vệ tim và phổi. Xương còn nâng đỡ, giúp vận động và lớn lên."],
- muscles:["💪","Muscles","Muscles pull on bones. They work in pairs. When one contracts and gets shorter, the other relaxes and gets longer.","Cơ kéo xương, làm việc theo cặp: một cơ co (ngắn lại) thì cơ kia duỗi (dài ra)."],
- animals:["🐟","Animals","Vertebrates have a backbone, like fish, frogs, snakes, birds and cats. Invertebrates have no backbone. Insects have a hard exoskeleton on the outside.","Có xương sống: cá, ếch, rắn, chim, mèo. Không xương sống: giun, côn trùng (côn trùng có vỏ cứng bên ngoài)."],
- medicine:["💊","Medicines","Germs cause infectious diseases. Medicines help us get better. A vaccination stops us getting ill. Only take medicine from a doctor or an adult.","Vi trùng gây bệnh truyền nhiễm. Tiêm vắc-xin giúp phòng bệnh. Chỉ uống thuốc do người lớn đưa."],
- forms:["🌈","5 Forms of energy","Light, heat, sound, movement and electrical energy. The Sun is a source of energy, not a form.","5 dạng năng lượng: ánh sáng, nhiệt, âm thanh, chuyển động, điện. Mặt Trời là nguồn, không phải dạng."],
- transfer:["➡️","Energy transfer","Energy moves from one thing to another. Heat moves from hot water to the spoon, then to the bead. Some heat escapes to the air around it.","Năng lượng truyền từ vật này sang vật khác; một phần nhiệt thoát ra không khí xung quanh."],
- change:["🔄","Energy change","Energy can change form. Rubbing hands turns movement into heat. A lamp turns electrical energy into light.","Năng lượng đổi dạng: xoa tay → nhiệt; đèn: điện → ánh sáng; ăn chuối → chuyển động."],
- food:["🌿","Food chain","Plants make food using sunlight. They are producers. The rabbit eats plants, so it is a herbivore and prey. The eagle eats the rabbit, so it is a carnivore and predator. A bear eats both, so it is an omnivore.","Cây là sinh vật sản xuất. Thỏ ăn cỏ, là con mồi. Đại bàng ăn thịt, là kẻ săn mồi. Gấu ăn cả hai."],
- fair:["🔬","Fair test","Change one thing, like the water temperature. Measure one thing, like the time. Keep everything else the same. Hotter water makes the bead fall faster.","Thay đổi 1 thứ (nhiệt độ), đo 1 thứ (thời gian), giữ nguyên phần còn lại."],
- particles:["🔵","Particles","Everything is made of tiny particles. They are too small to see, and they are always moving.","Mọi vật được tạo từ những hạt rất nhỏ, luôn chuyển động."],
- solidliquid:["🧊","Solid and liquid","In a solid, particles are packed tightly in rows, so it keeps its shape. In a liquid, particles slide past each other, so it flows and takes the shape of its container.","Chất rắn: hạt xếp sát, giữ hình dạng. Chất lỏng: hạt trượt qua nhau, chảy và có hình dạng của vật chứa."],
- powder:["🏖️","Powders","Sand, flour and salt can pour like a liquid, but they are solids. They are tiny grains with air between them.","Cát, bột, muối rót được như chất lỏng nhưng vẫn là chất rắn."],
- melt:["🍦","Melt and freeze","Heating makes a solid melt into a liquid. Cooling makes a liquid solidify, or freeze, into a solid. It is still the same stuff, so we can change it back.","Đun nóng → nóng chảy. Làm lạnh → đông đặc. Vẫn là chất cũ, đổi lại được."],
- react:["✨","Chemical reaction","A new substance is made. Iron plus water plus air makes rust. Burning wood makes ash. We cannot change it back.","Phản ứng hoá học tạo ra chất mới: gỉ sét, tro. Không đổi lại được."]
-};
-const dlg=document.getElementById('pop');
-let cur=null;
-function say(t){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-GB';u.rate=.9;speechSynthesis.speak(u)}catch(e){}}
-document.querySelectorAll('[data-pop]').forEach(el=>el.onclick=()=>{
-  cur=POP[el.dataset.pop];
-  dlg.style.setProperty('--c',getComputedStyle(el).getPropertyValue('--c'));
-  dlg.style.setProperty('--t',getComputedStyle(el).getPropertyValue('--t'));
-  pPic.textContent=cur[0];pTitle.textContent=cur[1];pText.textContent=cur[2];pVn.textContent=cur[3];
-  dlg.showModal();say(cur[2]);
-});
-pSay.onclick=()=>cur&&say(cur[2]);
-pClose.onclick=()=>{try{speechSynthesis.cancel()}catch(e){}dlg.close()};
-dlg.addEventListener('click',e=>{if(e.target===dlg)pClose.onclick()});
-
-const W={b1:'--c1',b2:'--c2',b3:'--c3',b4:'--c4',b5:'--c5'};
-function wires(sec){
-  const map=sec&&sec.querySelector('.map');if(!map)return;
-  const svg=map.querySelector('.wires');if(getComputedStyle(svg).display==='none')return;
-  const m=map.getBoundingClientRect(),c=map.querySelector('.center').getBoundingClientRect();
-  const cx=c.left+c.width/2-m.left,cy=c.top+c.height/2-m.top;
+const COLORS={b1:'--c1b',b2:'--c2b',b3:'--c3b',b4:'--c4b',b5:'--c5b'};
+function drawWires(sec){
+  const map=sec&&sec.querySelector('.map'); if(!map) return;
+  const svg=map.querySelector('.wires'), c=map.querySelector('.center');
+  if(getComputedStyle(svg).display==='none') return;
+  const m=map.getBoundingClientRect(), cr=c.getBoundingClientRect();
+  const cx=cr.left+cr.width/2-m.left, cy=cr.top+cr.height/2-m.top;
   svg.setAttribute('viewBox',`0 0 ${m.width} ${m.height}`);
-  let o='';
-  for(const k in W){const r=map.querySelector('.'+k).getBoundingClientRect();
-    const side=k==='b4'||k==='b5';
-    const x=side?(k==='b4'?r.right:r.left)-m.left:r.left+r.width/2-m.left;
-    const y=side?r.top+r.height/2-m.top:r.bottom-m.top;
-    const col=getComputedStyle(document.documentElement).getPropertyValue(W[k]);
-    const d=side?`M${cx} ${cy} C ${(cx+x)/2} ${cy}, ${(cx+x)/2} ${y}, ${x} ${y}`:`M${cx} ${cy} C ${cx} ${(cy+y)/2}, ${x} ${(cy+y)/2}, ${x} ${y}`;
-    o+=`<path d="${d}" stroke="${col}"/>`;}
-  svg.innerHTML=o;
+  let out='';
+  for(const k in COLORS){
+    const card=map.querySelector('.'+k); if(!card) continue;
+    const r=card.getBoundingClientRect(); let x,y;
+    if(k==='b4'){x=r.right-m.left;y=r.top+r.height/2-m.top}
+    else if(k==='b5'){x=r.left-m.left;y=r.top+r.height/2-m.top}
+    else {x=r.left+r.width/2-m.left;y=r.bottom-m.top}
+    const col=getComputedStyle(document.documentElement).getPropertyValue(COLORS[k]);
+    const mx=(cx+x)/2;
+    const d=(k==='b4'||k==='b5')?`M${cx} ${cy} C ${mx} ${cy}, ${mx} ${y}, ${x} ${y}`:`M${cx} ${cy} C ${cx} ${(cy+y)/2}, ${x} ${(cy+y)/2}, ${x} ${y}`;
+    out+=`<path d="${d}" stroke="${col}"/>`;
+  }
+  svg.innerHTML=out;
 }
 function show(id){
   document.querySelectorAll('.unit').forEach(s=>s.classList.toggle('on',s.id===id));
   document.querySelectorAll('.tabs [data-u]').forEach(b=>b.setAttribute('aria-selected',b.dataset.u===id));
   try{localStorage.setItem('stormy-sci-tab',id)}catch(e){}
-  wires(document.getElementById(id));
+  drawWires(document.getElementById(id));
 }
 document.querySelectorAll('.tabs [data-u]').forEach(b=>b.onclick=()=>show(b.dataset.u));
-let s='u1';try{s=localStorage.getItem('stormy-sci-tab')||'u1'}catch(e){}
-show(document.getElementById(s)?s:'u1');
-addEventListener('resize',()=>wires(document.querySelector('.unit.on')));
-document.fonts&&document.fonts.ready.then(()=>wires(document.querySelector('.unit.on')));
-addEventListener('beforeprint',()=>document.querySelectorAll('.unit').forEach(x=>{x.classList.add('on');wires(x)}));
-addEventListener('afterprint',()=>show(document.querySelector('.tabs [aria-selected=true]').dataset.u));
+let start='u1'; try{start=localStorage.getItem('stormy-sci-tab')||'u1'}catch(e){}
+if(!document.getElementById(start)) start='u1';
+show(start);
+addEventListener('resize',()=>drawWires(document.querySelector('.unit.on')));
+document.fonts&&document.fonts.ready.then(()=>drawWires(document.querySelector('.unit.on')));
+addEventListener('beforeprint',()=>{document.querySelectorAll('details').forEach(d=>d.open=true);document.querySelectorAll('.unit').forEach(s=>{s.classList.add('on');drawWires(s)})});
+addEventListener('afterprint',()=>show(document.querySelector('.tabs [aria-selected=true]')?.dataset.u||'u1'));
 </script>
 <a href="../" aria-label="Back to Peter's World" style="position:fixed;left:calc(10px + env(safe-area-inset-left,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:2147483000;width:48px;height:48px;border-radius:50%;background:#fff;border:3px solid #5fd3b0;display:grid;place-items:center;font-size:22px;text-decoration:none;box-shadow:0 3px 0 rgba(0,0,0,.18)">🏠</a>
 </body>

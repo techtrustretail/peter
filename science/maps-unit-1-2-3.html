@@ -120,16 +120,19 @@ details .ans{margin:4px 0 2px 26px;color:var(--c1b);font-weight:800}
   header .tabs,.foot{display:none}
   header{padding:0 0 4px}h1{font-size:20px}h1 small{font-size:11px}
   .unit{display:block!important;break-after:page}
-  .map{grid-template-columns:1fr 1fr 1fr;grid-template-areas:"b1 b2 b3" "b4 c b5" "tip tip tip";gap:12px 14px}
-  .wires{display:block}
+  .map{grid-template-columns:1fr 1fr 1fr;grid-template-areas:"c c c" "b1 b2 b3" "b4 b5 tip";gap:10px 12px;align-items:start}
+  .wires{display:none!important}
+  .center{max-width:none;width:100%;border-radius:16px;padding:6px 14px;display:flex;align-items:center;justify-content:center;gap:16px;box-shadow:none;animation:none}
+  .center .big{font-size:26px}.center h2{font-size:18px;margin:0}.center br{display:none}.center p{font-size:12px}
+  .card{break-inside:avoid;box-shadow:none}
+  .b4{break-before:page}
   .card h3{font-size:14px;padding:5px 9px}.card .body{padding:5px 9px 7px}
-  .center{padding:10px}.center .big{font-size:34px}.center h2{font-size:19px}
-  .tip{padding:6px 12px}.tip .cat{font-size:28px}.tip h4{font-size:14px}
+  .tip{padding:8px 12px;grid-template-columns:1fr}.tip .cat{display:none}.tip h4{font-size:14px}.tip ul{columns:1}
   .row .e{font-size:16px}.part svg{width:60px;height:60px}
-  .card,.center{box-shadow:none}
-  .pics{break-before:page;grid-template-columns:1fr 1fr}
-  .pic svg{max-height:165mm}
-  .deep{break-before:page;grid-template-columns:1fr 1fr}
+  .pics{break-before:page;grid-template-columns:1fr 1fr;margin-top:0}
+  .pic{break-inside:avoid}
+  .pic svg{max-height:135mm}
+  .deep{break-before:page;grid-template-columns:1fr 1fr;margin-top:0}
   details .ans{display:block}
   details:not([open]) > :not(summary){display:block}
 }
@@ -262,7 +265,7 @@ details .ans{margin:4px 0 2px 26px;color:var(--c1b);font-weight:800}
       <text class="lb" x="94" y="146">upper arm</text><text class="lv" x="94" y="161">xương cánh tay</text>
       <text class="lb" x="94" y="224">lower arm</text><text class="lv" x="94" y="239">xương cẳng tay</text>
       <text class="lb" x="94" y="331">thigh bone</text><text class="lv" x="94" y="346">xương đùi</text>
-      <text class="lb" x="94" y="421">lower leg</text><text class="lv" x="94" y="436">xương cẳng chân</text>
+      <text class="lb" x="94" y="421">lower leg</text><text class="lv" x="94" y="436">cẳng chân</text>
     </g>
     <text class="lb" x="306" y="136">rib cage</text><text class="lv" x="306" y="151">lồng ngực</text>
     <text class="lb" x="306" y="234">spine</text><text class="lv" x="306" y="249">cột sống</text>
@@ -281,9 +284,9 @@ details .ans{margin:4px 0 2px 26px;color:var(--c1b);font-weight:800}
     <ellipse cx="398" cy="110" rx="7" ry="56" fill="#F9D3DE" stroke="#C2185B" stroke-width="2"/>
     <use href="#armU1" stroke="#5A3A2E" stroke-width="12"/><use href="#armU1" stroke="#FFF3DF" stroke-width="7"/>
     <g fill="#FFF3DF" stroke="#5A3A2E" stroke-width="2.5"><circle cx="90" cy="46" r="11"/><circle cx="190" cy="92" r="9"/><circle cx="380" cy="46" r="11"/><circle cx="387" cy="282" r="9"/></g>
-    <g class="ld"><path d="M122 140 L150 192"/><path d="M70 166 L70 236"/><path d="M405 110 L440 110"/><path d="M360 148 L350 236"/></g>
+    <g class="ld"><path d="M122 140 L150 192"/><path d="M70 166 L70 272"/><path d="M405 110 L440 110"/><path d="M360 148 L350 236"/></g>
     <text class="lb" x="140" y="208">biceps CONTRACTS</text><text class="lv" x="140" y="224">shorter + fatter</text><text class="lv" x="140" y="239">→ pulls the arm up</text><text class="lv" x="140" y="254">co lại: ngắn + phình</text>
-    <text class="lb" x="30" y="254">triceps RELAXES</text><text class="lv" x="30" y="270">longer + thinner</text><text class="lv" x="30" y="285">duỗi ra: dài + mỏng</text>
+    <text class="lb" x="30" y="288">triceps RELAXES</text><text class="lv" x="30" y="304">longer + thinner</text><text class="lv" x="30" y="319">duỗi ra: dài + mỏng</text>
     <text class="lb" x="444" y="106">biceps</text><text class="lb" x="444" y="122">RELAXES</text><text class="lv" x="444" y="137">longer + thinner</text>
     <text class="lb" x="300" y="304">triceps CONTRACTS</text><text class="lv" x="300" y="320">shorter → pulls the arm down</text>
   </svg>

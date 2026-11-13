@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Peter's Quest</title>
+<script>
+/* Dữ liệu game do _he-thong/tao-game.py chèn vào. KHÔNG sửa tay file .html — sửa file .json rồi chạy lại công cụ. */
+const GAME = {"id": "2026-11-13_u3-ice-cream-lab", "subject": "Science", "subjectLabel": "Science · Unit 3 Materials", "title": "Stormy's Ice-Cream Lab", "hero": "🍦", "lang": "en-GB", "unit": "Unit 3 · Materials", "questions": [{"skill": "s-u3-particles", "type": "mc", "q": "🔬 All materials consist of…", "choices": ["particles", "germs", "energy", "muscles"], "answer": 0, "tip": "Everything is made of tiny particles."}, {"skill": "s-u3-particles", "type": "mc", "q": "🪟 Glass is made by mixing sand, soda ash and limestone. Glass is a…", "choices": ["substance", "material", "particle", "gas"], "answer": 1, "tip": "A material is often a mixture. A substance is one pure thing, like salt."}, {"skill": "s-u3-particles", "type": "mc", "q": "💧 Drops of food dye spread in still water. This shows that particles…", "choices": ["are always moving", "are very big", "never move", "are solid"], "answer": 0, "tip": "Nobody stirred the water, so the particles moved by themselves!"}, {"skill": "s-u3-solidliquid", "type": "mc", "q": "🧊 Particles packed tightly in a regular pattern. Solid or liquid?", "choices": ["solid", "liquid"], "answer": 0, "tip": "Solid = soldiers standing in rows."}, {"skill": "s-u3-solidliquid", "type": "mc", "q": "💧 Particles close together but NOT in a fixed pattern. Solid or liquid?", "choices": ["solid", "liquid"], "answer": 1, "tip": "Liquid particles slide past each other."}, {"skill": "s-u3-solidliquid", "type": "mc", "q": "🫗 Which one takes the shape of its container?", "choices": ["a brick", "a liquid", "a pencil", "a solid"], "answer": 1, "tip": "Liquids flow and take the shape of their container."}, {"skill": "s-u3-solidliquid", "type": "mc", "q": "🧱 A brick does not change shape. Why?", "choices": ["Its particles slide around", "Its particles are packed tightly in a fixed place", "It has no particles", "It is a liquid"], "answer": 1, "tip": "Solid particles stay in fixed places, so a solid keeps its shape."}, {"skill": "s-u3-powder", "type": "mc", "q": "🍚 Flour can be poured. Is flour a solid or a liquid?", "choices": ["a liquid", "a solid", "a gas", "both"], "answer": 1, "tip": "Flour is a solid made of tiny grains with air between them."}, {"skill": "s-u3-powder", "type": "mc", "q": "🏖️ Why can sand be poured?", "choices": ["It is wet", "It is made of tiny grains with air between them", "It is a liquid", "Its particles melt"], "answer": 1, "tip": "The grains have space to move and flow past each other."}, {"skill": "s-u3-state", "type": "mc", "q": "🔥 Heating a solid to make it a liquid is called…", "choices": ["solidifying", "melting", "rusting", "burning"], "answer": 1, "tip": "Melt = solid → liquid."}, {"skill": "s-u3-state", "type": "mc", "q": "🍦 Ice-cream mix goes into the freezer. What happens?", "choices": ["solid → liquid (melting)", "liquid → solid (solidifying)", "it becomes rust", "nothing"], "answer": 1, "tip": "Cooling makes a liquid solidify (freeze)."}, {"skill": "s-u3-state", "type": "mc", "q": "🫗 Why pour ice-cream mix into a container BEFORE freezing?", "choices": ["A liquid takes the shape of its container", "Solids can be poured", "To make it melt", "To make it rust"], "answer": 0, "tip": "The liquid takes the container's shape and keeps it when it freezes."}, {"skill": "s-u3-state", "type": "mc", "q": "🧊 Ice melts into water. Is it still the same substance?", "choices": ["Yes — change of state is a physical process", "No — it is a new substance"], "answer": 0, "tip": "Ice and water are both water. We can freeze it back."}, {"skill": "s-u3-chemical", "type": "mc", "q": "🔩 Rust forms quickest when iron has…", "choices": ["air only", "water only", "water + air", "oil"], "answer": 2, "tip": "Rust needs Water + Air — rust needs a WAsh!"}, {"skill": "s-u3-chemical", "type": "mc", "q": "🛢️ Why does rust form slower in water covered with oil?", "choices": ["Oil is hot", "Oil stops air reaching the metal", "Oil is a solid", "Oil makes more rust"], "answer": 1, "tip": "No air → much less rust."}, {"skill": "s-u3-chemical", "type": "mc", "q": "✨ Rusting is a chemical reaction because…", "choices": ["the metal melts", "a new substance forms and cannot change back", "it is cold", "it can change back"], "answer": 1, "tip": "Chemical reaction = NEW stuff that can't go back. Burning wood is another one."}]};
+</script>
+<style>
+:root{--bg:#fff7e6;--card:#fff;--ink:#2b2d42;--pri:#4361ee;--ok:#2ec4b6;--bad:#ff6b6b;--sun:#ffd166}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 20% 10%,#ffe8b0,var(--bg) 60%);font-family:"Comic Sans MS","Chalkboard SE","Trebuchet MS",sans-serif;color:var(--ink);display:flex;justify-content:center;padding:16px}
+.wrap{width:100%;max-width:760px}
+header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.hero{font-size:56px;animation:bob 2s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-8px)}}
+h1{margin:0;font-size:28px}.sub{opacity:.7}
+.stars{margin-left:auto;font-size:26px;white-space:nowrap}
+.home{font-size:22px;text-decoration:none;background:#fff;border-radius:14px;padding:6px 10px;box-shadow:0 3px 0 #0001}
+.bar{height:14px;background:#eee;border-radius:99px;overflow:hidden;margin-bottom:16px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--ok),var(--pri));width:0;transition:width .4s}
+.card{background:var(--card);border-radius:28px;padding:24px;box-shadow:0 10px 0 #0001}
+.q{font-size:30px;line-height:1.3;margin:0 0 20px;display:flex;gap:10px;align-items:flex-start}
+.say{border:0;background:var(--sun);border-radius:50%;width:52px;height:52px;font-size:26px;flex:none}
+.choices{display:grid;gap:14px}
+.btn{font:inherit;font-size:26px;padding:18px;border:4px solid #dfe3ff;border-radius:22px;background:#f5f7ff;color:var(--ink);text-align:left}
+.btn:active{transform:scale(.97)}
+.btn.ok{background:#d9fbf7;border-color:var(--ok)}
+.btn.bad{background:#ffe3e3;border-color:var(--bad);animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.line{min-height:76px;border:4px dashed #c9cff5;border-radius:20px;padding:10px;display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+.pool{display:flex;flex-wrap:wrap;gap:10px}
+.w{font:inherit;font-size:24px;padding:12px 16px;border-radius:16px;border:0;background:var(--sun);box-shadow:0 4px 0 #e0a800;color:var(--ink)}
+.tip{margin-top:16px;font-size:22px;background:#fff3c4;padding:12px 16px;border-radius:16px;display:none}
+.row{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap}
+.go{font:inherit;font-size:24px;padding:14px 24px;border:0;border-radius:18px;background:var(--pri);color:#fff;box-shadow:0 5px 0 #2b3fb8}
+.go.alt{background:#2ec4b6;box-shadow:0 5px 0 #1f9d92}
+.end{text-align:center}.end .big{font-size:110px}
+.code{font-family:ui-monospace,Menlo,monospace;font-size:15px;background:#f1f3f5;border-radius:12px;padding:10px;word-break:break-all;text-align:left;margin-top:12px;user-select:all;-webkit-user-select:all}
+.note{font-size:16px;opacity:.75;margin-top:8px}
+#fx{position:fixed;inset:0;pointer-events:none}
+</style>
+</head>
+<body>
+<canvas id="fx"></canvas>
+<div class="wrap">
+  <header><div class="hero" id="hero"></div><div><h1 id="title"></h1><div class="sub" id="subj"></div></div>
+    <div class="stars" id="stars">⭐ 0</div><a class="home" href="../../../TRANG-CHU.html" title="Home">🏠</a></header>
+  <div class="bar"><i id="prog"></i></div>
+  <div class="card" id="card"></div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const QS=GAME.questions;
+let i=0,score=0,tries=0,log=[],t0=Date.now();
+$('hero').textContent=GAME.hero;$('title').textContent=GAME.title;$('subj').textContent=GAME.subjectLabel||GAME.subject;
+const AC=window.AudioContext||window.webkitAudioContext;let ac;
+function beep(ok){try{ac=ac||new AC();const o=ac.createOscillator(),g=ac.createGain();o.connect(g);g.connect(ac.destination);
+ const t=ac.currentTime;(ok?[523,659,784]:[220,180]).forEach((f,k)=>o.frequency.setValueAtTime(f,t+k*.12));
+ g.gain.setValueAtTime(.2,t);g.gain.exponentialRampToValueAtTime(.001,t+.45);o.start(t);o.stop(t+.5)}catch(e){}}
+function speak(t){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang=GAME.lang;u.rate=.85;speechSynthesis.speak(u)}catch(e){}}
+function confetti(){const c=$('fx'),x=c.getContext('2d');c.width=innerWidth;c.height=innerHeight;
+ const P=Array.from({length:90},()=>({x:innerWidth/2,y:innerHeight/3,vx:(Math.random()-.5)*14,vy:Math.random()*-12-4,c:`hsl(${Math.random()*360},90%,60%)`,s:6+Math.random()*8}));
+ let n=0;(function f(){x.clearRect(0,0,c.width,c.height);P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.45;x.fillStyle=p.c;x.fillRect(p.x,p.y,p.s,p.s)});if(++n<70)requestAnimationFrame(f);else x.clearRect(0,0,c.width,c.height)})()}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function win(){const q=QS[i];score+=tries===0?2:1;$('stars').textContent='⭐ '+score;beep(true);confetti();
+ log.push({q:i+1,skill:q.skill||'chung',ok1:tries===0,tries:tries+1});
+ $('tip').style.display='block';$('tip').innerHTML='🎉 '+(tries===0?'Amazing!':'Well done!')+'<br>'+esc(q.tip||'');$('nav').style.display='flex'}
+function render(){const q=QS[i];tries=0;$('prog').style.width=(i/QS.length*100)+'%';
+ if(!q)return finish();
+ let h=`<p class="q"><button class="say" id="say">🔊</button><span>${esc(q.q)}</span></p>`;
+ h+=q.type==='order'?`<div class="line" id="line"></div><div class="pool" id="pool"></div>`
+   :`<div class="choices">`+q.choices.map((c,k)=>`<button class="btn" data-k="${k}">${esc(c)}</button>`).join('')+`</div>`;
+ h+=`<div class="tip" id="tip"></div><div class="row" id="nav" style="display:none"><button class="go" id="next">Next ➜</button></div>`;
+ $('card').innerHTML=h;$('say').onclick=()=>speak(q.q);$('next').onclick=()=>{i++;render()};
+ if(q.type==='order'){const pool=$('pool'),line=$('line');
+  [...q.words].sort(()=>Math.random()-.5).forEach(w=>{const b=document.createElement('button');b.className='w';b.textContent=w;
+   b.onclick=()=>{if($('nav').style.display==='flex')return;(b.parentNode===pool?line:pool).appendChild(b);check()};pool.appendChild(b)});
+  function check(){if(pool.children.length)return;const got=[...line.children].map(b=>b.textContent).join(' ');
+   if(got===q.words.join(' '))win();else{tries++;beep(false);line.style.borderColor='var(--bad)';setTimeout(()=>{line.style.borderColor='';[...line.children].forEach(b=>pool.appendChild(b))},700)}}}
+ else document.querySelectorAll('.btn').forEach(b=>b.onclick=()=>{if($('nav').style.display==='flex')return;
+  if(+b.dataset.k===q.answer){b.classList.add('ok');win()}else{tries++;b.classList.add('bad');beep(false);setTimeout(()=>b.classList.remove('bad'),400)}});
+}
+/* ---- Kết quả: lưu trong máy + tải file JSON (Mac) + mã ngắn (iPad) ---- */
+function result(){const d=new Date(),pad=n=>String(n).padStart(2,'0');
+ const stamp=`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}`;
+ return {app:'QuangQuest',v:2,game:GAME.id,subject:GAME.subject,title:GAME.title,when:stamp,minutes:Math.round((Date.now()-t0)/60000),score,max:QS.length*2,items:log}}
+function shortCode(r){const s={};r.items.forEach(x=>{s[x.skill]=s[x.skill]||[0,0];s[x.skill][1]++;if(x.ok1)s[x.skill][0]++});
+ return `QQ|${r.subject}|${r.game}|${r.when}|${r.score}/${r.max}|`+Object.entries(s).map(([k,v])=>`${k}:${v[0]}/${v[1]}`).join(';')}
+function saveLocal(r){try{const h=JSON.parse(localStorage.getItem('QQ_history')||'[]');h.push({game:r.game,subject:r.subject,when:r.when,score:r.score,max:r.max});localStorage.setItem('QQ_history',JSON.stringify(h))}catch(e){}}
+function download(r){try{const b=new Blob([JSON.stringify(r)],{type:'application/json'}),a=document.createElement('a');
+ a.href=URL.createObjectURL(b);a.download=`QQ_${r.subject}_${r.game}_${r.when}.json`;document.body.appendChild(a);a.click();a.remove()}catch(e){}}
+function finish(){$('prog').style.width='100%';confetti();const r=result();saveLocal(r);download(r);const max=r.max,code=shortCode(r);
+ $('card').innerHTML=`<div class="end"><div class="big">${score>=max*.8?'🏆':score>=max*.5?'🥈':'💪'}</div>
+ <h1>${score>=max*.8?'Champion!':'Great effort!'}</h1><p style="font-size:26px">⭐ ${score} / ${max}</p>
+ <div class="row" style="justify-content:center"><button class="go" id="again">Play again 🔁</button><button class="go alt" id="copy">📋 Copy kết quả</button></div>
+ <div class="code" id="code">${esc(code)}</div>
+ <div class="note">Trên Mac: kết quả đã tự lưu vào thư mục Downloads. Trên iPad: bấm "Copy kết quả" rồi dán gửi Claude (hoặc chụp màn hình).</div></div>`;
+ $('again').onclick=()=>{i=0;score=0;log=[];t0=Date.now();$('stars').textContent='⭐ 0';render()};
+ $('copy').onclick=()=>{try{navigator.clipboard.writeText(code);$('copy').textContent='✅ Đã copy'}catch(e){}}}
+render();
+</script>
+<a href="../" aria-label="Back to Peter's World" style="position:fixed;left:calc(10px + env(safe-area-inset-left,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:2147483000;width:48px;height:48px;border-radius:50%;background:#fff;border:3px solid #5fd3b0;display:grid;place-items:center;font-size:22px;text-decoration:none;box-shadow:0 3px 0 rgba(0,0,0,.18)">🏠</a>
+</body>
+</html>

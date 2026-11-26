@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stormy's Revision Coach</title>
+<style>
+:root{--bg:#eafaf3;--card:#fff;--ink:#3b2a20;--soft:#7a6656;--mint:#2bb38a;--mint2:#c9f2e2;--choc:#6b3f26;--gold:#f2b632;--red:#e2574c;--line:#e3d9cf}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#17221e;--card:#22302b;--ink:#f3ece4;--soft:#c2b4a6;--mint2:#1f4a3c;--line:#3a4a44}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.5 "Comic Sans MS","Chalkboard SE","Segoe UI",system-ui,sans-serif}
+header{background:linear-gradient(135deg,#2bb38a,#6b3f26);color:#fff;padding:18px 16px}
+header h1{margin:0;font-size:26px}header p{margin:4px 0 0;opacity:.9}
+.wrap{max-width:860px;margin:0 auto;padding:16px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.tab{border:0;border-radius:999px;padding:10px 16px;font:inherit;background:var(--card);color:var(--ink);cursor:pointer;box-shadow:0 2px 0 var(--line)}
+.tab.on{background:var(--mint);color:#fff}
+.card{background:var(--card);border-radius:18px;padding:16px;margin:12px 0;box-shadow:0 3px 0 var(--line)}
+.pg{display:flex;justify-content:space-between;align-items:center;gap:8px;cursor:pointer}
+.pg h3{margin:0;font-size:20px}
+.badge{font-size:14px;background:var(--mint2);border-radius:999px;padding:2px 10px;white-space:nowrap}
+.q{border-top:2px dashed var(--line);padding:12px 0}
+.qn{display:inline-block;background:var(--choc);color:#fff;border-radius:50%;width:28px;height:28px;text-align:center;line-height:28px;margin-right:6px;font-size:15px}
+.qt{font-weight:bold}
+.help{color:var(--soft);margin:6px 0}
+.btns{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+button.s{border:0;border-radius:12px;padding:8px 12px;font:inherit;font-size:16px;cursor:pointer;background:var(--mint2);color:var(--ink)}
+button.go{background:var(--mint);color:#fff}
+.box{border-radius:12px;padding:10px 12px;margin:6px 0;font-size:17px}
+.hint{background:#fff6dc;color:#5a4300}.ex{background:#e8f1ff;color:#1f3b6b}.fix{background:#ffe9e6;color:#7a2018}.ok{background:#dcf7ea;color:#0d5c3f}.no{background:#ffe9e6;color:#7a2018}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .hint{background:#4a3d14;color:#ffe9a8}:root:not([data-theme="light"]) .ex{background:#1d3150;color:#cfe0ff}:root:not([data-theme="light"]) .fix,:root:not([data-theme="light"]) .no{background:#4d2420;color:#ffd2cc}:root:not([data-theme="light"]) .ok{background:#164534;color:#c6f5e1}}
+textarea,input[type=text]{width:100%;font:inherit;border:2px solid var(--line);border-radius:12px;padding:10px;background:var(--bg);color:var(--ink)}
+textarea{min-height:70px}
+.star{color:var(--gold)}
+.small{font-size:15px;color:var(--soft)}
+.hide{display:none}
+table.plan{width:100%;border-collapse:collapse;font-size:16px}table.plan td,table.plan th{border:1px solid var(--line);padding:6px;text-align:left;vertical-align:top}
+.stormy{font-size:40px;float:right}
+.chip{display:inline-block;border:2px solid var(--line);border-radius:999px;padding:6px 12px;margin:4px;cursor:pointer;background:var(--card);user-select:none}
+.chip.sel{background:var(--gold);color:#3b2a20;border-color:var(--gold)}
+.vi{font-family:system-ui,sans-serif;font-size:16px}
+a.home{color:#fff}
+</style>
+</head>
+<body>
+<header><div class="wrap" style="padding:0"><span class="stormy">🐱☁️</span>
+<h1>Stormy's Revision Coach</h1>
+<p>Semester 1 English · your teacher's booklet, page by page · ⭐ <span id="stars">0</span> stars</p></div></header>
+<div class="wrap">
+<div class="tabs" id="tabs"></div>
+<div id="view"></div>
+</div>
+<script>
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s);
+const store={get(k,d){try{const v=localStorage.getItem('s1c_'+k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem('s1c_'+k,JSON.stringify(v))}catch(e){}}};
+let done=store.get('done',{});
+function star(id){if(!done[id]){done[id]=1;store.set('done',done)}$('#stars').textContent=Object.keys(done).length}
+function say(t){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-GB';u.rate=.9;speechSynthesis.speak(u)}catch(e){}}
+const norm=s=>s.replace(/[“”„]/g,'"').replace(/[‘’]/g,"'").replace(/\s+/g,' ').trim();
+const low=s=>norm(s).toLowerCase().replace(/[.!?,"']/g,'').trim();
+const sentences=s=>norm(s).split(/(?<=[.!?])\s+/).filter(x=>x.length);
+/* rule checker for writing boxes. Each rule returns '' if ok, else a tip */
+const RULES={
+ cap:t=>/^["']?[A-Z]/.test(norm(t))?'':'Start with a CAPITAL letter.',
+ stop:t=>/[.!?]["']?$/.test(norm(t))?'':'End with a full stop . ! or ?',
+ caps:t=>{const bad=sentences(t).filter(x=>!/^["']?[A-Z]/.test(x));return bad.length?'Every new sentence needs a capital letter: "'+bad[0].slice(0,20)+'…"':''},
+ i:t=>/(^|\s)i(\s|')/.test(norm(t))?'Little "i" on its own must be a capital I.':'',
+ quote:t=>/".+"/.test(norm(t))?'':'Copy the exact words inside "speech marks".',
+ because:t=>/because/i.test(t)?'':'Use "because" to give your reason.',
+ shows:t=>/shows?|means|tells/i.test(t)?'':'Add "This shows that…" to explain.',
+ ly:t=>/\b\w{3,}ly\b/i.test(t)?'':'Add an adverb – a HOW word, often ending in -ly.',
+ simile:t=>/\blike\b|\bas \w+ as\b/i.test(t)?'':'Add a simile: "like a…" or "as … as a…".',
+ q:t=>/\?/.test(t)?'':'Add one question (?).',
+ ex:t=>/!/.test(t)?'':'Add one exclamation (!).',
+ nosaid:t=>/\bsaid\b/i.test(t)?'Use a speech verb that is NOT "said" (shouted, cried, gasped…).':'',
+ lines4:t=>t.split(/\n/).filter(x=>x.trim()).length>=4?'':'Write at least 4 lines – new speaker, new line.',
+};
+function ruleCheck(t,rules){const out=[];for(const r of rules){let m;
+ if(m=r.match(/^no:(.+)$/)){if(new RegExp('\\b'+m[1]+'\\b','i').test(t))out.push('Do not use the word "'+m[1]+'". Show it instead!');continue}
+ if(m=r.match(/^min:(\d+)$/)){if(norm(t).split(' ').length<+m[1])out.push('Write a bit more – at least '+m[1]+' words.');continue}
+ if(m=r.match(/^sent:(\d+)$/)){const n=sentences(t).length;if(n!=+m[1])out.push('I count '+n+' sentence(s). The task wants '+m[1]+'. Each one ends with a full stop.');continue}
+ if(m=r.match(/^short:(\d+)$/)){const l=sentences(t).filter(x=>x.split(' ').length>+m[1]);if(l.length)out.push('Make every sentence SHORT (≤'+m[1]+' words). "'+l[0]+'" is too long.');continue}
+ if(m=r.match(/^sentmin:(\d+)$/)){if(sentences(t).length<+m[1])out.push('Write at least '+m[1]+' sentences.');continue}
+ if(m=r.match(/^has:(.+)$/)){if(!new RegExp(m[1],'i').test(t))out.push(m[1].includes('|')?'Use one of: '+m[1].split('|').join(', '):'Include "'+m[1]+'".');continue}
+ const f=RULES[r];if(f){const x=f(t);if(x)out.push(x)}}return out}
+
+/* ---------- DATA: the teacher's booklet ----------
+ q: question · help: what it really asks · hints: step clues · ex: SAME skill, DIFFERENT words
+ type: check (ans list) | write (rules) | note (do on paper) · fix: Peter's own work to look at again */
+const DAYS=[
+{id:'d1',tab:'Mon',title:'Day 1 · Monday',pages:[
+ {id:'p3',p:3,title:'Upgrade the writing',tip:'5 upgrades: short sentences · show, don\'t tell · interesting adjectives · powerful verbs & adverbs · similes & alliteration.',qs:[
+  {n:1,q:'Mia was nervous. Show the feeling. Do NOT use "nervous".',help:'Show = what Mia\'s BODY does, what she SAYS or how she LOOKS.',hints:['Think: hands? knees? voice? breathing?','Use 2 actions: "Mia\'s … and she …"'],ex:'Tell: Leo was happy.  →  Show: Leo grinned and bounced on his toes.',type:'write',rules:['cap','stop','no:nervous','min:7'],fix:'You wrote "Mia was trembling" – great verb! Now add a body part and one more action, then a full stop.'},
+  {n:2,q:'The old house was creepy. Do NOT use "creepy".',help:'Give 2 things you can SEE or HEAR that make it creepy.',hints:['See: cobwebs? broken windows? Hear: a door creaking?','You can start: "Cobwebs …" or "The old house …"'],ex:'The forest was scary.  →  Twisted branches clawed at the sky and an owl hooted.',type:'write',rules:['cap','stop','no:creepy','min:8'],fix:'You stopped after "The old house was". Finish it with 2 details.'},
+  {n:3,q:'Ben was tired. Do NOT use "tired".',help:'Better word OR show it (yawning, eyes closing).',hints:['Spelling: ex-H-austed (there is a silent h!)','Name = capital B.'],ex:'Sam was hungry. → Sam\'s tummy growled and he stared at the cake.',type:'write',rules:['cap','stop','no:tired','min:4'],fix:'"ben was exausted" → capital B and spell exhausted with h.'},
+  {n:4,q:'The dog ran. Add ONE adjective and ONE adverb.',help:'Adjective = describes the dog (before "dog"). Adverb = HOW it ran (after "ran"), often ends in -ly.',hints:['Adjective ideas: fluffy, enormous, excited, muddy','Adverb ideas: quickly, wildly, happily','Spelling: quick + ly = quickly'],ex:'The cat slept. → The lazy cat slept peacefully.',type:'write',rules:['cap','stop','ly'],fix:'"quicky" → quickly (quick + ly). "entertained" is a feeling about a show – pick a word that describes a dog.'},
+  {n:5,q:'Rewrite as THREE short sentences to build tension.',help:'Chop the long sentence into 3 tiny pieces. Each piece ends with a full stop.',hints:['Piece 1: something suddenly happens.','Piece 2: the door had been shut for years.','Piece 3: what it did – creaked open slowly.'],ex:'The tall man, who had waited for hours, finally stood up. → The man waited. Hours passed. Finally, he stood up.',type:'write',rules:['sent:3','short:8','caps'],fix:'You copied it as ONE long sentence. The task wants THREE short ones.'},
+  {n:6,q:'Write a more powerful verb: said → , went → , looked →',help:'A stronger word that shows HOW.',hints:['said: whispered, shouted, gasped','went: hurried, crept, dashed','looked: stared, peered, glared'],ex:'ate → gobbled',type:'note',fix:'Check spelling: whispered (wh-), hurried (y → i + ed).'},
+  {n:7,q:'Upgrade the paragraph. Use at least THREE upgrades.',help:'The girl walked to the beach. It was hot. She was happy. She saw a big wave.',hints:['1 powerful verb instead of walked (skipped? strolled?)','Show "hot": the sand burned her feet…','Show "happy": she giggled / skipped…','A simile for the wave: "as tall as a …" or "like a …"'],ex:'The boy went to the park. It was cold. → The boy trudged to the park. Frost crunched under his boots like broken glass.',type:'write',rules:['caps','stop','simile','sentmin:3','no:happy'],fix:'", it was hot." → full stop + capital I: ". It was hot." Add a simile and SHOW happy.'}]},
+ {id:'p4',p:4,title:'Find the evidence (Zara)',tip:'Point + Evidence "…" + Explain: I think… because the text says "…". This shows that…',qs:[
+  {n:1,q:'Zara is nervous. Underline TWO pieces of evidence.',help:'Find what her BODY does and what her VOICE does.',hints:['One is about her hands.','One is about her voice.'],type:'note'},
+  {n:2,q:'I think Zara is nervous because the text says "…". This shows that … (2 marks)',help:'Copy the EXACT words inside " ". Then explain something NEW – don\'t just say "nervous" again.',hints:['Copy exactly: "Zara\'s hands shook" or "her voice came out as a whisper".','This shows that she is afraid of … (the audience? going on stage?)'],ex:'"Ali\'s face went red and he looked at the floor." This shows that he feels embarrassed and wants to hide.',type:'write',rules:['quote','shows','no:nervous'],fix:'Your evidence was right! But "This shows that Zara was nervous" repeats the question. Explain WHY: what is she scared of?'}]},
+ {id:'p5',p:5,title:'Word Detective',tip:'4 clues: read around · look inside (prefix/suffix) · swap it · check it.',qs:[
+  {n:1,q:'Ferocious: copy the clue words, then tick.',help:'Copy the words around it that help you.',hints:['Which words describe the waves and the wind?'],type:'note',fix:'Your tick ✔ is right! Now copy the clue words on the line.'},
+  {n:2,q:'What does famished mean? Write the clue words too.',help:'Meaning + the words that told you.',hints:['Spelling: h-u-n-g-r-y','Clue: how long had he not eaten? What did his stomach do?'],type:'write',rules:['has:hungry|starving','has:eaten|stomach|rumbled'],fix:'Meaning ✔. Add the clue words from the text.'},
+  {n:3,q:'Prefixes: unlock, rewrite, disappear, misread',help:'un- = not / undo · re- = again · dis- = the opposite · mis- = wrongly',hints:['disappear = the opposite of appear. What is the opposite of appearing?'],type:'check',items:[['unlock =',['not lock','undo the lock','open','open the lock','opposite of lock','not locked','to open']],['rewrite =',['write again']],['disappear =',['not appear','opposite of appear','go away','vanish','go out of sight','not be seen','not appear anymore']],['misread =',['read wrongly','read wrong','read it wrong','read incorrectly']]],fix:'"disappear = finished" is not right. dis- means opposite.'}]},
+]},
+{id:'d2',tab:'Tue',title:'Day 2 · Tuesday',pages:[
+ {id:'p6',p:6,title:'Spot the technique',tip:'Simile = what is compared + the picture it gives.',qs:[
+  {n:1,q:'Copy the simile.',type:'note',fix:'✔ Spelling: sleepy (one p after slee).'},
+  {n:2,q:'What does that simile help you imagine?',help:'How is fog LIKE a sleepy cat?',hints:['A sleepy cat is soft, slow and quiet.','"It helps me imagine the fog moving …"'],ex:'"The snow was like a white blanket" – it helps me imagine the snow is thick and covers everything softly.',type:'write',rules:['cap','stop','has:soft|slow|quiet|gentle|silent'],fix:'Say what the fog is LIKE (soft? slow? quiet?), not only that it crept.'},
+  {n:3,q:'Why does the writer repeat "Nobody"?',type:'note',fix:'Good idea! Shorter: "To show how silent it is and build tension." Spell: emphasise.'},
+  {n:4,q:'How does Jo feel? Give a reason.',type:'note',fix:'✔ Great reason. Spell: frightened (fright-en-ed).'},
+  {n:5,q:'Reluctant',type:'note',fix:'✔ Correct!'}]},
+ {id:'p7',p:7,title:'The Whistle in the Woods',tip:'Every 1-mark "why" answer: one clear idea + a word from the text.',qs:[
+  {n:1,q:'Where does Arjun follow the path?',type:'note',fix:'✔ grandmother\'s needs the apostrophe (the farm belongs to her).'},
+  {n:3,q:'Why does the writer repeat thud?',help:'What sound is "thud, thud, thud"? What does it do to the reader?',hints:['It is the sound of his heart.','It builds tension / shows he is scared.'],type:'write',rules:['cap','stop','has:heart|tension|scared|afraid|nervous'],fix:'Your answer is about the character. Say: it sounds like his heart beating and builds tension.'},
+  {n:4,q:'Which word in Part 2 is an adverb?',help:'Adverb = HOW something is done. Many end in -ly.',hints:['"crouched" is a VERB (an action).','Read sentence 6 of Part 2. Find a -ly word.'],type:'check',items:[['Adverb:',['slowly']]],fix:'"crouched" is a verb, not an adverb.'},
+  {n:5,q:'What does gulped tell you about how Arjun feels?',type:'note',fix:'"unsure" is OK. A stronger feeling word: nervous / scared.'},
+  {n:6,q:'How can you tell the hut might not be empty? Use evidence.',help:'Find what shows someone is inside – copy it in " ".',hints:['What was the window doing?','Where did the whistle come from?'],type:'write',rules:['quote','because'],fix:'Use the words from Part 2 in " " (window, whistle). "Magical" is a guess – use evidence.'},
+  {n:7,q:'Why end with "The door swung open before he touched it"?',help:'How does the reader feel at the end?',hints:['It is a mystery / cliffhanger.','It makes the reader want to read on.'],type:'write',rules:['cap','stop','has:mystery|read on|want to know|tension|cliffhanger|surprise'],fix:'Say the effect on the READER: makes us want to read on.'},
+  {n:8,q:'Is Arjun brave? Tick, then give a detail.',type:'note',hints:['Detail: what does he do even though he is scared? (crept forward, pushed aside the ivy, reached for the handle)'],fix:'You ticked Yes – now write the detail!'}]},
+ {id:'p9',p:9,title:'A Cold Night in London (questions)',tip:'Historical story: look for jobs, clothes, objects, places and how people talk.',qs:[
+  {n:1,q:'Where and when?',type:'note',fix:'✔ London needs a capital L (it is a place name).'},
+  {n:2,q:'Two details that show the past.',type:'note',fix:'✔ Great – lamplighter is a job from the past!'},
+  {n:4,q:'Two adjectives that describe the setting.',help:'Setting = the place. Adjectives = describing words.',hints:['Look in paragraph 1 at the words before "brick wall".','And the words before "street".'],type:'check',items:[['Adjective 1:',['cold','narrow','cobbled','thin']],['Adjective 2:',['cold','narrow','cobbled']]],fix:'You left this blank. Find them in paragraph 1.'},
+  {n:5,q:'Rewrite in Standard English: "Ain\'t got no father neither."',help:'Ain\'t → haven\'t · no → a · neither → either',hints:['Start with "I".'],type:'check',items:[['Standard English:',["i havent got a father either","i dont have a father either","i have not got a father either","i do not have a father either"]]],fix:'Close! Add "either" at the end and a capital I.'},
+  {n:6,q:'Why did the lamplighter give Tom his scarf? Use evidence. (2 marks)',help:'2 marks = a point + evidence.',hints:['Point: he felt sorry for Tom / Tom was freezing.','Evidence: look at paragraph 5 (Tom\'s fingers) or how he spoke in paragraph 3.'],ex:'I think the girl shared her lunch because she was kind. The text says "she saw his empty lunchbox".',type:'write',rules:['cap','because','quote'],fix:'"be he was kind" – good point, but add the evidence in " " (bare, blue fingers).'},
+  {n:7,q:'What happens next? Give a reason. (2 marks)',help:'A guess + a reason FROM THE TEXT.',hints:['Will Tom go? Think of his stomach and the hot soup.','I think … because the text says "…"'],type:'write',rules:['cap','stop','because'],fix:'Good! Use a clue from the text, e.g. his stomach "rumbled loudly" and there is "hot soup".'}]},
+]},
+{id:'d3',tab:'Wed',title:'Day 3 · Wednesday',pages:[
+ {id:'p10',p:10,title:'Verbs and tenses',tip:'Past = finished · Present = now · Future = will. Irregular: go–went, see–saw, hide–hid, sleep–slept.',qs:[
+  {n:1,q:'Rewrite with a MORE powerful verb.',help:'walked, said, ran → a word that shows HOW.',hints:['Sneaky walk? crept, tiptoed, sneaked','Angry said? snapped, shouted, growled','Fast ran? raced, dashed, sprinted'],type:'check',items:[['The thief ___ into the shop.',['crept','tiptoed','sneaked','snuck','slipped','stormed','burst','marched','strolled','stomped']],['"Go away!" the old man ___.',['shouted','snapped','yelled','growled','screamed','roared','bellowed','barked','cried','grumbled','shrieked','hissed']],['The children ___ down the street.',['raced','dashed','sprinted','rushed','zoomed','hurried','charged','bolted','scurried','galloped','skipped']]]},
+  {n:2,q:'Complete the table (past / present / future).',help:'Future = will + verb. Careful with hide and sleep (irregular)!',hints:['shiver: add -ed for the past.','hid ← hide','will sleep → slept'],type:'check',items:[['Past of shiver:',['shivered']],['Future of shiver:',['will shiver']],['Present of hid:',['hide']],['Future of hid:',['will hide']],['Past of will sleep:',['slept']],['Present of will sleep:',['sleep']]]},
+  {n:3,q:'Circle the correct word.',hints:['Yesterday → past','Tomorrow → future (will)'],type:'check',items:[['Yesterday, Tom ___ to the market.',['walked']],['Tomorrow, we ___ the museum.',['will visit']]]},
+  {n:4,q:'Rewrite in the past tense.',help:'Tom hides under the bridge. He shivers and listens. Then he sees a light.',hints:['4 verbs to change: hides, shivers, listens, sees','hide → hid, see → saw (irregular!)'],type:'check',items:[['Past tense:',['tom hid under the bridge he shivered and listened then he saw a light']]]}]},
+ {id:'p12',p:12,title:'Linh and the River (questions)',tip:'5 stages: Introduction → Problem → Climax → Resolution → Conclusion.',qs:[
+  {n:1,q:'Where and when? Give evidence.',hints:['When: the first 2 words of the story.','Where: "in a small village beside …"'],type:'write',rules:['cap','quote']},
+  {n:2,q:'Why did Linh sigh?',hints:['What did she carry every morning?'],type:'write',rules:['cap','stop','has:heavy|bucket']},
+  {n:3,q:'Copy ONE word for how the villagers felt.',hints:['Paragraph 3, first sentence.'],type:'check',items:[['One word:',['terrified']]]},
+  {n:4,q:'"water was creeping towards the houses" suggests…',hints:['Creeping = moving slowly. Towards the houses = getting closer.'],type:'note'},
+  {n:5,q:'The heron\'s words in your OWN words. (2 marks)',help:'Do NOT copy. Say it a different way.',hints:['"Be kind to the river" = look after …','"the river will be kind to you" = it will …'],ex:'"Treat others well and they will treat you well" → If you are nice to people, they will be nice back.',type:'write',rules:['cap','stop','no:kind','min:8']},
+  {n:6,q:'What message does the story teach? Use the last paragraph. (2 marks)',hints:['Find the words after "never forgot:"','Message + evidence in " ".'],type:'write',rules:['cap','quote']},
+  {n:7,q:'Complete the story map.',hints:['1 Linh carries heavy water.','2 The heron speaks; the rain falls.','3 The flood! Linh scoops the mud.','4 Villagers dig a channel.','5 Clean water; the lesson.'],type:'note'}]},
+]},
+{id:'d4',tab:'Thu',title:'Day 4 · Thursday',pages:[
+ {id:'p13',p:13,title:'Punctuating speech',tip:'"Spoken words," said Dad.  Punctuation goes INSIDE the speech marks. Capital letter to start the spoken words.',qs:[
+  {n:1,q:'Rewrite with inverted commas and the correct punctuation.',help:'Find the EXACT words the person says. Put " " around them.',hints:['Speech first → comma inside: "…," said Dad.','Question → ? inside, then asked (small a).','Speech second → Linh whispered, "I …"','Split speech: "…," said the heron, "the water …"'],type:'check',sp:1,items:[['come and look at this said Dad',['"come and look at this," said dad']],['where are you going asked Mum',['"where are you going?" asked mum']],['I love the sea shouted Ben',['"i love the sea!" shouted ben','"i love the sea," shouted ben']],['Linh whispered I think the river is rising',['linh whispered, "i think the river is rising."']],['be careful said the heron the water is deep',['"be careful," said the heron, "the water is deep."','"be careful," said the heron. "the water is deep."']]]}]},
+ {id:'p14',p:14,title:'Speech (continued)',tip:'One mistake in each – find it like a detective 🔍.',qs:[
+  {n:1,q:'Each sentence has ONE mistake. Rewrite it.',hints:['1: a punctuation mark is missing inside.','2: "Asked" should not have a capital.','3: a comma is missing before the speech marks.','4: the full stop should be a comma.'],type:'check',sp:1,items:[['"Come back" shouted Linh.',['"come back!" shouted linh.','"come back," shouted linh.']],['"Where are you going?" Asked Mum.',['"where are you going?" asked mum.']],['The heron said "Be kind to the river."',['the heron said, "be kind to the river."']],['"I am hungry." said the boy.',['"i am hungry," said the boy.']]]},
+  {n:2,q:'Rewrite as direct speech (exact words).',help:'Change "he was" → "I am". The person speaks for himself!',hints:['Tom said that he was cold → "I am …"','Mum asked Ben where he had put his shoes → "Where have you …?"','The heron told Linh to be kind → "Be kind …"'],type:'check',sp:1,items:[['Tom said that he was cold.',['"i am cold," said tom.','"i\'m cold," said tom.','tom said, "i am cold."','tom said, "i\'m cold."','"i am cold," tom said.']],['Mum asked Ben where he had put his shoes.',['"where have you put your shoes?" asked mum.','"ben, where have you put your shoes?" asked mum.','mum asked ben, "where have you put your shoes?"','"where have you put your shoes, ben?" asked mum.','"where did you put your shoes?" asked mum.','"where have you put your shoes?" mum asked ben.','"where have you put your shoes?" mum asked.']],['The heron told Linh to be kind to the river.',['"be kind to the river," said the heron.','"be kind to the river, linh," said the heron.','the heron said, "be kind to the river."','"be kind to the river," the heron told linh.']]]},
+  {n:3,q:'Write a conversation (4 lines) between Linh and a villager.',help:'New speaker = new line. Use 1 speech verb that is not "said", 1 question, 1 exclamation.',hints:['"Help me!" cried Linh.','"What can we do?" asked the old man.'],type:'write',big:1,rules:['lines4','quote','q','ex','nosaid']}]},
+ {id:'p15',p:'15–16',title:'Mystery Story: The Night the Lights Went Out',tip:'120–180 words · 4–5 short paragraphs · plan 5 min, write 20, check 5.',qs:[
+  {n:1,q:'Plan (notes, not sentences).',help:'Setting · Character + feeling · The strange thing · What happens next · Surprise · Ending · 2 adjectives, 2 verbs, 1 simile.',hints:['Setting idea: your bedroom at night, the lift in your building, the ski lodge in the Alps…','Strange thing: a glowing pawprint? music from the empty kitchen?','Ending: link back to the start, or leave a question.'],type:'note'},
+  {n:2,q:'Practise your story here (then copy it neatly on paper).',help:'Stormy checks it as you type.',type:'write',big:2,story:1,rules:['caps','i','simile','min:120']}]},
+ {id:'p17',p:17,title:'Use the word tools',tip:'A–Z: if the first letter is the same, look at the second, then the third.',qs:[
+  {n:1,q:'Put in A–Z order: stormy · sail · shore · sailor · storm · ship',hints:['All start with s! Look at the 2nd letter: a, h, t','sail comes before sailor (shorter word first).'],type:'check',items:[['A–Z order (commas):',['sail sailor ship shore storm stormy']]]},
+  {n:2,q:'Word class of evaporate? Meaning in your own words.',hints:['Look at the brackets (…) after the word.'],type:'check',items:[['Word class:',['verb','a verb']]]},
+  {n:3,q:'Tired words, weakest → strongest: exhausted · sleepy · weary · drowsy',hints:['Which one means "so tired you can\'t move"? That goes LAST.'],type:'note'},
+  {n:4,q:'ne\'er = never. Rewrite the line.',type:'check',items:[['Modern line:',['there never were such thousands of leaves on a tree']]]}]},
+]},
+{id:'d5',tab:'Fri',title:'Day 5 · Friday · Mars (persuasive)',pages:[
+ {id:'p19',p:19,title:'Questions on the advert and the argument',tip:'Fact = can be checked. Opinion = what someone thinks or feels.',qs:[
+  {n:1,q:'What is the advert trying to persuade readers to do?',hints:['Read the last line of the advert.'],type:'note'},
+  {n:2,q:'Two FACTS.',hints:['Fact test: can you check it with a calendar, a ticket, a clock?','Look for days, months, what the ticket includes.'],type:'note'},
+  {n:3,q:'Two OPINIONS.',hints:['Opinion words: SAFE, UNFORGETTABLE, delicious…'],type:'note'},
+  {n:6,q:'How do CAPITALS and ! persuade? (2 marks)',hints:['Point 1: they make the words stand out / sound loud.','Point 2: the reader feels excited / sure.'],type:'write',rules:['cap','stop','min:10']},
+  {n:8,q:'Two connectives in the argument. What does each do? (2 marks)',hints:['However = shows the other side (contrast).','Firstly/Secondly/Finally = puts reasons in order.'],type:'note'}]},
+ {id:'p20',p:20,title:'Grammar and spelling',tip:'Prefix at the start (un-, dis-) · suffix at the end (-able, -ness, -ly).',qs:[
+  {n:1,q:'Correct punctuation.',type:'check',sp:1,items:[['are you ready for the trip of a lifetime',['are you ready for the trip of a lifetime?']],['pack your bag and come with us',['pack your bag and come with us!','pack your bag and come with us.']],['don t miss this amazing chance',["don't miss this amazing chance!","don't miss this amazing chance."]]]},
+  {n:2,q:'Add a prefix or suffix.',type:'check',items:[['comfort →',['comfortable','uncomfortable','comforting','comforted','comforter']],['kind →',['unkind','kindly','kindness']],['fashion →',['fashionable','unfashionable']],['believe →',['unbelievable','believable','disbelieve','believer']]]},
+  {n:3,q:'Join with commas + connectives.',help:'Mars is exciting. It has huge volcanoes. It is very far away. It may not be safe.',hints:['… because it has …','However, it is … , so …'],type:'write',rules:['caps','has:because','has:however,','stop']},
+  {n:4,q:'Best connective.',type:'check',items:[['I love space, (so / however) I would not like to live there.',['however']],['We packed warm clothes (because / but) Mars is freezing.',['because']]]}]},
+ {id:'p21',p:21,title:'Grammar Toolkit',tip:'Statement . · Question ? · Command (starts with a verb) · Exclamation (What…! How…!).',qs:[
+  {n:1,q:'Sentence type.',type:'check',items:[['Pack your bag and come with us.',['command']],['What a spectacular view!',['exclamation']],['Have you ever watched it on television?',['question']],['The show started in 2001.',['statement']]]},
+  {n:2,q:'Use pronouns: Mia found a shell. Mia put the shell in Mia\'s bag.',type:'check',items:[['Rewrite:',['mia found a shell she put it in her bag']]]},
+  {n:3,q:'both / either / neither',type:'check',items:[['I like apples and bananas. I like ___ fruits.',['both']],['You can have tea or juice. You can have ___ one.',['either']],['Ana can\'t swim and Ben can\'t swim. ___ of them can swim.',['neither']]]}]},
+]},
+{id:'d6',tab:'Sat',title:'Day 6 · Saturday · The Power of the Sea',pages:[
+ {id:'p22',p:'22–23',title:'When the Sea Came to Visit (poem)',tip:'Personification = the sea acts like a person (tiptoeing, whispered). Quote the line: I think… because the poem says "…".',qs:[
+  {n:1,q:'Hunt the techniques (tap to choose).',type:'sort',items:[['tiptoeing up the sand','personification'],['As soft as a sleepy cat','simile'],['silver moon / shushing, splashing','alliteration'],['rose up like towers','simile'],['thunder boomed','onomatopoeia'],['It whispered secrets to my toes','personification']]}]},
+ {id:'p24',p:24,title:'Vocabulary',tip:'Shades of meaning: cool → cold → freezing.',qs:[
+  {n:1,q:'Weakest → strongest.',type:'check',items:[['cool · freezing · cold',['cool cold freezing']],['damp · soaked · wet',['damp wet soaked']],['pleased · thrilled · happy',['pleased happy thrilled']]]},
+  {n:3,q:'Adjective → adverb.',type:'check',items:[['fierce',['fiercely']],['gentle',['gently']],['quick',['quickly']],['happy',['happily']]],hints:['gentle → drop the e, add -ly → gently','happy → y becomes i → happily']},
+  {n:4,q:'Replace nice / got / said.',help:'It was a nice day. We got some shells. "Come here," she said.',type:'write',rules:['no:nice','no:got','no:said','caps']},
+  {n:5,q:'Finish the similes with YOUR OWN idea.',hints:['as quiet as… a snowflake landing?','as bright as… the Northern Lights?','The waves roared like… a hungry dragon?'],type:'note'}]},
+]},
+{id:'d7',tab:'Sun',title:'Day 7 · Sunday · Mini Mock Test',pages:[
+ {id:'p25',p:'25–30',title:'The Night Library (60 minutes)',tip:'Section A Reading 30 min · Section B Writing 30 min. Work on your own. Then check with the answer sheet in a different colour pen.',qs:[
+  {n:1,q:'Before you start: the 5-second question check',type:'note',help:'Underline the command word: Find and copy → exact words. In your own words → don\'t copy. Why / How do you know → because + "…". (2 marks) → 2 points or point + evidence.'},
+  {n:2,q:'Timer',type:'timer'},
+  {n:3,q:'Writing: practise your story here first',type:'write',big:2,story:1,rules:['caps','i','simile','min:120']}]},
+]},
+];
+
+/* ---------- Drills built from Peter's own mistakes ---------- */
+const DRILLS=[
+ {id:'adv',title:'🔍 Adverb or not?',help:'Tap ONLY the adverbs (HOW words).',words:[['slowly',1],['crouched',0],['quickly',1],['gently',1],['crept',0],['softly',1],['enormous',0],['nervously',1],['cobbled',0],['loudly',1],['ferocious',0],['kindly',1]]},
+ {id:'cap',title:'🔠 Capital Fixer',help:'Type the sentence again with capitals and full stops.',items:[['in london in 1870 it was cold','In London in 1870 it was cold.'],['ben was exhausted after school','Ben was exhausted after school.'],['the girl walked to the beach. it was hot','The girl walked to the beach. It was hot.'],['peter and i went to paris','Peter and I went to Paris.']]},
+ {id:'spell',title:'✏️ Peter\'s Spelling Log',help:'Listen 🔊, type the word, check.',words:['exhausted','quickly','whispered','hurried','frightened','character','hungry','emphasise','grandmother\'s','entertained','colossal','either']},
+];
+
+/* ---------- render ---------- */
+let cur=store.get('tab','tonight');
+function tabs(){const t=[['tonight','🌙 Tonight'],...DAYS.map(d=>[d.id,d.tab]),['drills','🎯 Drills'],['parents','👨‍👩‍👦 Bố mẹ']];
+ $('#tabs').innerHTML=t.map(([id,l])=>`<button class="tab ${cur==id?'on':''}" onclick="go('${id}')">${l}</button>`).join('')}
+function go(id){cur=id;store.set('tab',id);tabs();render();scrollTo(0,0)}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}
+function render(){
+ if(cur=='tonight')return tonight();
+ if(cur=='drills')return drills();
+ if(cur=='parents')return parents();
+ const d=DAYS.find(x=>x.id==cur);
+ $('#view').innerHTML=`<h2>${d.title}</h2><p class="small">Open your booklet at the same page. Read the question in the booklet, then use Stormy's help here. Write your final answer in the booklet.</p>`+d.pages.map(pageHTML).join('');
+}
+function pageHTML(p){
+ return `<div class="card"><div class="pg" onclick="this.nextElementSibling.classList.toggle('hide')"><h3>📄 Page ${p.p} · ${p.title}</h3><span class="badge">${p.qs.length} Qs</span></div>
+ <div><div class="box ex">💡 ${p.tip}</div>${p.qs.map((q,i)=>qHTML(p,q,i)).join('')}</div></div>`}
+function qHTML(p,q,i){const id=p.id+'_'+i;let h=`<div class="q" id="${id}"><span class="qn">${q.n}</span><span class="qt">${esc(q.q)}</span> ${done[id]?'<span class="star">⭐</span>':''}
+ <div class="btns"><button class="s" onclick="say(${esc(JSON.stringify(q.q+'. '+(q.help||'')))})">🔊 Read it</button>`;
+ if(q.hints)h+=`<button class="s" onclick="hint('${id}')">💡 Hint</button>`;
+ if(q.ex)h+=`<button class="s" onclick="tog('${id}_ex')">👀 Example (different words)</button>`;
+ if(q.fix)h+=`<button class="s" onclick="tog('${id}_fix')">🔧 Look again at my work</button>`;
+ h+=`</div>`;
+ if(q.help)h+=`<div class="help">👉 ${esc(q.help)}</div>`;
+ h+=`<div id="${id}_h"></div>`;
+ if(q.ex)h+=`<div class="box ex hide" id="${id}_ex">👀 ${esc(q.ex)}</div>`;
+ if(q.fix)h+=`<div class="box fix hide" id="${id}_fix">🔧 ${esc(q.fix)}</div>`;
+ if(q.type=='check')h+=q.items.map((it,k)=>`<div style="margin:8px 0"><div>${esc(it[0])}</div><input type="text" id="${id}_i${k}" autocomplete="off" autocapitalize="off" spellcheck="false"><div id="${id}_r${k}"></div></div>`).join('')+`<button class="s go" onclick="check('${p.id}',${i})">✅ Check</button>`;
+ if(q.type=='write'){const k=id+'_w';h+=`<textarea id="${k}" style="min-height:${q.big==2?260:q.big?140:70}px" oninput="${q.story?`wc('${id}')`:''};save('${k}')">${esc(store.get(k,''))}</textarea>${q.story?`<div class="small" id="${id}_wc"></div>`:''}<button class="s go" onclick="wcheck('${p.id}',${i})">🐱 Stormy, check my writing</button><div id="${id}_r"></div>`}
+ if(q.type=='note')h+=`<button class="s" onclick="star('${id}');this.textContent='⭐ Done in my booklet!'">✍️ I did it in my booklet</button>`;
+ if(q.type=='sort')h+=sortHTML(id,q);
+ if(q.type=='timer')h+=`<div style="font-size:42px" id="tm">60:00</div><button class="s go" onclick="timer()">▶️ Start 60 minutes</button>`;
+ return h+'</div>'}
+function tog(id){$('#'+id).classList.toggle('hide')}
+const hintN={};
+function hint(id){const [pid,i]=id.split('_');const q=findQ(pid,+i);hintN[id]=(hintN[id]||0);if(hintN[id]<q.hints.length){$('#'+id+'_h').insertAdjacentHTML('beforeend',`<div class="box hint">💡 Hint ${hintN[id]+1}: ${esc(q.hints[hintN[id]])}</div>`);hintN[id]++}}
+function findQ(pid,i){for(const d of DAYS)for(const p of d.pages)if(p.id==pid)return p.qs[i]}
+function save(k){store.set(k,$('#'+k).value)}
+function check(pid,i){const q=findQ(pid,i),id=pid+'_'+i;let all=true;
+ q.items.forEach((it,k)=>{const v=$('#'+id+'_i'+k).value;const r=$('#'+id+'_r'+k);
+  if(!v.trim()){r.innerHTML='';all=false;return}
+  const ok=it[1].some(a=>q.sp?norm(v).toLowerCase().replace(/\.$/,'')==norm(a).toLowerCase().replace(/\.$/,''):low(v)==low(a));
+  let extra='';
+  if(q.sp&&ok&&!/^["']?[A-Z]/.test(norm(v)))extra=' (Remember: capital letter at the start!)';
+  if(ok)r.innerHTML=`<div class="box ok">✅ Yes!${extra}</div>`;
+  else{all=false;r.innerHTML=`<div class="box no">🙈 Not yet. ${q.sp?speechTip(v):'Try a hint 💡 and look at the text again.'}</div>`}});
+ if(all){star(id);say('Brilliant! Now write it in your booklet.')}}
+function speechTip(v){v=norm(v);if(!/"/.test(v))return'Add speech marks " " around the spoken words.';
+ if(/"[^"]*"\s*[a-z]/.test(v)&&!/[,!?]"/.test(v))return'Punctuation (, ? !) goes INSIDE the closing speech mark.';
+ if(/[.]"\s*(said|asked|shouted|cried|whispered)/i.test(v))return'Before "said", use a comma, not a full stop.';
+ if(/"\s*(Said|Asked|Shouted|Cried|Whispered)/.test(v))return'"said / asked" needs a small letter.';
+ if(/(said|whispered|shouted)\s"/i.test(v))return'Put a comma before the speech marks: said, "…';
+ return'Check: speech marks, capital letter, punctuation inside.'}
+function wcheck(pid,i){const q=findQ(pid,i),id=pid+'_'+i,t=$('#'+id+'_w').value;const r=$('#'+id+'_r');
+ if(!t.trim()){r.innerHTML='<div class="box hint">Write something first 🙂</div>';return}
+ const tips=ruleCheck(t,q.rules);
+ if(!tips.length){r.innerHTML='<div class="box ok">🌟 Stormy is purring! It ticks every box. Copy it neatly into your booklet.</div>';star(id);say('Purr! Great work.')}
+ else r.innerHTML=`<div class="box no">🐱 ${tips.length==1?'One':'A few'} thing${tips.length>1?'s':''} to fix:<br>• ${tips.map(esc).join('<br>• ')}</div>`}
+function wc(id){const t=$('#'+id+'_w').value;const n=t.trim()?t.trim().split(/\s+/).length:0;const pa=t.split(/\n\s*\n|\n/).filter(x=>x.trim()).length;
+ $('#'+id+'_wc').innerHTML=`Words: <b>${n}</b> (aim 120–180) · Paragraphs: <b>${pa}</b> (aim 4–5) ${n>=120&&n<=180?'✅':''}`}
+function sortHTML(id,q){const opts=['simile','personification','alliteration','onomatopoeia'];
+ return q.items.map((it,k)=>`<div style="margin:8px 0"><i>"${esc(it[0])}"</i><br>${opts.map(o=>`<span class="chip" onclick="pick(this,'${id}',${k},'${o}','${it[1]}')">${o}</span>`).join('')}<span id="${id}_s${k}"></span></div>`).join('')}
+function pick(el,id,k,o,a){[...el.parentNode.querySelectorAll('.chip')].forEach(c=>c.classList.remove('sel'));el.classList.add('sel');$('#'+id+'_s'+k).textContent=o==a?' ✅':' 🙈';if(o==a)star(id+'_'+k)}
+let tmI;function timer(){clearInterval(tmI);let s=3600;tmI=setInterval(()=>{s--;$('#tm').textContent=String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');if(s==1800)say('Thirty minutes. Time to start the writing section.');if(s<=0){clearInterval(tmI);say('Time is up! Pens down.')}},1000)}
+
+function tonight(){$('#view').innerHTML=`<div class="card"><h2>🌙 Tonight's mission (about 1 hour)</h2>
+<p>Your teacher will mark Monday–Thursday. Stormy helps you understand each question. <b>You</b> write the answers in your booklet.</p>
+<table class="plan"><tr><th>⏱</th><th>Do this</th><th>Go</th></tr>
+<tr><td>10 min</td><td>🔧 Fix pages 3–9 you already did (tap "Look again at my work")</td><td><button class="s" onclick="go('d1')">Mon</button> <button class="s" onclick="go('d2')">Tue</button></td></tr>
+<tr><td>15 min</td><td>Page 10 verbs + Linh and the River (page 12)</td><td><button class="s" onclick="go('d3')">Wed</button></td></tr>
+<tr><td>15 min</td><td>Speech pages 13–14 + word tools page 17</td><td><button class="s" onclick="go('d4')">Thu</button></td></tr>
+<tr><td>20 min</td><td>Mystery story: plan 5 · write 12 · check 3. Writing on paper!</td><td><button class="s" onclick="go('d4')">Thu</button></td></tr>
+</table><p class="small">Stuck for more than 2 minutes? Tap 💡 Hint. Still stuck? Leave it and move on – your teacher will help tomorrow.</p></div>
+<div class="card"><h3>📅 Weekend plan before the test (Mon 30/11)</h3><table class="plan">
+<tr><td><b>Fri</b> 2–3h</td><td>① Fix what your teacher marked (45 min) ② Day 5 Mars, pages 18–21 (60 min) ③ Drills (20 min)</td></tr>
+<tr><td><b>Sat</b> 2–3h</td><td>① Day 6 poem + vocabulary, pages 22–24 (50 min) ② Write the mystery story again, better (40 min) ③ Spelling log + Capital Fixer (20 min)</td></tr>
+<tr><td><b>Sun</b> 2h</td><td>① Mini Mock Test, timed 60 min, on your own ② Check with the answer sheet in green pen (30 min) ③ Redo the questions you lost marks on (30 min)</td></tr></table>
+<p class="small">Take a 10-minute break every 40 minutes – go and pet a cat 🐱 or have a scoop of mint choc chip 🍦.</p></div>
+<div class="card"><h3>🧠 The 3 golden rules for the test</h3>
+<p>1️⃣ <b>2 marks = 2 things.</b> A point + evidence "…" from the text.<br>2️⃣ <b>Every sentence:</b> Capital letter → … → full stop. Names (London, Ben) always get capitals.<br>3️⃣ <b>Read the command word:</b> "Find and copy" = exact words. "Own words" = don't copy. "Three short sentences" = really three!</p></div>`}
+
+function drills(){let h='<h2>🎯 Drills from your own work</h2>';
+ const a=DRILLS[0];h+=`<div class="card"><h3>${a.title}</h3><p class="help">${a.help}</p>${a.words.map(([w,y],k)=>`<span class="chip" onclick="adv(this,${y},${k})">${w}</span>`).join('')}<div id="advr"></div></div>`;
+ const c=DRILLS[1];h+=`<div class="card"><h3>${c.title}</h3><p class="help">${c.help}</p>${c.items.map(([w,a],k)=>`<div style="margin:8px 0"><i>${w}</i><input type="text" id="cap${k}" autocomplete="off"><div id="capr${k}"></div></div>`).join('')}<button class="s go" onclick="capc()">✅ Check</button></div>`;
+ const s=DRILLS[2];h+=`<div class="card"><h3>${s.title}</h3><p class="help">${s.help}</p>${s.words.map((w,k)=>`<div style="display:flex;gap:6px;align-items:center;margin:6px 0"><button class="s" onclick="say('${w.replace("'","\\'")}')">🔊 ${k+1}</button><input type="text" id="sp${k}" autocomplete="off" autocapitalize="off" spellcheck="false"><span id="spr${k}" style="min-width:110px"></span></div>`).join('')}<button class="s go" onclick="spc()">✅ Check</button></div>`;
+ $('#view').innerHTML=h}
+let advs={};function adv(el,y,k){el.classList.add('sel');advs[k]=y;el.textContent+=y?' ✅':' 🙈';const n=Object.values(advs).filter(Boolean).length;$('#advr').innerHTML=`<div class="box ${y?'ok':'no'}">${y?'Yes – it tells HOW!':'That one is not an adverb. Is it an action (verb) or a describing word (adjective)?'} (${n}/6 found)</div>`;if(n==6)star('drill_adv')}
+function capc(){let all=1;DRILLS[1].items.forEach(([w,a],k)=>{const v=norm($('#cap'+k).value);const ok=v==a;if(!ok)all=0;$('#capr'+k).innerHTML=v?`<div class="box ${ok?'ok':'no'}">${ok?'✅':'🙈 '+(RULES.caps(v)||RULES.stop(v)||'Check names and the word I.')}</div>`:''});if(all)star('drill_cap')}
+function spc(){let n=0;DRILLS[2].words.forEach((w,k)=>{const v=norm($('#sp'+k).value).replace(/’/g,"'");if(!v)return;const ok=v.toLowerCase()==w;if(ok)n++;$('#spr'+k).innerHTML=ok?'✅':'🙈 '+w});if(n==DRILLS[2].words.length)star('drill_spell')}
+
+function parents(){$('#view').innerHTML=`<div class="card vi"><h2>Góc bố mẹ · Đánh giá sau tập ôn HK1 (26/11)</h2>
+<p><b>Peter đã làm:</b> Day 1–2 (trang 3–9). Day 3–7 còn trống.</p>
+<h3>⭐ Điểm mạnh</h3><ul>
+<li><b>Tìm thông tin trong bài</b> rất tốt: London 1870, chép đúng simile, tìm được chi tiết "lamplighter", "Ain't got no…" (dấu hiệu quá khứ).</li>
+<li><b>Đoán nghĩa từ</b> đúng: ferocious, reluctant, famished; biết từ mạnh: stared, exhausted, colossal, whispered.</li>
+<li>Bắt đầu có ý suy luận hay ("to emphasise that there is no action").</li></ul>
+<h3>🔧 Cần luyện gấp trước thi (theo thứ tự ưu tiên)</h3><ol>
+<li><b>Câu 2 điểm thiếu dẫn chứng:</b> "be he was kind" (không trích); "This shows that Zara was nervous" (nhắc lại đề). → Công thức: ý + "trích nguyên văn" + giải thích. Mất ~1 điểm mỗi câu như vậy.</li>
+<li><b>Viết hoa + dấu chấm:</b> "in london", "ben was…", ", it was hot." → lỗi lặp lại từ tháng 10.</li>
+<li><b>Không làm đúng yêu cầu đề:</b> đề bảo "three short sentences" con chép lại nguyên câu dài; câu 2 trang 3 bỏ dở; câu 4 trang 9 và câu 8 trang 7 bỏ trống.</li>
+<li><b>Từ loại:</b> chọn "crouched" là adverb (thực ra là động từ). Con chưa chắc adverb/adjective/verb.</li>
+<li><b>Chính tả:</b> exausted, quicky, wispered, hurryed, frighted, caracter, colosal.</li></ol>
+<p><b>Trình độ ước lượng:</b> Đọc hiểu mức "Secure" Stage 4 với câu hỏi tìm ý; câu suy luận/giải thích và phần Writing đang ở mức "Developing". Nếu sửa được 2 lỗi đầu, con có thể thêm 4–6 điểm/50 ở bài thi.</p>
+<h3>👨‍👩‍👦 Bố mẹ hỗ trợ thế nào</h3><ul>
+<li>Ngồi cạnh nhưng <b>không đọc đáp án</b>. Hỏi 3 câu: "Đề bảo làm gì?" · "Dẫn chứng ở dòng nào?" · "Câu đã có chữ hoa và dấu chấm chưa?"</li>
+<li>App không cho đáp án câu mở: chỉ có gợi ý từng bước + ví dụ <i>khác đề</i>. Câu đóng (điền từ, thì, dấu ngoặc kép) app chấm đúng/sai và chỉ ra lỗi.</li>
+<li>Phần viết truyện: tối nay viết tay trên tập; thứ 7 gõ lại trong app để Stormy đếm từ, kiểm chữ hoa, simile.</li>
+<li>Chủ nhật làm Mini Mock bấm giờ 60 phút, rồi để con tự chấm bằng bút màu khác theo Home Answer Sheet.</li>
+<li>Khen cụ thể kiểu "2 sao 1 điều ước".</li></ul>
+<p class="small">Sao đã đạt trên máy này: ${Object.keys(done).length}. <button class="s" onclick="if(confirm('Xoá hết sao và bài đã gõ trên máy này?')){try{Object.keys(localStorage).filter(k=>k.startsWith('s1c_')).forEach(k=>localStorage.removeItem(k))}catch(e){};location.reload()}">Xoá tiến độ</button></p></div>`}
+
+tabs();render();$('#stars').textContent=Object.keys(done).length;
+</script>
+<a href="../" aria-label="Back to Peter's World" style="position:fixed;left:calc(10px + env(safe-area-inset-left,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:2147483000;width:48px;height:48px;border-radius:50%;background:#fff;border:3px solid #5fd3b0;display:grid;place-items:center;font-size:22px;text-decoration:none;box-shadow:0 3px 0 rgba(0,0,0,.18)">🏠</a>
+</body>
+</html>

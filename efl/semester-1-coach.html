@@ -40,6 +40,9 @@ table.plan{width:100%;border-collapse:collapse;font-size:16px}table.plan td,tabl
 .chip.sel{background:var(--gold);color:#3b2a20;border-color:var(--gold)}
 .vi{font-family:system-ui,sans-serif;font-size:16px}
 a.home{color:#fff}
+#askb{position:fixed;right:14px;bottom:14px;z-index:9;border:0;border-radius:999px;padding:12px 16px;font:inherit;background:var(--choc);color:#fff;box-shadow:0 3px 8px rgba(0,0,0,.3);cursor:pointer}
+#ask{position:fixed;right:14px;bottom:70px;z-index:9;width:min(360px,calc(100vw - 28px));max-height:70vh;overflow:auto;background:var(--card);border-radius:18px;padding:14px;box-shadow:0 6px 20px rgba(0,0,0,.3)}
+#ask.hide{display:none}
 </style>
 </head>
 <body>
@@ -376,9 +379,132 @@ function tord(i){const r=$('#tor');if(i==5){r.innerHTML='<div class="box no">�
 function tpara(){const p=['tp1','tp2','tp3'].map(k=>$('#'+k).value.trim()).filter(Boolean).join(' ');if(!p)return;const tips=ruleCheck(p,['caps','stop','i','sent:3']);
  $('#tpr').innerHTML=`<div class="box ex">📖 ${esc(p)}</div>`+(tips.length?`<div class="box no">🐱 • ${tips.map(esc).join('<br>• ')}</div>`:'<div class="box ok">🏆 You wrote a PARAGRAPH! Read it aloud to Mum, then copy it on paper.</div>');if(!tips.length)star('tiny_para')}
 
+/* ---------- Fix My Story (page 15–16) ---------- */
+const FS={
+bugs:[
+ ['Peter used his musty ___ .',['torch','touch'],0,'"Torch" = đèn pin 🔦. "Touch" = chạm tay. (And "musty" means smelly-old, so we say "small torch".)'],
+ ['When Peter ___ the door, …',['opened','open'],0,'The story already happened → past tense → add -ed. (Truyện đã xảy ra rồi → thêm -ed.)'],
+ ['He ___ the door. It was locked.',['checked','check'],0,'Past tense again: check → checked.'],
+ ['He ___ through the window.',['escaped','escape'],0,'escape → escaped (already ends in e, just add -d).'],
+ ['Peter ___ back to Grandma\'s house.',['came','comed'],0,'Special word! come → came. No -ed. (Từ đặc biệt, không thêm -ed.)'],
+ ['But one day, ___ Peter was visiting…',['when','When'],0,'Capital letter ONLY at the start of a sentence or for names. (Chữ hoa chỉ ở đầu câu hoặc tên riêng.)'],
+ ['He explored ___ strange sound.',['a','her'],0,'The sound was not Grandma\'s. "a strange sound" = một tiếng động lạ.']],
+steps:[
+ {k:'p1',t:'Paragraph 1 · Opening (setting + character)',
+  orig:'Peter loved visiting grandma\'s house every weekend. But one day When Peter was visiting, the lights suddenly went out.',
+  why:[['The storm causes the blackout, so it must come FIRST.','Bão làm mất điện → phải kể bão trước.'],['The reader needs to see the setting: when? where? weather?','Cô chấm "setting is clear": khi nào, ở đâu, thời tiết.'],['Your great words "hammering" and "howled" move up here.','Câu hay của con được chuyển lên đây, không mất đi.']],
+  opts:[['A · Start with Peter',"Peter loved visiting Grandma's old house every weekend. One stormy Saturday night, rain was hammering on the roof and the wind howled. Suddenly, the lights went out."],
+        ['B · Start with a sound',"Crash! Thunder shook Grandma's old house. Peter loved visiting her every weekend, but tonight the rain was hammering on the roof. Suddenly, the lights went out."]]},
+ {k:'p2',t:'Paragraph 2 · The strange sound + tension',
+  orig:'So Peter decided to use his musty touch and explored her strange sound in rusty wooden shed. When Peter open the door, he was curious, when he open the door, he saw nothing but when he check the door, it was locked.',
+  why:[['"when" is used 4 times → the reader gets lost.','Lặp "when" 4 lần → rối. Tách thành câu mới.'],['"he was curious" TELLS. Show it with the body!','"he was curious" là KỂ. Cô muốn TẢ qua cơ thể.'],['Short sentences = scary and exciting.','Câu ngắn ở chỗ hồi hộp: "Nothing." "Locked."']],
+  pick:[['sound','What sound did Peter hear?',['scratching','tapping','squeaking']],['feel','Show his feeling (body):',['His heart thumped.','His hands trembled.','He held his breath.']]],
+  text:s=>`Then Peter heard a strange ${s.sound} sound from the rusty wooden shed. He grabbed his small torch and crept outside. ${s.feel} Slowly, he opened the door. Nothing. Bang! The wind slammed it shut. He pushed hard. Locked.`},
+ {k:'p3',t:'Paragraph 3 · The strange thing (simile!)',
+  orig:'Outside he saw two glowing eyes staring at him, When he looked closely it was an otter, when he open the window the soaking wet otter hurried inside.',
+  why:[['You need at least ONE simile (like… / as… as…).','Bắt buộc có 1 phép so sánh. Bài cũ chưa có.'],['A comma cannot join two sentences. Use a full stop.','Dấu phẩy không nối 2 câu được → dùng dấu chấm.'],['"glowing eyes staring" is GREAT – we keep it! ⭐','Giữ nguyên ý hay của con.']],
+  pick:[['sim','Choose your simile:',['like two tiny torches','like car headlights','as bright as stars']]],
+  text:s=>`Just then, two glowing eyes stared at him through the dusty window. They shone ${s.sim}. Peter looked closely. It was an otter! He opened the window and the soaking wet otter hurried inside.`},
+ {k:'p4',t:'Paragraph 4 · What Peter does (his character)',
+  orig:'He took an ancient jacket and escape through window quickly. He let the otter go and Peter come back Grandma\'s house safe and sound.',
+  why:[['Why did he take the jacket? The reader needs a reason.','Lấy áo để làm gì? Phải có lý do.'],['Kind actions show WHO Peter is (building character).','Hành động tốt bụng = xây dựng tính cách nhân vật.']],
+  opts:[['A · Kind Peter (keep the jacket)',"The otter was shivering, so Peter wrapped it in an ancient jacket. Then he climbed out of the window and carried it to the river. Gently, he let it go."],
+        ['B · Quick Peter (no jacket)',"Peter climbed out of the window quickly with the otter in his arms. He ran to the river. Gently, he let it go."]]},
+ {k:'p5',t:'Paragraph 5 · Ending (link back or surprise)',
+  orig:'While outside was calm and beautiful.',
+  why:[['Grandma is in the first sentence but missing at the end.','Mở bài có bà → kết bài nên quay lại bà.'],['"While outside was calm…" is only half a sentence.','Đây chưa phải câu hoàn chỉnh.']],
+  opts:[['A · Link back to Grandma',"Finally, Peter came back to Grandma's house safe and sound. Grandma was waiting with hot cocoa. Outside, the night was calm and beautiful again."],
+        ['B · Surprise!',"Finally, Peter came back to Grandma's house safe and sound. The next weekend, he looked out of the window. Four glowing eyes were staring back at him!"],
+        ['C · A secret (only with the jacket)',"Finally, Peter came back to Grandma's house safe and sound. Grandma smiled. \"That jacket was Grandpa's,\" she whispered. \"He loved otters too.\""]]}
+]};
+let fs=store.get('fs',{});
+function fsSave(){store.set('fs',fs)}
+function fsPara(st){if(st.text){const s={};(st.pick||[]).forEach(([k,,o])=>s[k]=fs[k]||null);if((st.pick||[]).some(([k])=>!fs[k]))return '';return st.text(s)}
+ const i=fs[st.k];return i==null?'':st.opts[i][1]}
+function fsStory(){return FS.steps.map(fsPara)}
+function fsWc(s){return (s.match(/[A-Za-z']+/g)||[]).length}
+function fixstory(){
+ const bugsDone=FS.bugs.filter((b,i)=>fs['b'+i]===b[2]).length;
+ let h=`<h2>✏️ Fix My Story · page 15–16</h2>
+ <div class="card"><b>The Night the Lights Went Out</b> · 120–180 words · 4–5 paragraphs<br>
+ <span class="small">You already wrote a great story! Now we make it SHINE. You only tap – no typing. At the end you copy it on paper.<br><span class="vi">Con không cần gõ. Chỉ bấm chọn, đọc lý do, cuối cùng chép bài vào giấy.</span></span></div>
+ <div class="card"><h3>⭐ Two stars first!</h3>
+ <div class="box ok">⭐ Super strong words: <b>hammering, howled, glowing eyes staring, soaking wet, hurried, rusty wooden shed, ancient jacket</b>.</div>
+ <div class="box ok">⭐ Your story has a beginning, a problem and an ending – and the otter is a lovely surprise!</div>
+ <div class="box hint">🌱 One wish: some sentences are too long. We cut them into shorter ones.</div></div>
+ <div class="card"><h3>🐞 Step 1 · Bug hunt (${bugsDone}/${FS.bugs.length})</h3><p class="small">Tap the right word. Read why.</p>`;
+ FS.bugs.forEach((b,i)=>{const a=fs['b'+i];
+  h+=`<div class="q">${esc(b[0]).replace('___','<b>___</b>')}<div class="btns">${b[1].map((w,j)=>`<button class="s ${a===j?(j===b[2]?'go':''):''}" onclick="fsBug(${i},${j})">${esc(w)}</button>`).join('')}</div>${a==null?'':a===b[2]?`<div class="box ok">✅ ${esc(b[3])}</div>`:`<div class="box no">Try again! 🤔</div>`}</div>`});
+ h+='</div>';
+ FS.steps.forEach((st,n)=>{const p=fsPara(st);
+  h+=`<div class="card"><h3>Step ${n+2} · ${esc(st.t)}</h3>
+  <div class="box fix"><b>You wrote:</b> ${esc(st.orig)}</div>
+  <b>Why change? 🤔</b>${st.why.map(([e,v])=>`<div class="box hint">• ${esc(e)}<br><span class="vi">${esc(v)}</span></div>`).join('')}`;
+  if(st.opts)h+=`<b>Choose one:</b>`+st.opts.map(([l,t],i)=>{const off=st.k=='p5'&&i==2&&fs.p4===1;return `<div class="box ${fs[st.k]===i?'ok':'ex'}" style="cursor:pointer;opacity:${off?.4:1}" onclick="${off?'':`fsPick('${st.k}',${i})`}"><b>${esc(l)}</b><br>${esc(t)}</div>`}).join('');
+  (st.pick||[]).forEach(([k,q,o])=>{h+=`<div><b>${esc(q)}</b><br>${o.map(w=>`<span class="chip ${fs[k]===w?'sel':''}" onclick="fsPick('${k}','${w.replace(/'/g,"\\'")}')">${esc(w)}</span>`).join('')}</div>`});
+  if(p&&st.text)h+=`<div class="box ok"><b>New paragraph:</b><br>${esc(p)}</div>`;
+  if(p)h+=`<button class="s" onclick="say(fsStory()[${n}])">🔊 Listen</button>`;
+  h+='</div>'});
+ const s=fsStory(),all=s.every(Boolean),full=s.join(' '),w=fsWc(full);
+ h+=`<div class="card"><h3>🏆 Step 7 · Your finished story</h3>`;
+ if(!all)h+=`<p>Finish Steps 2–6 to see your whole story. (${s.filter(Boolean).length}/5 paragraphs)</p>`;
+ else{
+  const chk=[['Short sentences for tension','"Nothing." "Locked."'],['Strange thing with interesting words','"two glowing eyes stared at him"'],['Ending links back or surprises',fs.p5==1?'Surprise: four glowing eyes!':'Back with Grandma'],['Setting and character are clear','"Grandma\'s old house… stormy Saturday night"'],['Showed feeling, not told','"'+fs.feel+'"'],['At least one simile','"'+fs.sim+'"'],['Capital letters, full stops, spelling','Bug hunt done ✅'],['Word count 120–180',w+' words']];
+  h+=`<p class="small">Title on paper: <b>The Night the Lights Went Out</b></p>`+s.map((p,i)=>`<p style="text-indent:1.5em;margin:8px 0">${esc(p)}</p>`).join('')+
+  `<button class="s go" onclick="say(fsStory().join(' '))">🔊 Read my whole story</button>
+  <h3 style="margin-top:14px">✅ Teacher's checklist</h3>`+chk.map(([a,b])=>`<div class="box ok">✔ <b>${esc(a)}</b> – ${esc(b)}</div>`).join('')+
+  `<h3>📝 Copy it on paper</h3><div class="box hint">• One paragraph at a time. Tap ✔ when it is copied.<br>• New paragraph = new line + small space at the start.<br>• Check: Capital ✔ Full stop ✔ Finger space ✔<br><span class="vi">Mỗi lần chép 1 đoạn, nghỉ 1 phút rồi chép tiếp. Không cần vội.</span></div>`+
+  s.map((p,i)=>`<span class="chip ${fs['c'+i]?'sel':''}" onclick="fsPick('c${i}',${fs['c'+i]?0:1})">${fs['c'+i]?'✔':'☐'} Paragraph ${i+1}</span>`).join('');
+  if(s.every((p,i)=>fs['c'+i])){h+='<div class="box ok">🎉 Whole story copied! Show it to Mum. Stormy is so proud of you!</div>';star('fix_story')}
+ }
+ h+='</div>';
+ $('#view').innerHTML=h}
+function fsBug(i,j){fs['b'+i]=j;fsSave();const y=scrollY;fixstory();scrollTo(0,y);if(j===FS.bugs[i][2])star('fsb'+i)}
+function fsPick(k,v){fs[k]=v;if(k=='p4'&&v===1&&fs.p5===2)delete fs.p5;fsSave();const y=scrollY;fixstory();scrollTo(0,y)}
+
+/* ---------- Ask Stormy helper ---------- */
+const ASK=[
+ [['simile'],'A simile compares two things with "like" or "as". Example: "eyes like two tiny torches".','So sánh bằng "like" hoặc "as": mắt sáng NHƯ hai chiếc đèn pin.'],
+ [['short sentence','short','tension'],'Short sentences make the reader hold their breath. "Nothing." "Locked." Use them at the scary part.','Câu ngắn làm người đọc hồi hộp. Dùng ở chỗ đáng sợ nhất.'],
+ [['past','tense','-ed'],'The story already happened, so verbs are in the past: open → opened, come → came.','Truyện đã xảy ra → động từ ở quá khứ: thêm -ed, hoặc từ đặc biệt: come → came.'],
+ [['show','tell','feeling','feel'],'Telling: "He was scared." Showing: "His hands trembled." Show what the BODY does.','KỂ: "Cậu ấy sợ". TẢ: "Tay cậu run lên". Tả cơ thể để người đọc tự đoán.'],
+ [['when'],'Using "when" again and again makes one long, tiring sentence. Start new sentences with: Suddenly, Slowly, Just then, Moments later.','Lặp "when" làm câu quá dài. Thay bằng câu mới: Suddenly, Slowly, Just then.'],
+ [['paragraph'],'A paragraph is a group of sentences about one idea. New idea = new paragraph = new line.','Đoạn văn = nhóm câu về 1 ý. Ý mới → xuống dòng.'],
+ [['how many words','words','word count','long'],'Your story needs 120–180 words and 4–5 paragraphs.','Bài cần 120–180 từ, 4–5 đoạn.'],
+ [['torch','touch'],'A torch is a small light you hold 🔦. Touch means to feel with your hand ✋.','Torch = đèn pin. Touch = chạm.'],
+ [['musty'],'Musty = smells old and damp, like an old cupboard.','Musty = mùi ẩm mốc.'],
+ [['otter'],'An otter is a small furry animal that lives near rivers and loves swimming 🦦.','Rái cá – sống gần sông, rất thích bơi.'],
+ [['ancient'],'Ancient = very, very old.','Ancient = rất cũ, cổ xưa.'],
+ [['ending','end','link back','surprise'],'A good ending goes back to the start (Grandma!) or gives a surprise (four eyes!).','Kết hay: quay lại mở bài (bà) hoặc tạo bất ngờ.'],
+ [['setting'],'The setting is WHEN and WHERE: a stormy night at Grandma\'s old house.','Bối cảnh = khi nào + ở đâu.'],
+ [['character'],'Character = who the story is about. What Peter DOES shows what he is like – helping the otter shows he is kind.','Nhân vật. Việc Peter làm cho thấy tính cách: cứu rái cá = tốt bụng.'],
+ [['capital'],'Capital letters: start of a sentence, names (Peter, Grandma), and "I".','Chữ hoa: đầu câu, tên riêng, chữ "I".'],
+ [['full stop','stop','comma'],'A full stop ends a sentence. A comma cannot join two sentences – use a full stop.','Dấu chấm kết thúc câu. Không dùng dấu phẩy để nối 2 câu.'],
+ [['hammering'],'Hammering = hitting hard again and again, like a hammer 🔨.','Đập mạnh liên tục như búa.'],
+ [['howled'],'Howled = made a long, loud crying sound, like a wolf 🐺.','Hú lên như sói.'],
+ [['crept','creep'],'Crept = walked slowly and quietly so no one hears.','Rón rén đi.'],
+ [['slammed','slam'],'Slammed = shut very hard with a BANG.','Đóng sầm.'],
+ [['shivering','shiver'],'Shivering = shaking because you are cold.','Run vì lạnh.'],
+ [['gently'],'Gently = softly and carefully.','Nhẹ nhàng.'],
+ [['whispered'],'Whispered = said very quietly.','Thì thầm.'],
+ [['glowing'],'Glowing = giving out a soft light.','Phát sáng.'],
+ [['thumped'],'Thumped = beat hard. "His heart thumped" = his heart beat fast because he was scared.','Đập thình thịch.'],
+ [['trembled'],'Trembled = shook a little because of fear.','Run rẩy.'],
+ [['soaking','wet'],'Soaking wet = very, very wet.','Ướt sũng.'],
+ [['dusty'],'Dusty = covered in dust (old dirt).','Đầy bụi.'],
+ [['why','change','fix'],'We change things so your story is clear, exciting, and ticks every box on the teacher\'s checklist.','Sửa để bài rõ ràng, hấp dẫn và đủ mọi tiêu chí của cô.']];
+function askAns(q){q=' '+q.toLowerCase()+' ';let best=null;for(const a of ASK)if(a[0].some(k=>q.includes(k))){best=a;break}
+ return best?`<div class="box ok">🐱 ${esc(best[1])}<br><span class="vi">${esc(best[2])}</span></div>`:`<div class="box hint">🐱 Hmm, I don't know that one yet. Try a key word like "simile", "past tense", "torch" – or ask Mum!<br><span class="vi">Stormy chưa biết câu này. Thử gõ 1 từ khoá, hoặc hỏi mẹ nhé.</span></div>`}
+function askUI(){if($('#ask'))return;const d=document.createElement('div');d.innerHTML=`<button id="askb" onclick="$('#ask').classList.toggle('hide')">🐱 Ask Stormy</button>
+<div id="ask" class="hide"><div style="display:flex;justify-content:space-between"><b>🐱 Ask Stormy</b><button class="s" onclick="$('#ask').classList.add('hide')">✖</button></div>
+<p class="small">Tap a question, or type a word you don't understand.</p>
+<div>${['What is a simile?','Why short sentences?','What is past tense?','Show, not tell?','Why not "when"?','What is a paragraph?','How many words?','What is an otter?'].map(q=>`<span class="chip" onclick="askGo('${q.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">${esc(q)}</span>`).join('')}</div>
+<div style="display:flex;gap:6px;margin-top:6px"><input type="text" id="askq" placeholder="e.g. crept" onkeydown="if(event.key=='Enter')askGo(this.value)"><button class="s go" onclick="askGo($('#askq').value)">Ask</button></div><div id="aska"></div></div>`;document.body.appendChild(d)}
+function askGo(q){if(!q.trim())return;$('#aska').innerHTML=`<p class="small">You asked: ${esc(q)}</p>`+askAns(q);const t=$('#aska').innerText;say(t.split('\n')[1]||'')}
+
 /* ---------- render ---------- */
 let cur=store.get('tab','tonight');
-function tabs(){const t=[['tonight','🌙 Start here'],['tiny','🧱 Tiny Steps'],['ladder','🪜 Writing Ladder'],...DAYS.map(d=>[d.id,d.tab]),['drills','🎯 Drills'],['parents','👨‍👩‍👦 Bố mẹ']];
+function tabs(){const t=[['tonight','🌙 Start here'],['tiny','🧱 Tiny Steps'],['ladder','🪜 Writing Ladder'],['fix','✏️ Fix My Story'],...DAYS.map(d=>[d.id,d.tab]),['drills','🎯 Drills'],['parents','👨‍👩‍👦 Bố mẹ']];
  $('#tabs').innerHTML=t.map(([id,l])=>`<button class="tab ${cur==id?'on':''}" onclick="go('${id}')">${l}</button>`).join('')}
 function go(id){cur=id;store.set('tab',id);tabs();render();scrollTo(0,0)}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}
@@ -387,6 +513,7 @@ function render(){
  if(cur=='drills')return drills();
  if(cur=='ladder')return ladder();
  if(cur=='tiny')return tiny();
+ if(cur=='fix')return fixstory();
  if(cur=='parents')return parents();
  const d=DAYS.find(x=>x.id==cur);
  $('#view').innerHTML=`<h2>${d.title}</h2><p class="small">Open your booklet at the same page. Read the question in the booklet, then use Stormy's help here. Write your final answer in the booklet.</p>`+warmHTML(d.id)+d.pages.map(pageHTML).join('');matchGame(d.id);
@@ -492,7 +619,7 @@ function parents(){$('#view').innerHTML=`<div class="card vi"><h2>Góc bố mẹ
 <li>Khen cụ thể kiểu "2 sao 1 điều ước".</li></ul>
 <p class="small">Sao đã đạt trên máy này: ${Object.keys(done).length}. <button class="s" onclick="if(confirm('Xoá hết sao và bài đã gõ trên máy này?')){try{Object.keys(localStorage).filter(k=>k.startsWith('s1c_')).forEach(k=>localStorage.removeItem(k))}catch(e){};location.reload()}">Xoá tiến độ</button></p></div>`}
 
-tabs();render();$('#stars').textContent=Object.keys(done).length;
+askUI();tabs();render();$('#stars').textContent=Object.keys(done).length;
 </script>
 <a href="../" aria-label="Back to Peter's World" style="position:fixed;left:calc(10px + env(safe-area-inset-left,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:2147483000;width:48px;height:48px;border-radius:50%;background:#fff;border:3px solid #5fd3b0;display:grid;place-items:center;font-size:22px;text-decoration:none;box-shadow:0 3px 0 rgba(0,0,0,.18)">🏠</a>
 </body>

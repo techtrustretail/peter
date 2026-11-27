@@ -304,9 +304,81 @@ function story(){const parts=['s1','s2','s3','s4','s5'].map(k=>$('#'+k).value.tr
  if(!/\b(\w+)\. (\w+)\./.test(t))tips.push('Add 2 SHORT sentences in a row for tension (e.g. "Silence. Peter froze.").');
  $('#str').innerHTML=tips.length?`<div class="box no">🐱 Almost! <br>• ${tips.map(esc).join('<br>• ')}</div>`:'<div class="box ok">🏆 Wow – a full 5-part story! Read it aloud, then write it neatly in your booklet.</div>';if(!tips.length)star('ladder_story')}
 
+/* ---------- TINY STEPS: paragraph writing broken into very small steps ---------- */
+const BANK={see:['a flickering candle','long shadows','frosty windows','a dark staircase','glowing eyes','the old wooden door','snowflakes','a torn curtain'],hear:['a creak','a thud','the wind howling','a soft meow','footsteps','a whisper','the clock ticking'],feel:['cold air on my neck','my heart thudding','shaky hands','goosebumps','a fluffy tail on my leg']};
+let T=store.get('tiny',{bank:[],core:[],exp:{},ord:[],odd:null});
+function tsave(){store.set('tiny',T)}
+function tbank(w){const i=T.bank.indexOf(w);i>=0?T.bank.splice(i,1):T.bank.push(w);tsave();tiny()}
+const SCR=['The lights went out at midnight.','Peter could not see a thing.','Then he heard a soft creak on the stairs.','His heart thudded like a drum.','Slowly, he reached for his torch.'];
+const ODD='Peter likes pizza with cheese.';
+function tiny(){const B=T.bank;
+ let h=`<h2>🧱 Tiny Steps to a paragraph</h2><div class="box hint vi">🇻🇳 Mỗi bậc chỉ 1 việc nhỏ, 10 phút. Cùng 1 chủ đề: <b>Đêm mất điện ở nhà gỗ trên núi tuyết</b>. Thứ 6: bậc 0–4. Thứ 7: bậc 5–9.</div>
+ <p style="font-size:60px;text-align:center;margin:6px">🏔️🏠🌙🕯️🐱</p>`;
+ // 0
+ h+=`<div class="card"><h3>Step 0 · Talk it 🗣️ <span class="badge">Fri</span></h3><p>Tell Mum or Dad the story out loud in 1 minute. Vietnamese is OK!</p>
+ <ol><li>Who is there? 🧒🐱</li><li>Where are you? When?</li><li>What strange thing happens when the lights go out?</li><li>How do you feel? What does your body do?</li><li>How does it end?</li></ol>
+ <div class="box hint vi">🇻🇳 Bố mẹ chỉ hỏi và gật đầu, không sửa lỗi. Mục tiêu: con có ý trước khi phải viết.</div><button class="s" onclick="star('t0');this.textContent='⭐ Done!'">✅ I told my story</button></div>`;
+ // 1
+ h+=`<div class="card"><h3>Step 1 · Collect words 🧺 <span class="badge">Fri</span></h3><p>Only WORDS – no sentences yet! Tap to put them in your basket. Pick 5 to SEE, 3 to HEAR, 2 to FEEL.</p>
+ ${[['see','👀 I see'],['hear','👂 I hear'],['feel','✋ I feel']].map(([k,l])=>`<p><b>${l}</b><br>${BANK[k].map(w=>`<span class="chip ${B.includes(w)?'sel':''}" onclick="tbank('${w}')">${w}</span>`).join('')}</p>`).join('')}
+ <p>Add your own word: <input type="text" id="tw" style="width:200px"> <button class="s" onclick="const v=$('#tw').value.trim();if(v){T.bank.push(v);tsave();tiny()}">➕</button></p>
+ <div class="box ex">🧺 My basket (${B.length}): ${B.join(' · ')||'empty'}</div>${B.length>=10?'<div class="box ok">🌟 Great basket! You will use these words in every step.</div>':''}</div>`;
+ if(B.length>=10)star('t1');
+ // 3
+ h+=`<div class="card"><h3>Step 2 · Tiny sentences 🧩 <span class="badge">Fri</span></h3><p>Just 2 pieces: <b>WHO</b> + <b>DID WHAT</b>. Capital at the start, full stop at the end.</p>
+ <table class="plan"><tr><th>WHO</th><th>DID WHAT</th></tr><tr><td>Peter · Stormy · The door · The wind · A shadow</td><td>crept · froze · creaked · howled · moved · gasped · shivered</td></tr></table>
+ <div class="box ex">👀 Peter froze. The wind howled.</div>
+ <p>✍️ Write 3 tiny sentences (one per line):</p><textarea id="tc" oninput="save('tc')">${esc(store.get('tc',''))}</textarea><button class="s go" onclick="tchk('tc',['caps','stop','sent:3','short:4'])">🐱 Check</button><div id="tc_r"></div></div>`;
+ // 4
+ const E=T.exp;const wh=[['⏰ WHEN?',['At midnight,','Suddenly,','A moment later,']],['🐌 HOW?',['slowly','quietly','nervously']],['📍 WHERE?',['down the dark staircase.','towards the kitchen.','across the cold floor.']]];
+ h+=`<div class="card"><h3>Step 3 · Grow the sentence 🌱 <span class="badge">Fri</span></h3><p>Start: <b>Peter crept.</b> Add one card from each question.</p>
+ ${wh.map(([l,o],k)=>`<p><b>${l}</b><br>${o.map(x=>`<span class="chip ${E[k]==x?'sel':''}" onclick="T.exp[${k}]='${x}';tsave();tiny()">${x}</span>`).join('')}</p>`).join('')}
+ <div class="box ex" style="font-size:20px">🌱 ${E[0]?E[0]+' ':''}${E[0]?'Peter':'Peter'} crept${E[1]?' '+E[1]:''}${E[2]?' '+E[2]:'.'}</div>
+ <div class="box hint vi">🇻🇳 Câu lõi "Peter crept." + khi nào + như thế nào (-ly = adverb) + ở đâu = câu hay! Nhớ dấu phẩy sau "At midnight,".</div>
+ <p>✍️ Now grow one of YOUR tiny sentences from Step 2 (add when + how + where):</p><textarea id="te" oninput="save('te')">${esc(store.get('te',''))}</textarea><button class="s go" onclick="tchk('te',['cap','stop','ly','min:7'])">🐱 Check</button><div id="te_r"></div></div>`;
+ // 5 connectives
+ const CN=[['Peter was cold, ___ he grabbed a blanket.','so',['so','but','because']],['Stormy wanted to explore, ___ Peter was scared.','but',['so','but','because']],['Peter held his breath ___ he heard footsteps.','because',['so','but','because']]];
+ h+=`<div class="card"><h3>Step 4 · Join two ideas 🔗 <span class="badge">Sat</span></h3><p><b>so</b> = what happens next · <b>but</b> = the opposite · <b>because</b> = the reason</p>
+ ${CN.map(([s,a,o],k)=>`<p>${s.replace('___','<b>___</b>')}<br>${o.map(x=>`<span class="chip" onclick="this.parentNode.querySelectorAll('.chip').forEach(c=>c.classList.remove('sel'));this.classList.add('sel');$('#cn${k}').textContent='${x}'=='${a}'?' ✅':' 🙈'">${x}</span>`).join('')}<span id="cn${k}"></span></p>`).join('')}</div>`;
+ // 6 openers
+ h+=`<div class="card"><h3>Step 5 · New beginnings 🚪 <span class="badge">Sat</span></h3><p>Don't start every sentence with "Peter…". Rewrite <b>Peter opened the door.</b> 3 times, each with a different opener:</p>
+ <p><span class="chip">Suddenly,</span><span class="chip">Slowly,</span><span class="chip">With a shaky hand,</span><span class="chip">Without a sound,</span><span class="chip">Holding his breath,</span></p>
+ <div class="box ex">👀 Slowly, Peter opened the door.</div>
+ ${[1,2,3].map(k=>`<input type="text" id="to${k}" style="margin:4px 0" value="${esc(store.get('to'+k,''))}" oninput="save('to${k}')">`).join('')}<button class="s go" onclick="openers()">🐱 Check</button><div id="to_r"></div></div>`;
+ // 7 unscramble
+ const order=T.ord;const left=[3,5,0,4,2,1].filter(i=>!order.includes(i));
+ h+=`<div class="card"><h3>Step 6 · Put the paragraph in order 🧩 <span class="badge">Sat</span></h3><p>Tap the sentences in the right order. ⚠️ One sentence does NOT belong – leave it out!</p>
+ <div class="box ex">${order.map(i=>esc(SCR[i])).join(' ')||'…'}</div>
+ ${left.map(i=>`<span class="chip" onclick="tord(${i})">${esc(i<5?SCR[i]:ODD)}</span>`).join('<br>')}
+ <div id="tor"></div><button class="s" onclick="T.ord=[];tsave();tiny()">↩️ Start again</button></div>`;
+ // 9 three-sentence paragraph
+ h+=`<div class="card"><h3>Step 7 · My first 3-sentence paragraph 🥪 <span class="badge">Sat</span></h3>
+ <div class="box hint vi">🇻🇳 Câu 1 = ý chính (ở đâu, chuyện gì). Câu 2 = điều con thấy/nghe (lấy từ giỏ từ!). Câu 3 = cảm xúc, tả bằng cơ thể.</div>
+ <div class="box ex">👀 At midnight, the lights in the ski lodge went out. Long shadows crept across the frosty windows. Peter's heart thudded as he hugged Stormy.</div>
+ <p class="small">🧺 Your basket: ${B.join(' · ')||'(collect words in Step 1)'}</p>
+ ${[['tp1','1 Main idea:','At midnight, the lights…'],['tp2','2 I see / hear:','Suddenly, I heard…'],['tp3','3 I feel (show it!):','My hands…']].map(([k,l,s])=>`<div>${l}</div><input type="text" id="${k}" placeholder="${s}" value="${esc(store.get(k,''))}" oninput="save('${k}')" style="margin-bottom:6px">`).join('')}
+ <button class="s go" onclick="tpara()">🥪 Make my paragraph</button><div id="tpr"></div>
+ <p class="small">Next: when this is easy, go to 🪜 Writing Ladder → Burger (5 sentences) → Story Mountain.</p></div>`;
+ // plan to remember
+ h+=`<div class="card" style="border:3px solid var(--gold)"><h3>🎒 My test-day story plan (learn it by heart!)</h3>
+ <p class="small vi">🇻🇳 Học thuộc khung này. Đề thi nào về truyện bí ẩn con cũng dùng được: chỉ cần đổi nơi chốn và điều kỳ lạ.</p>
+ <ol><li><b>When + where + who + feeling</b> – "On a snowy night, Peter was…"</li><li><b>Something strange</b> – I see / I hear (2 basket words)</li><li><b>Tension</b> – 2 short sentences + body feeling. "Silence. Peter froze."</li><li><b>Surprise</b> – it was only… / it was magic!</li><li><b>Ending</b> – link back to the start or a question.</li></ol>
+ <p>Must-haves: ✅ 1 simile · ✅ 2 WOW adjectives · ✅ 2 powerful verbs · ✅ capitals + full stops</p></div>`;
+ $('#view').innerHTML=h}
+function tchk(k,rules){const t=$('#'+k).value;if(!t.trim())return;const tips=ruleCheck(t,rules);$('#'+k+'_r').innerHTML=tips.length?`<div class="box no">🐱 • ${tips.map(esc).join('<br>• ')}</div>`:'<div class="box ok">🌟 Yes! Next step ⬇️</div>';if(!tips.length)star('tiny_'+k)}
+function openers(){const v=[1,2,3].map(k=>norm($('#to'+k).value));const tips=[];const firsts=new Set();
+ v.forEach((s,k)=>{if(!s){tips.push('Write sentence '+(k+1)+'.');return}if(/^peter/i.test(s))tips.push('Sentence '+(k+1)+' still starts with "Peter". Put an opener first!');else if(!/^[A-Z][^,]*,/.test(s))tips.push('Sentence '+(k+1)+': capital letter + comma after the opener (Slowly, …).');if(!/[.!]$/.test(s))tips.push('Sentence '+(k+1)+': end with a full stop.');firsts.add(s.split(',')[0].toLowerCase())});
+ if(!tips.length&&firsts.size<3)tips.push('Use 3 DIFFERENT openers.');
+ $('#to_r').innerHTML=tips.length?`<div class="box no">🐱 • ${tips.map(esc).join('<br>• ')}</div>`:'<div class="box ok">🌟 3 new beginnings! Your writing sounds grown-up.</div>';if(!tips.length)star('tiny_open')}
+function tord(i){const r=$('#tor');if(i==5){r.innerHTML='<div class="box no">🍕 That one is not about the lights going out – it does not belong! Leave it out.</div>';return}
+ if(i!=T.ord.length){r.innerHTML='<div class="box no">🙈 Not next. Which sentence comes first – what happens at the start?</div>';return}
+ T.ord.push(i);tsave();tiny();if(T.ord.length==5){$('#tor').innerHTML='<div class="box ok">🌟 Perfect order! See: main idea → can\'t see → hear → feel → action.</div>';star('tiny_order')}}
+function tpara(){const p=['tp1','tp2','tp3'].map(k=>$('#'+k).value.trim()).filter(Boolean).join(' ');if(!p)return;const tips=ruleCheck(p,['caps','stop','i','sent:3']);
+ $('#tpr').innerHTML=`<div class="box ex">📖 ${esc(p)}</div>`+(tips.length?`<div class="box no">🐱 • ${tips.map(esc).join('<br>• ')}</div>`:'<div class="box ok">🏆 You wrote a PARAGRAPH! Read it aloud to Mum, then copy it on paper.</div>');if(!tips.length)star('tiny_para')}
+
 /* ---------- render ---------- */
 let cur=store.get('tab','tonight');
-function tabs(){const t=[['tonight','🌙 Start here'],['ladder','🪜 Writing Ladder'],...DAYS.map(d=>[d.id,d.tab]),['drills','🎯 Drills'],['parents','👨‍👩‍👦 Bố mẹ']];
+function tabs(){const t=[['tonight','🌙 Start here'],['tiny','🧱 Tiny Steps'],['ladder','🪜 Writing Ladder'],...DAYS.map(d=>[d.id,d.tab]),['drills','🎯 Drills'],['parents','👨‍👩‍👦 Bố mẹ']];
  $('#tabs').innerHTML=t.map(([id,l])=>`<button class="tab ${cur==id?'on':''}" onclick="go('${id}')">${l}</button>`).join('')}
 function go(id){cur=id;store.set('tab',id);tabs();render();scrollTo(0,0)}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}
@@ -314,6 +386,7 @@ function render(){
  if(cur=='tonight')return tonight();
  if(cur=='drills')return drills();
  if(cur=='ladder')return ladder();
+ if(cur=='tiny')return tiny();
  if(cur=='parents')return parents();
  const d=DAYS.find(x=>x.id==cur);
  $('#view').innerHTML=`<h2>${d.title}</h2><p class="small">Open your booklet at the same page. Read the question in the booklet, then use Stormy's help here. Write your final answer in the booklet.</p>`+warmHTML(d.id)+d.pages.map(pageHTML).join('');matchGame(d.id);
@@ -382,8 +455,8 @@ function tonight(){$('#view').innerHTML=`<div class="card" style="border:3px sol
 <tr><td>20 min</td><td>Mystery story: plan 5 · write 12 · check 3. Writing on paper!</td><td><button class="s" onclick="go('d4')">Thu</button></td></tr>
 </table><p class="small">Stuck for more than 2 minutes? Tap 💡 Hint. Still stuck? Leave it and move on – your teacher will help tomorrow.</p></div>
 <div class="card"><h3>📅 Weekend plan before the test (Mon 30/11)</h3><table class="plan">
-<tr><td><b>Fri</b> 2–3h</td><td>⓪ Writing Ladder steps 1–2 (20 min) ① Fix what your teacher marked (45 min) ② Day 5 Mars, pages 18–21 (60 min) ③ Drills (20 min)</td></tr>
-<tr><td><b>Sat</b> 2–3h</td><td>① Day 6 poem + vocabulary, pages 22–24 (50 min) ② Writing Ladder steps 3–4: burger paragraph, then the whole mystery story (50 min) ③ Spelling log + Capital Fixer (20 min)</td></tr>
+<tr><td><b>Fri</b> 2–3h</td><td>⓪ 🧱 Tiny Steps 0–3 (30 min) ① Fix what your teacher marked (45 min) ② Day 5 Mars, pages 18–21 (60 min) ③ Drills (20 min)</td></tr>
+<tr><td><b>Sat</b> 2–3h</td><td>① Day 6 poem + vocabulary, pages 22–24 (50 min) ② 🧱 Tiny Steps 4–7 (30 min), then Writing Ladder burger + Story Mountain (40 min) ③ Spelling log + Capital Fixer (20 min)</td></tr>
 <tr><td><b>Sun</b> 2h</td><td>① Mini Mock Test, timed 60 min, on your own ② Check with the answer sheet in green pen (30 min) ③ Redo the questions you lost marks on (30 min)</td></tr></table>
 <p class="small">Take a 10-minute break every 40 minutes – go and pet a cat 🐱 or have a scoop of mint choc chip 🍦.</p></div>
 <div class="card"><h3>🧠 The 3 golden rules for the test</h3>

@@ -201,18 +201,122 @@ const DRILLS=[
  {id:'spell',title:'✏️ Peter\'s Spelling Log',help:'Listen 🔊, type the word, check.',words:['exhausted','quickly','whispered','hurried','frightened','character','hungry','emphasise','grandmother\'s','entertained','colossal','either']},
 ];
 
+/* ---------- WARM-UP: words + how-to, before the teacher's pages ----------
+ words: [word, emoji, easy meaning, Vietnamese, example]
+ how: I do (model + think aloud) → We do (choose) → You do (booklet) */
+const WARM={
+d1:{words:[['nervous','😬','worried and a bit scared','lo lắng, hồi hộp','Peter felt nervous before the test.'],['tremble','🫨','to shake a little because you are scared or cold','run rẩy','Her hands trembled.'],['exhausted','😩','very, very tired','mệt lả','After skiing all day, I was exhausted.'],['creak','🚪','a long squeaky sound an old door makes','kêu cót két','The door creaked open.'],['tension','😰','the feeling that something scary will happen','sự hồi hộp, căng thẳng','Short sentences build tension.'],['evidence','🔍','words from the text that PROVE your answer','bằng chứng','My evidence is "her hands shook".'],['ferocious','🐺','very fierce and violent','dữ dội, hung tợn','The ferocious storm broke the trees.'],['famished','🍽️','very, very hungry','đói lả','I was famished after school.']],
+ how:{name:'Show, don\'t tell 🎬',vi:'Đừng nói thẳng cảm xúc. Hãy tả cơ thể nhân vật làm gì để người đọc tự đoán.',
+  ido:['Tell: "Tom was scared."','I ask: what does a scared BODY do? 🤔 Hands shake. Heart thuds. Legs freeze.','Show: "Tom\'s hands shook and his heart thudded."'],
+  wedo:{q:'Which one SHOWS that Mia is happy?',c:['Mia was happy.','Mia grinned and skipped down the path.','Mia was very very happy.'],a:1,why:'It tells us what her face and legs do!'}}},
+d2:{words:[['simile','🐱','compares two things using "like" or "as"','so sánh (dùng like/as)','The fog was like a sleepy cat.'],['crept','🐾','moved slowly and quietly (past of creep)','rón rén, lẻn','He crept past the classroom.'],['thud','🥁','a heavy, low sound','tiếng thình thịch','His heart went thud, thud, thud.'],['gulped','😳','swallowed hard because you are nervous','nuốt khan (vì sợ)','Arjun gulped.'],['clearing','🌳','an open space in a forest with no trees','khoảng trống trong rừng','A hut stood in the clearing.'],['lamplighter','🏮','a man who lit street lamps long ago','người thắp đèn đường (ngày xưa)','The lamplighter carried a long pole.'],['cobbled','🪨','a street made of round stones','lát đá cuội','The cobbled street was cold.'],['bare','🖐️','not covered (no gloves, no shoes)','trần, không che','His bare fingers were blue.']],
+ how:{name:'Point + Evidence + Explain 🍔',vi:'Câu 2 điểm = Ý của con + trích nguyên văn trong ngoặc kép + giải thích.',
+  ido:['Question: Why did the lamplighter give Tom his scarf?','POINT: I think he felt sorry for Tom…','EVIDENCE: …because the text says "Tom\'s bare, blue fingers".','EXPLAIN: This shows Tom was freezing and needed help.'],
+  wedo:{q:'Which part is the EVIDENCE?',c:['I think he was kind.','"He looked at Tom\'s bare, blue fingers."','This shows he wanted to help.'],a:1,why:'Evidence = the exact words from the text, inside " ".'}}},
+d3:{words:[['tense','⏰','tells WHEN: past, present or future','thì (quá khứ/hiện tại/tương lai)','"walked" is past tense.'],['irregular','🤪','a verb that does NOT add -ed in the past','bất quy tắc','hide → hid'],['shiver','🥶','to shake because you are cold','run cầm cập vì lạnh','Tom shivered in the snow.'],['heron','🦩','a tall bird with long legs that lives near water','con diệc','The heron stood in the river.'],['sigh','😮‍💨','to breathe out loudly when tired or sad','thở dài','"There must be an easier way," she sighed.'],['terrified','😱','very, very scared','khiếp sợ','The villagers were terrified.'],['channel','🌊','a path for water to flow','kênh dẫn nước','They dug a new channel.'],['message','💌','the lesson a story teaches','bài học của câu chuyện','The message is: care for nature.']],
+ how:{name:'Story Mountain ⛰️',vi:'Truyện có 5 phần như leo núi: Mở đầu → Rắc rối → Đỉnh điểm → Giải quyết → Kết.',
+  ido:['1 Introduction: who + where (Linh, a village by a river).','2 Problem: the heavy buckets, then the rain.','3 Climax: the flood comes! (top of the mountain)','4 Resolution: everyone digs a channel.','5 Conclusion: clean water + the message.'],
+  wedo:{q:'"The river was rising fast" is which part?',c:['Introduction','Problem / build-up','Conclusion'],a:1,why:'The trouble is starting to build up.'}}},
+d4:{words:[['inverted commas','💬','the marks " " around words someone says','dấu ngoặc kép','"Come here," said Dad.'],['gasped','😮','took a quick breath because of surprise','há hốc, thở hắt','"Look!" she gasped.'],['mystery','🕵️','something strange we do not understand yet','điều bí ẩn','The glowing book was a mystery.'],['flicker','🕯️','light that goes on and off quickly','chập chờn','The lights flickered and went out.'],['shadow','👤','a dark shape made when something blocks light','cái bóng','A shadow moved across the wall.'],['whisper','🤫','to speak very quietly','thì thầm','"Who is there?" I whispered.'],['synonym','👯','a word with a similar meaning','từ đồng nghĩa','big → enormous'],['A–Z order','🔤','order of the alphabet','thứ tự bảng chữ cái','ant, bat, cat']],
+ how:{name:'The Speech Sandwich 🥪',vi:'Lời nói nằm trong " ". Dấu phẩy/dấu hỏi/dấu chấm than nằm BÊN TRONG ngoặc. Viết hoa chữ đầu lời nói.',
+  ido:['Words someone says: come here','Put the bread: "Come here"','Add the sauce INSIDE: "Come here,"','Who said it (small letter): "Come here," said Dad.'],
+  wedo:{q:'Which one is correct?',c:['"Stop" cried Linh!','"Stop!" cried Linh.','"Stop!" Cried Linh.'],a:1,why:'! is inside, and cried has a small c.'}}},
+d5:{words:[['persuade','📣','to make someone agree or do something','thuyết phục','The advert persuades you to buy a ticket.'],['fact','✅','something you can check is true','sự thật (kiểm chứng được)','Mars is the fourth planet.'],['opinion','💭','what someone thinks or feels','ý kiến riêng','Mars is the most exciting planet!'],['advert','📺','a text that sells something','quảng cáo','The advert sells trips to Mars.'],['unforgettable','🌟','so good you will never forget it','không thể quên','An unforgettable trip!'],['connective','🔗','a word that joins ideas','từ nối','because, however, so'],['however','↩️','shows the OTHER side','tuy nhiên','I love space. However, it is far.'],['command','👉','a sentence that tells you to do something','câu mệnh lệnh','Book today!']],
+ how:{name:'Fact or Opinion test 🧪',vi:'Hỏi: "Có kiểm tra được không?" Được → fact. Là cảm nghĩ → opinion.',
+  ido:['"The spaceship leaves every Saturday." Can I check it on a timetable? YES → fact.','"It\'s UNFORGETTABLE!" Can I check it? NO, it is a feeling → opinion.'],
+  wedo:{q:'"Children travel half price." is…',c:['a fact','an opinion'],a:0,why:'You can check the price on the ticket.'}}},
+d6:{words:[['personification','🌊','writing about a thing as if it is a person','nhân hoá','The sea whispered.'],['tiptoe','🩰','to walk quietly on your toes','đi nhón chân','The sea came tiptoeing up the sand.'],['scuttle','🦀','to run with small quick steps','chạy lon ton','The crabs scuttled away.'],['roar','🦁','a very loud deep sound','gầm, rống','The waves roared.'],['soaked','💦','very, very wet','ướt sũng','I was soaked in the rain.'],['shades of meaning','🎨','words that mean nearly the same but are weaker or stronger','mức độ mạnh/yếu của từ','cool → cold → freezing'],['overused','🔁','used too many times (nice, got, said)','dùng quá nhiều','"nice" is overused.'],['adverb','⚡','tells HOW: gently, fiercely','trạng từ (cách thức)','She sang gently.']],
+ how:{name:'Poem Detective 🔎',vi:'Đọc to 2 lần. Tìm: like/as (simile), cùng âm đầu (alliteration), vật làm việc của người (personification).',
+  ido:['"The sea came tiptoeing up the sand."','Can the sea really tiptoe? No! People tiptoe.','So it is personification. The sea moves quietly like a person.'],
+  wedo:{q:'"The wind sang a wobbly song" is…',c:['simile','personification','alliteration'],a:1,why:'Wind cannot really sing – people sing.'}}},
+d7:{words:[['dazzling','✨','so bright it nearly hurts your eyes','sáng chói, lấp lánh','The library was dazzling.'],['curiosity','🧐','wanting to know or find out','sự tò mò','His curiosity was stronger than his fear.'],['caretaker','🧹','a person who looks after a building','bác bảo vệ / trông nhà','The caretaker forgot to lock the door.'],['shimmering','🌟','shining softly and moving','lung linh','shimmering letters'],['widened','👀','got bigger (eyes widen in surprise)','mở to','His eyes widened.'],['drummed','🥁','beat fast like a drum','đập dồn dập','His heart drummed faster.'],['flutter','🦋','to move quickly and lightly','bay phấp phới','The pages fluttered.'],['peg','🪝','a hook to hang a coat','móc treo','His jacket hung on its peg.']],
+ how:{name:'Test routine ⏱️',vi:'Đọc truyện 2 lần → gạch chân từ lệnh trong câu hỏi → trả lời → kiểm tra chữ hoa, dấu chấm.',
+  ido:['Read the story TWICE.','Underline the command: find and copy? own words? why?','Look at the marks: (2) = 2 things.','Check: capital, full stop, spelling.'],
+  wedo:{q:'"Find and copy one word…" means…',c:['write it in your own words','copy the exact word from the text','write two words'],a:1,why:'Find and copy = exact words.'}}},
+};
+function warmHTML(did){const w=WARM[did];if(!w)return'';const id='w_'+did;
+ return `<div class="card" style="border:3px solid var(--mint)"><h3>🔥 Step 1 · Warm-up words (${w.words.length})</h3>
+ <p class="small">Tap 🔊, say the word 3 times, read the example. Tap 🇻🇳 if you need help.</p>
+ ${w.words.map((x,k)=>`<div class="q" style="padding:8px 0"><span style="font-size:30px">${x[1]}</span> <b style="font-size:21px">${x[0]}</b> <button class="s" onclick="say('${x[0].replace(/'/g,"\\'")}. ${x[4].replace(/'/g,"\\'").replace(/"/g,'')}')">🔊</button> <button class="s" onclick="tog('${id}v${k}')">🇻🇳</button><div>= ${esc(x[2])}</div><div class="small"><i>${esc(x[4])}</i></div><div class="box hint vi hide" id="${id}v${k}">${esc(x[3])}</div></div>`).join('')}
+ <h3>🎯 Word match</h3><p class="small">Tap a word, then tap its meaning.</p><div id="${id}_m"></div></div>
+ <div class="card" style="border:3px solid var(--gold)"><h3>🧠 Step 2 · How to do it: ${w.how.name}</h3>
+ <div class="box hint vi">🇻🇳 ${esc(w.how.vi)}</div>
+ <p><b>👩‍🏫 I do (watch me):</b></p><ol>${w.how.ido.map(s=>`<li>${esc(s)}</li>`).join('')}</ol>
+ <p><b>🤝 We do:</b> ${esc(w.how.wedo.q)}</p>${w.how.wedo.c.map((c,k)=>`<span class="chip" onclick="wedo(this,'${did}',${k})">${esc(c)}</span>`).join('')}<div id="${id}_wd"></div>
+ <p><b>🙋 You do:</b> now open your booklet and try the pages below ⬇️</p></div><h3>📚 Step 3 · Your teacher's pages</h3>`}
+function wedo(el,did,k){const w=WARM[did].how.wedo;const ok=k==w.a;el.classList.add('sel');$('#w_'+did+'_wd').innerHTML=`<div class="box ${ok?'ok':'no'}">${ok?'✅ Yes! '+esc(w.why):'🙈 Not quite – try again.'}</div>`;if(ok)star('wedo_'+did)}
+let mSel={};
+function matchGame(did){const w=WARM[did];if(!w)return;const el=$('#w_'+did+'_m');if(!el)return;
+ const words=w.words.map((x,k)=>k);const means=[...words].sort(()=>Math.random()-.5);
+ el.innerHTML=`<div style="display:flex;gap:10px;flex-wrap:wrap"><div style="flex:1;min-width:140px">${words.map(k=>`<span class="chip" id="mw_${did}_${k}" onclick="mPick('${did}','w',${k})">${w.words[k][1]} ${w.words[k][0]}</span>`).join('<br>')}</div><div style="flex:2;min-width:200px">${means.map(k=>`<span class="chip" id="mm_${did}_${k}" onclick="mPick('${did}','m',${k})">${esc(w.words[k][2])}</span>`).join('<br>')}</div></div><div id="mr_${did}"></div>`;mSel[did]={n:0}}
+function mPick(did,side,k){const s=mSel[did];const el=$(`#m${side}_${did}_${k}`);if(el.dataset.done)return;
+ if(side=='w'){document.querySelectorAll(`[id^=mw_${did}_]`).forEach(e=>{if(!e.dataset.done)e.classList.remove('sel')});el.classList.add('sel');s.w=k;return}
+ if(s.w==null){$('#mr_'+did).innerHTML='<div class="box hint">Tap a word first 👈</div>';return}
+ if(s.w==k){[el,$(`#mw_${did}_${k}`)].forEach(e=>{e.dataset.done=1;e.classList.add('sel');e.style.opacity=.55});s.n++;s.w=null;say(WARM[did].words[k][0]);
+  $('#mr_'+did).innerHTML=s.n==WARM[did].words.length?'<div class="box ok">🌟 All matched! You are ready.</div>':'<div class="box ok">✅ '+s.n+' matched</div>';if(s.n==WARM[did].words.length)star('match_'+did)}
+ else $('#mr_'+did).innerHTML='<div class="box no">🙈 Not that one. Read the example again.</div>'}
+
+/* ---------- WRITING LADDER: word → sentence → character → paragraph → story ---------- */
+const FEEL={scared:['😨','sợ',['hands shook','heart thudded','froze','held his breath','knees wobbled','voice came out as a whisper']],happy:['😄','vui',['grinned from ear to ear','skipped','giggled','eyes sparkled','clapped her hands']],angry:['😠','tức giận',['clenched his fists','stomped his feet','face turned red','slammed the door','growled']],sad:['😢','buồn',['shoulders drooped','tears rolled down her cheeks','stared at the floor','voice shook','sniffed']],excited:['🤩','háo hức',['bounced on his toes','couldn\'t sit still','squealed','eyes widened','rushed to the door']],tired:['😩','mệt',['yawned','eyes drooped','dragged her feet','slumped in the chair','rubbed his eyes']]};
+const CHAR={looks:['messy brown hair','sparkly green eyes','a red woolly scarf','muddy ski boots','a gap-toothed smile','round glasses','a fluffy grey cat called Stormy'],traits:[['brave','dũng cảm'],['curious','tò mò'],['kind','tốt bụng'],['shy','nhút nhát'],['clever','thông minh'],['cheeky','tinh nghịch'],['grumpy','cáu kỉnh']],does:{brave:'never ran away from danger',curious:'asked "Why?" about everything',kind:'shared his snacks with everyone',shy:'hid behind his mum when he met new people',clever:'solved puzzles faster than anyone',cheeky:'played tricks on his big brother',grumpy:'complained about everything'},says:{brave:'"Don\'t worry, I\'ll go first!"',curious:'"What\'s behind that door?"',kind:'"Do you want half of my sandwich?"',shy:'"Um… hello," in a tiny voice.',clever:'"I\'ve got an idea!"',cheeky:'"Gotcha!"',grumpy:'"Not again!"'}};
+let L=store.get('ladder',{feel:'scared',acts:[],name:'Peter',look1:'',look2:'',trait:''});
+function lset(k,v){L[k]=v;store.set('ladder',L);ladder()}
+function ladder(){const f=FEEL[L.feel];
+ let h=`<h2>🪜 Writing Ladder</h2><p class="small">Climb one step at a time. Each step uses the one before. 🇻🇳 Mỗi bậc chỉ 5–10 phút. Con chọn mảnh ghép → nhìn câu mẫu → tự gõ câu của mình.</p>`;
+ h+=`<div class="card"><h3>Step 1 · Feelings → SHOW them 🎬</h3><p class="help">Pick a feeling. Then pick 2 body actions.</p>
+ ${Object.entries(FEEL).map(([k,v])=>`<span class="chip ${L.feel==k?'sel':''}" onclick="L.acts=[];lset('feel','${k}')">${v[0]} ${k}</span>`).join('')}
+ <div class="box hint vi">🇻🇳 "${L.feel}" = ${f[1]}. Đừng viết "${L.feel}" – hãy tả cơ thể.</div>
+ ${f[2].map(a=>`<span class="chip ${L.acts.includes(a)?'sel':''}" onclick="lact('${a.replace(/'/g,"\\'")}')">${a}</span>`).join('')}
+ <div class="box ex">👀 Model: ${L.acts.length==2?`Peter's ${L.acts[0]} and he ${L.acts[1]}.`.replace("Peter's held","Peter held").replace("Peter's froze","Peter froze"):'(pick 2 actions)'}</div>
+ <p>✍️ Your turn: write a sentence about <b>Tom in the dark cave</b> showing he is ${L.feel}. Don't use the word "${L.feel}".</p>
+ <textarea id="l1" oninput="save('l1')">${esc(store.get('l1',''))}</textarea><button class="s go" onclick="lchk('l1',['cap','stop','no:${L.feel}','min:6'])">🐱 Check</button><div id="l1_r"></div></div>`;
+ const t=L.trait;
+ h+=`<div class="card"><h3>Step 2 · Build a character 🧑‍🎤</h3><p class="help">A character = LOOKS + PERSONALITY + DOES + SAYS.</p>
+ <p>Name: <input type="text" style="width:180px" value="${esc(L.name)}" onchange="lset('name',this.value)"></p>
+ <p><b>👀 Looks</b> (pick 2):<br>${CHAR.looks.map(x=>`<span class="chip ${L.look1==x||L.look2==x?'sel':''}" onclick="llook('${x}')">${x}</span>`).join('')}</p>
+ <p><b>💛 Personality</b> (pick 1):<br>${CHAR.traits.map(([x,v])=>`<span class="chip ${t==x?'sel':''}" onclick="lset('trait','${x}')">${x} <span class="small">(${v})</span></span>`).join('')}</p>
+ ${L.look1&&L.look2&&t?`<div class="box ex">👀 Model character paragraph:<br><b>${esc(L.name)}</b> was a ${t} boy with ${L.look1} and ${L.look2}. Everyone knew he was ${t} because he ${CHAR.does[t]}. ${CHAR.says[t].includes('tiny')?`He always said ${CHAR.says[t]}`:`His favourite words were ${CHAR.says[t]}`}</div>
+ <p class="small">🔍 See the 3 parts: <b>looks</b> → <b>personality + proof (because…)</b> → <b>says</b>.</p>`:'<p class="small">Pick looks and personality to see the model.</p>'}
+ <p>✍️ Your turn: describe a NEW character (a girl, a grandpa or a snow monster!). 3 sentences: looks · personality because… · what they say.</p>
+ <textarea id="l2" style="min-height:110px" oninput="save('l2')">${esc(store.get('l2',''))}</textarea><button class="s go" onclick="lchk('l2',['caps','stop','because','quote','sentmin:3'])">🐱 Check</button><div id="l2_r"></div></div>`;
+ h+=`<div class="card"><h3>Step 3 · The Paragraph Burger 🍔</h3><p class="help">A paragraph = 1 top bun + 3 fillings + 1 bottom bun. All about ONE idea.</p>
+ <div class="box hint vi">🇻🇳 Đoạn văn = câu chủ đề (ý chính) → 3 câu chi tiết (nhìn/nghe/cảm thấy) → câu kết. Tất cả nói về 1 ý.</div>
+ <table class="plan"><tr><td>🍞 Top bun<br><span class="small">main idea</span></td><td>The old ski lodge was silent and dark.</td></tr>
+ <tr><td>🥬 Filling 1<br><span class="small">I SEE</span></td><td>Moonlight crept through the dusty windows.</td></tr>
+ <tr><td>🧀 Filling 2<br><span class="small">I HEAR</span></td><td>Somewhere, a floorboard creaked.</td></tr>
+ <tr><td>🍅 Filling 3<br><span class="small">I FEEL (show!)</span></td><td>Peter's hands trembled as he held his torch.</td></tr>
+ <tr><td>🍞 Bottom bun<br><span class="small">end / hook</span></td><td>Then the torch went out.</td></tr></table>
+ <p>✍️ Your turn – <b>The Night the Lights Went Out</b>, paragraph 1. Write each layer:</p>
+ ${[['b1','🍞 Top bun – where are you, and is it quiet/dark?','At midnight, my bedroom was…'],['b2','🥬 I SEE…','Shadows…'],['b3','🧀 I HEAR…','Suddenly, I heard…'],['b4','🍅 I FEEL (show it!)','My heart…'],['b5','🍞 Bottom bun – a short sentence hook','Then…']].map(([k,l,s])=>`<div style="margin:8px 0"><div>${l}</div><input type="text" id="${k}" placeholder="${s}" value="${esc(store.get(k,''))}" oninput="save('${k}')"></div>`).join('')}
+ <button class="s go" onclick="burger()">🍔 Stack my burger</button><div id="bur"></div></div>`;
+ h+=`<div class="card"><h3>Step 4 · Whole story on the Story Mountain ⛰️</h3><p class="help">5 short paragraphs (3–4 sentences each) = about 150 words. Perfect for the test!</p>
+ ${[['s1','1 Introduction','Who? Where? When? A feeling.','On a snowy night, Peter and his cat Stormy were…'],['s2','2 Build-up','Something strange: what do you see / hear?','Suddenly, the lights flickered…'],['s3','3 Problem / climax','SHORT sentences. Show fear.','Silence. Then a thud. Peter froze.'],['s4','4 Resolution','How is it solved? A surprise?','Peter grabbed his torch and…'],['s5','5 Ending','Link back to the start, or leave a question.','When the lights came back on, …']].map(([k,l,hh,s])=>`<div style="margin:10px 0"><b>${l}</b> <span class="small">– ${hh}</span><br><span class="small">Starter: <i>${s}</i></span><textarea id="${k}" oninput="save('${k}');stcount()">${esc(store.get(k,''))}</textarea></div>`).join('')}
+ <div id="stc" class="small"></div><button class="s go" onclick="story()">🐱 Check my whole story</button><div id="str"></div></div>`;
+ $('#view').innerHTML=h;stcount()}
+function lact(a){const i=L.acts.indexOf(a);if(i>=0)L.acts.splice(i,1);else{L.acts.push(a);if(L.acts.length>2)L.acts.shift()}store.set('ladder',L);ladder()}
+function llook(x){if(L.look1==x)L.look1='';else if(L.look2==x)L.look2='';else{L.look1=L.look2;L.look2=x}store.set('ladder',L);ladder()}
+function lchk(k,rules){const t=$('#'+k).value,r=$('#'+k+'_r');if(!t.trim())return;const tips=ruleCheck(t,rules);r.innerHTML=tips.length?`<div class="box no">🐱 Fix: <br>• ${tips.map(esc).join('<br>• ')}</div>`:'<div class="box ok">🌟 Purr-fect! Climb to the next step.</div>';if(!tips.length)star('ladder_'+k)}
+function burger(){const p=['b1','b2','b3','b4','b5'].map(k=>$('#'+k).value.trim()).filter(Boolean).join(' ');if(!p)return;const tips=ruleCheck(p,['caps','stop','i','sentmin:5']);
+ $('#bur').innerHTML=`<div class="box ex">📖 ${esc(p)}</div>`+(tips.length?`<div class="box no">🐱 • ${tips.map(esc).join('<br>• ')}</div>`:'<div class="box ok">🌟 That is a real paragraph! Copy it on paper.</div>');if(!tips.length)star('ladder_burger')}
+function stcount(){const t=['s1','s2','s3','s4','s5'].map(k=>($('#'+k)||{value:''}).value).join(' ').trim();const n=t?t.split(/\s+/).length:0;const e=$('#stc');if(e)e.innerHTML=`Words: <b>${n}</b> (aim 120–180) ${n>=120&&n<=180?'✅':''}`}
+function story(){const parts=['s1','s2','s3','s4','s5'].map(k=>$('#'+k).value.trim());const t=parts.join('\n');const tips=ruleCheck(t,['caps','i','simile','min:120']);
+ const empty=parts.map((p,i)=>p?null:i+1).filter(Boolean);if(empty.length)tips.unshift('Paragraph '+empty.join(', ')+' is empty.');
+ if(!/\b(\w+)\. (\w+)\./.test(t))tips.push('Add 2 SHORT sentences in a row for tension (e.g. "Silence. Peter froze.").');
+ $('#str').innerHTML=tips.length?`<div class="box no">🐱 Almost! <br>• ${tips.map(esc).join('<br>• ')}</div>`:'<div class="box ok">🏆 Wow – a full 5-part story! Read it aloud, then write it neatly in your booklet.</div>';if(!tips.length)star('ladder_story')}
+
 /* ---------- render ---------- */
 let cur=store.get('tab','tonight');
-function tabs(){const t=[['tonight','🌙 Tonight'],...DAYS.map(d=>[d.id,d.tab]),['drills','🎯 Drills'],['parents','👨‍👩‍👦 Bố mẹ']];
+function tabs(){const t=[['tonight','🌙 Start here'],['ladder','🪜 Writing Ladder'],...DAYS.map(d=>[d.id,d.tab]),['drills','🎯 Drills'],['parents','👨‍👩‍👦 Bố mẹ']];
  $('#tabs').innerHTML=t.map(([id,l])=>`<button class="tab ${cur==id?'on':''}" onclick="go('${id}')">${l}</button>`).join('')}
 function go(id){cur=id;store.set('tab',id);tabs();render();scrollTo(0,0)}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}
 function render(){
  if(cur=='tonight')return tonight();
  if(cur=='drills')return drills();
+ if(cur=='ladder')return ladder();
  if(cur=='parents')return parents();
  const d=DAYS.find(x=>x.id==cur);
- $('#view').innerHTML=`<h2>${d.title}</h2><p class="small">Open your booklet at the same page. Read the question in the booklet, then use Stormy's help here. Write your final answer in the booklet.</p>`+d.pages.map(pageHTML).join('');
+ $('#view').innerHTML=`<h2>${d.title}</h2><p class="small">Open your booklet at the same page. Read the question in the booklet, then use Stormy's help here. Write your final answer in the booklet.</p>`+warmHTML(d.id)+d.pages.map(pageHTML).join('');matchGame(d.id);
 }
 function pageHTML(p){
  return `<div class="card"><div class="pg" onclick="this.nextElementSibling.classList.toggle('hide')"><h3>📄 Page ${p.p} · ${p.title}</h3><span class="badge">${p.qs.length} Qs</span></div>
@@ -265,7 +369,11 @@ function sortHTML(id,q){const opts=['simile','personification','alliteration','o
 function pick(el,id,k,o,a){[...el.parentNode.querySelectorAll('.chip')].forEach(c=>c.classList.remove('sel'));el.classList.add('sel');$('#'+id+'_s'+k).textContent=o==a?' ✅':' 🙈';if(o==a)star(id+'_'+k)}
 let tmI;function timer(){clearInterval(tmI);let s=3600;tmI=setInterval(()=>{s--;$('#tm').textContent=String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');if(s==1800)say('Thirty minutes. Time to start the writing section.');if(s<=0){clearInterval(tmI);say('Time is up! Pens down.')}},1000)}
 
-function tonight(){$('#view').innerHTML=`<div class="card"><h2>🌙 Tonight's mission (about 1 hour)</h2>
+function tonight(){$('#view').innerHTML=`<div class="card" style="border:3px solid var(--mint)"><h2>🗺️ How every day works</h2>
+<p>🔥 <b>Step 1 Warm-up words</b> (5 min) → 🧠 <b>Step 2 Watch how to do it</b> (5 min) → 📚 <b>Step 3 Teacher's pages</b> with hints.</p>
+<p>✍️ Writing feels hard? Climb the <button class="s" onclick="go('ladder')">🪜 Writing Ladder</button> first: feelings → character → paragraph → story. 10 minutes a step.</p>
+<p class="small vi">🇻🇳 Mỗi ngày: học từ mới → xem cách làm mẫu → mới làm bài của cô. Phần viết đoạn: leo "Bậc thang viết" từng bậc.</p></div>
+<div class="card"><h2>🌙 Tonight's mission (about 1 hour)</h2>
 <p>Your teacher will mark Monday–Thursday. Stormy helps you understand each question. <b>You</b> write the answers in your booklet.</p>
 <table class="plan"><tr><th>⏱</th><th>Do this</th><th>Go</th></tr>
 <tr><td>10 min</td><td>🔧 Fix pages 3–9 you already did (tap "Look again at my work")</td><td><button class="s" onclick="go('d1')">Mon</button> <button class="s" onclick="go('d2')">Tue</button></td></tr>
@@ -274,8 +382,8 @@ function tonight(){$('#view').innerHTML=`<div class="card"><h2>🌙 Tonight's mi
 <tr><td>20 min</td><td>Mystery story: plan 5 · write 12 · check 3. Writing on paper!</td><td><button class="s" onclick="go('d4')">Thu</button></td></tr>
 </table><p class="small">Stuck for more than 2 minutes? Tap 💡 Hint. Still stuck? Leave it and move on – your teacher will help tomorrow.</p></div>
 <div class="card"><h3>📅 Weekend plan before the test (Mon 30/11)</h3><table class="plan">
-<tr><td><b>Fri</b> 2–3h</td><td>① Fix what your teacher marked (45 min) ② Day 5 Mars, pages 18–21 (60 min) ③ Drills (20 min)</td></tr>
-<tr><td><b>Sat</b> 2–3h</td><td>① Day 6 poem + vocabulary, pages 22–24 (50 min) ② Write the mystery story again, better (40 min) ③ Spelling log + Capital Fixer (20 min)</td></tr>
+<tr><td><b>Fri</b> 2–3h</td><td>⓪ Writing Ladder steps 1–2 (20 min) ① Fix what your teacher marked (45 min) ② Day 5 Mars, pages 18–21 (60 min) ③ Drills (20 min)</td></tr>
+<tr><td><b>Sat</b> 2–3h</td><td>① Day 6 poem + vocabulary, pages 22–24 (50 min) ② Writing Ladder steps 3–4: burger paragraph, then the whole mystery story (50 min) ③ Spelling log + Capital Fixer (20 min)</td></tr>
 <tr><td><b>Sun</b> 2h</td><td>① Mini Mock Test, timed 60 min, on your own ② Check with the answer sheet in green pen (30 min) ③ Redo the questions you lost marks on (30 min)</td></tr></table>
 <p class="small">Take a 10-minute break every 40 minutes – go and pet a cat 🐱 or have a scoop of mint choc chip 🍦.</p></div>
 <div class="card"><h3>🧠 The 3 golden rules for the test</h3>

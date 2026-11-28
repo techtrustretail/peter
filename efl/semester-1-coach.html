@@ -559,10 +559,71 @@ function qHTML(p,q,i){const id=p.id+'_'+i;let h=`<div class="q" id="${id}"><span
  if(q.fix)h+=`<div class="box fix hide" id="${id}_fix">🔧 ${esc(q.fix)}</div>`;
  if(q.type=='check')h+=q.items.map((it,k)=>`<div style="margin:8px 0"><div>${esc(it[0])}</div><input type="text" id="${id}_i${k}" autocomplete="off" autocapitalize="off" spellcheck="false"><div id="${id}_r${k}"></div></div>`).join('')+`<button class="s go" onclick="check('${p.id}',${i})">✅ Check</button>`;
  if(q.type=='write'){const k=id+'_w';h+=`<textarea id="${k}" style="min-height:${q.big==2?260:q.big?140:70}px" oninput="${q.story?`wc('${id}')`:''};save('${k}')">${esc(store.get(k,''))}</textarea>${q.story?`<div class="small" id="${id}_wc"></div>`:''}<button class="s go" onclick="wcheck('${p.id}',${i})">🐱 Stormy, check my writing</button><div id="${id}_r"></div>`}
- if(q.type=='note')h+=`<button class="s" onclick="star('${id}');this.textContent='⭐ Done in my booklet!'">✍️ I did it in my booklet</button>`;
+ if(q.type=='note'){const k=id+'_w';h+=`<textarea id="${k}" placeholder="Write your answer here…" oninput="save('${k}')">${esc(store.get(k,''))}</textarea><button class="s go" onclick="ncheck('${p.id}',${i})">✅ Check my answer</button><div id="${id}_r"></div>`}
  if(q.type=='sort')h+=sortHTML(id,q);
  if(q.type=='timer')h+=`<div style="font-size:42px" id="tm">60:00</div><button class="s go" onclick="timer()">▶️ Start 60 minutes</button>`;
  return h+'</div>'}
+/* ---------- Model answers (write → check → correct answer) ---------- */
+const ANS={
+ p3_0:["Mia's hands trembled and her voice came out as a whisper.",/hand|knee|voice|breath|heart|bit|shook|shak|trembl|swallow|sweat|stomach|tumm/i],
+ p3_1:["Cobwebs hung from the broken windows and the front door creaked in the wind.",/cobweb|creak|broken|dark|dust|howl|crack|spider|shadow|squeak|bat/i],
+ p3_2:["Ben was exhausted. He yawned and his eyes kept closing.",/exhausted|yawn|eyes|weary|sleepy|drowsy/i],
+ p3_3:["The fluffy dog ran quickly across the park.",/ly\b/i],
+ p3_4:["Suddenly, the door moved. It had been shut for years. Slowly, it creaked open.",/\.[^.]+\.[^.]+\./],
+ p3_5:["said → whispered · went → crept · looked → stared",/whisper|shout|gasp|crept|hurr|dash|stare|peer|glar|mutter|yell/i],
+ p3_6:["The girl skipped down to the beach. The sand burned her feet like hot coals. She giggled with joy. Suddenly, she spotted an enormous wave, as tall as a house!",/like|as \w+ as|skip|stroll|burn|giggl|grin|enormous|gigantic/i],
+ p4_0:['Underline: "Zara\'s hands shook" and "her voice came out as a whisper".',/shook[\s\S]*whisper|whisper[\s\S]*shook/i],
+ p4_1:['I think Zara is nervous because the text says "Zara\'s hands shook as she stepped onto the stage". This shows that she is scared of performing in front of the audience.',/"[^"]+"[\s\S]*(shows|afraid|scared|worried|audience|people|stage|perform)/i],
+ p5_0:['Clue words: "The waves crashed violently" and "the wind howled like a wolf". Ferocious = fierce and violent.',/crash|violent|howl|wolf/i],
+ p5_1:['Famished means very hungry. Clue words: "had not eaten for two days" and "his stomach rumbled loudly".'],
+ p6_0:['"like a sleepy grey cat"',/sleepy grey cat/i],
+ p6_1:['It helps me imagine the fog moving slowly and softly over the harbour, like a sleepy cat.'],
+ p6_2:['To show how still and silent it is, and to build tension.',/silen|quiet|still|tension|emphasi/i],
+ p6_3:['Jo feels nervous because "Jo\'s hands trembled as she lifted the lid".',/(nervous|scared|afraid|frightened|worried)[\s\S]*(trembl|hand)/i],
+ p6_4:['unwilling',/unwilling/i],
+ p7_0:["Behind his grandmother's farm.",/grandmother/i],
+ p7_1:["It is the sound of Arjun's heart beating fast. Repeating it builds tension and shows he is scared."],
+ p7_3:['It tells you Arjun is nervous or scared.',/nervous|scared|afraid|frightened|worried|anxious|unsure/i],
+ p7_4:['The text says "Its window glowed soft yellow" and "the whistle came from inside", so someone might be there.'],
+ p7_5:['It is a cliffhanger. It makes the reader curious and want to read on to find out who opened the door.'],
+ p7_6:['Yes. Even though his heart thudded, he "crept forward" and "pushed aside the ivy".',/crept|pushed|ivy|reached|handle|forward/i],
+ p9_0:['In London, in 1870 (on a cold, snowy night).',/london[\s\S]*1870|1870[\s\S]*london/i],
+ p9_1:['"a lamplighter" and "his long pole" (also: "cobbled street", "lad").',/lamplighter|cobbled|pole|lad\b|ragged/i],
+ p9_3:["I haven't got a father either."],
+ p9_4:['I think he gave Tom his scarf because he felt sorry for him. The text says he "looked at Tom\'s bare, blue fingers", so Tom was freezing.'],
+ p9_5:['I think Tom will go with the lamplighter because the text says "Tom\'s stomach rumbled loudly" and there is "hot soup" at the school.'],
+ p12_0:['Long ago, in a small village beside a wide river. The text says "Long ago, in a small village beside a wide river".'],
+ p12_1:['Because every morning she carried heavy buckets of water from the river to the village well.'],
+ p12_3:['The water was slowly getting closer and was dangerous.',/slow|closer|danger/i],
+ p12_4:['If you look after the river, the river will look after you and help you.'],
+ p12_5:['The message is: look after nature and work together. The text says "when you care for nature and work together, nature will care for you".'],
+ p12_6:['1 Linh carries heavy buckets every day. · 2 The heron speaks; heavy rain falls and the river floods. · 3 Linh clears the mud and cries "Help me!" · 4 The villagers dig a new channel. · 5 Clean water comes to the village; they learn to care for nature.',/heron|flood|channel|mud/i],
+ p14_2:['"Help me!" cried Linh.\n"What can we do?" asked the old man.\n"Bring your spades and buckets," shouted Linh.\n"We will dig a new channel!" replied the villagers.'],
+ p15_0:["Setting: Grandma's old house, stormy night · Character: Peter, curious then scared · Strange thing: scratching sound, glowing eyes · Next: shed door slams, locked · Surprise: it is an otter · Ending: back with Grandma · Words: rusty, ancient, crept, slammed, like two tiny torches",/./],
+ p17_2:['drowsy → sleepy → weary → exhausted (drowsy and sleepy are very close)',/(sleepy|drowsy)[\s\S]*weary[\s\S]*exhausted/i],
+ p19_0:['To book a seat on the spaceship trip to Mars.',/book|seat|ticket|trip|go to mars/i],
+ p19_1:['"Our spaceship leaves Earth every Saturday" and "Children travel half price." (also: it reaches Mars in seven months)',/saturday|seven months|half price|spacesuit/i],
+ p19_2:['"It\'s SAFE." and "It\'s UNFORGETTABLE!" (also: "delicious space meals")',/safe|comfortable|unforgettable|delicious|lifetime/i],
+ p19_3:['The capital letters make the words stand out, like shouting. The exclamation mark makes it sound exciting, so the reader feels sure and wants to go.'],
+ p19_4:['"However" shows the other side (contrast). "Firstly" puts the reasons in order.',/(however|firstly|secondly|finally)[\s\S]*(however|firstly|secondly|finally|for these reasons)/i],
+ p20_2:['Mars is exciting because it has huge volcanoes. However, it is very far away, so it may not be safe.'],
+ p24_2:['It was a sunny day. We collected some shells. "Come here," she called.'],
+ p24_3:['as quiet as a mouse · as bright as the sun · The waves roared like a hungry lion.',/as \w+ as|like/i],
+ p25_0:['Find and copy → exact words in " ". · In your own words → don\'t copy. · Why / How do you know → because + "…". · (2 marks) → two points, or a point + evidence.',/./],
+};
+ANS.p15_1=ANS.p25_2=["Peter loved visiting Grandma's old house every weekend. One stormy Saturday night, rain was hammering on the roof and the wind howled. Suddenly, the lights went out.\n\nThen Peter heard a strange scratching sound from the rusty wooden shed. He grabbed his small torch and crept outside. His heart thumped. Slowly, he opened the door. Nothing. Bang! The wind slammed it shut. He pushed hard. Locked.\n\nJust then, two glowing eyes stared at him through the dusty window. They shone like two tiny torches. Peter looked closely. It was an otter! He opened the window and the soaking wet otter hurried inside.\n\nThe otter was shivering, so Peter wrapped it in an ancient jacket. Then he climbed out of the window and carried it to the river. Gently, he let it go.\n\nFinally, Peter came back to Grandma's house safe and sound. Grandma was waiting with hot cocoa. Outside, the night was calm and beautiful again."];
+function pretty(s){return s.replace(/(^|[.!?]\s+|^")(["']?)([a-z])/g,(m,a,b,c)=>a+b+c.toUpperCase()).replace(/\bi\b/g,'I').replace(/\b(tom|mia|ben|linh|mum|mars|earth|london|zara)\b/g,w=>w[0].toUpperCase()+w.slice(1)).replace(/(^|\s)"([a-z])/g,(m,a,c)=>a+'"'+c.toUpperCase())}
+function modelOf(pid,i){const id=pid+'_'+i,a=ANS[id];if(a)return a[0];const q=findQ(pid,i);if(q.type!='check')return '';const used=new Set();
+ return q.items.map(([lab,acc])=>{const v=acc.find(x=>!used.has(x))||acc[0];used.add(v);return lab+' → '+pretty(v)}).join('\n')}
+function showModel(pid,i){const id=pid+'_'+i,m=modelOf(pid,i);if(!m)return;let el=$('#'+id+'_m');if(!el){$('#'+id).insertAdjacentHTML('beforeend',`<div id="${id}_m"></div>`);el=$('#'+id+'_m')}
+ el.innerHTML=`<div class="box ex"><b>📗 Correct answer:</b><br>${esc(m).replace(/\n/g,'<br>')}</div><span class="small">Compare with yours. Fix it, then write it in your booklet. <span class="vi">So với bài con, sửa lại rồi chép vào tập.</span></span>`}
+function ncheck(pid,i){const id=pid+'_'+i,t=$('#'+id+'_w').value.trim(),r=$('#'+id+'_r');save(id+'_w');
+ if(!t){r.innerHTML='<div class="box hint">Write your answer first 🙂 <span class="vi">Con viết câu trả lời trước nhé.</span></div>';return}
+ const a=ANS[id],ok=!a||!a[1]||a[1].test(t),tips=[];
+ if(!/^["']?[A-Z0-9]/.test(t))tips.push('Start with a capital letter. · Bắt đầu bằng chữ hoa.');
+ if(/\bi\b/.test(t))tips.push('"I" is always a capital. · Chữ "I" luôn viết hoa.');
+ r.innerHTML=(ok?'<div class="box ok">✅ Right idea! <span class="vi">Đúng ý rồi!</span></div>':'<div class="box no">🤔 Not quite. Look at the correct answer below and see what is different. <span class="vi">Chưa đúng – xem đáp án bên dưới, so sánh với bài con.</span></div>')+(tips.length?`<div class="box hint">🔧 ${tips.map(esc).join('<br>🔧 ')}</div>`:'');
+ if(ok&&!tips.length)star(id);showModel(pid,i)}
 function tog(id){$('#'+id).classList.toggle('hide')}
 const hintN={};
 function hint(id){const [pid,i]=id.split('_');const q=findQ(pid,+i);hintN[id]=(hintN[id]||0);if(hintN[id]<q.hints.length){$('#'+id+'_h').insertAdjacentHTML('beforeend',`<div class="box hint">💡 Hint ${hintN[id]+1}: ${esc(q.hints[hintN[id]])}</div>`);hintN[id]++}}
@@ -576,7 +637,8 @@ function check(pid,i){const q=findQ(pid,i),id=pid+'_'+i;let all=true;
   if(q.sp&&ok&&!/^["']?[A-Z]/.test(norm(v)))extra=' (Remember: capital letter at the start!)';
   if(ok)r.innerHTML=`<div class="box ok">✅ Yes!${extra}</div>`;
   else{all=false;r.innerHTML=`<div class="box no">🙈 Not yet. ${q.sp?speechTip(v):'Try a hint 💡 and look at the text again.'}</div>`}});
- if(all){star(id);say('Brilliant! Now write it in your booklet.')}}
+ if(all){star(id);say('Brilliant! Now write it in your booklet.')}
+ if(q.items.some((it,k)=>$('#'+id+'_i'+k).value.trim()))showModel(pid,i)}
 function speechTip(v){v=norm(v);if(!/"/.test(v))return'Add speech marks " " around the spoken words.';
  if(/"[^"]*"\s*[a-z]/.test(v)&&!/[,!?]"/.test(v))return'Punctuation (, ? !) goes INSIDE the closing speech mark.';
  if(/[.]"\s*(said|asked|shouted|cried|whispered)/i.test(v))return'Before "said", use a comma, not a full stop.';
@@ -587,7 +649,8 @@ function wcheck(pid,i){const q=findQ(pid,i),id=pid+'_'+i,t=$('#'+id+'_w').value;
  if(!t.trim()){r.innerHTML='<div class="box hint">Write something first 🙂</div>';return}
  const tips=ruleCheck(t,q.rules);
  if(!tips.length){r.innerHTML='<div class="box ok">🌟 Stormy is purring! It ticks every box. Copy it neatly into your booklet.</div>';star(id);say('Purr! Great work.')}
- else r.innerHTML=`<div class="box no">🐱 ${tips.length==1?'One':'A few'} thing${tips.length>1?'s':''} to fix:<br>• ${tips.map(esc).join('<br>• ')}</div>`}
+ else r.innerHTML=`<div class="box no">🐱 ${tips.length==1?'One':'A few'} thing${tips.length>1?'s':''} to fix:<br>• ${tips.map(esc).join('<br>• ')}</div>`;
+ showModel(pid,i)}
 function wc(id){const t=$('#'+id+'_w').value;const n=t.trim()?t.trim().split(/\s+/).length:0;const pa=t.split(/\n\s*\n|\n/).filter(x=>x.trim()).length;
  $('#'+id+'_wc').innerHTML=`Words: <b>${n}</b> (aim 120–180) · Paragraphs: <b>${pa}</b> (aim 4–5) ${n>=120&&n<=180?'✅':''}`}
 function sortHTML(id,q){const opts=['simile','personification','alliteration','onomatopoeia'];

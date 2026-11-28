@@ -542,7 +542,7 @@ function render(){
  if(cur=='fix')return fixstory();
  if(cur=='parents')return parents();
  const d=DAYS.find(x=>x.id==cur);
- $('#view').innerHTML=`<h2>${d.title}</h2><p class="small">Open your booklet at the same page. Read the question in the booklet, then use Stormy's help here. Write your final answer in the booklet.</p>`+warmHTML(d.id)+d.pages.map(pageHTML).join('');matchGame(d.id);
+ $('#view').innerHTML=`<h2>${d.title}</h2><p class="small">Open your booklet at the same page. Read the question in the booklet, then use Stormy's help here. Write your final answer in the booklet.</p>`+warmHTML(d.id)+d.pages.map(pageHTML).join('')+keyHTML(d);matchGame(d.id);
 }
 function pageHTML(p){
  return `<div class="card"><div class="pg" onclick="this.nextElementSibling.classList.toggle('hide')"><h3>📄 Page ${p.p} · ${p.title}</h3><span class="badge">${p.qs.length} Qs</span></div>
@@ -624,6 +624,10 @@ function ncheck(pid,i){const id=pid+'_'+i,t=$('#'+id+'_w').value.trim(),r=$('#'+
  if(/\bi\b/.test(t))tips.push('"I" is always a capital. · Chữ "I" luôn viết hoa.');
  r.innerHTML=(ok?'<div class="box ok">✅ Right idea! <span class="vi">Đúng ý rồi!</span></div>':'<div class="box no">🤔 Not quite. Look at the correct answer below and see what is different. <span class="vi">Chưa đúng – xem đáp án bên dưới, so sánh với bài con.</span></div>')+(tips.length?`<div class="box hint">🔧 ${tips.map(esc).join('<br>🔧 ')}</div>`:'');
  if(ok&&!tips.length)star(id);showModel(pid,i)}
+function keyHTML(d){let h=`<div class="card" style="border:3px dashed var(--choc)"><h3>🔒 Answer key – for Mum & Dad</h3><p class="small">Đáp án cả ngày, để ở cuối và khoá lại để con không xem trước. Bố mẹ bấm nút, trả lời phép tính để mở.</p><button class="s go" onclick="unlockKey('${d.id}')">🔓 Bố mẹ mở đáp án</button><div id="key_${d.id}" class="hide">`;
+ d.pages.forEach(p=>{h+=`<h4 style="margin:12px 0 4px">📄 Page ${p.p} · ${esc(p.title)}</h4>`;p.qs.forEach((q,i)=>{const m=modelOf(p.id,i);if(m)h+=`<div class="box ex"><b>Q${q.n}.</b> ${esc(m).replace(/\n/g,'<br>')}</div>`})});
+ return h+`<button class="s" onclick="$('#key_${d.id}').classList.add('hide')">🔒 Khoá lại</button></div></div>`}
+function unlockKey(id){const a=6+Math.floor(Math.random()*4),b=7+Math.floor(Math.random()*3);const r=prompt(`Bố mẹ: ${a} × ${b} = ?`);if(r!==null&&+r===a*b)$('#key_'+id).classList.remove('hide');else if(r!==null)alert('Chưa đúng.')}
 function tog(id){$('#'+id).classList.toggle('hide')}
 const hintN={};
 function hint(id){const [pid,i]=id.split('_');const q=findQ(pid,+i);hintN[id]=(hintN[id]||0);if(hintN[id]<q.hints.length){$('#'+id+'_h').insertAdjacentHTML('beforeend',`<div class="box hint">💡 Hint ${hintN[id]+1}: ${esc(q.hints[hintN[id]])}</div>`);hintN[id]++}}

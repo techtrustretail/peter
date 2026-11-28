@@ -444,6 +444,7 @@ function fixstory(){
   (st.pick||[]).forEach(([k,q,o])=>{h+=`<div><b>${esc(q)}</b><br>${o.map(w=>`<span class="chip ${fs[k]===w?'sel':''}" onclick="fsPick('${k}','${w.replace(/'/g,"\\'")}')">${esc(w)}</span>`).join('')}</div>`});
   if(p&&st.text)h+=`<div class="box ok"><b>New paragraph:</b><br>${esc(p)}</div>`;
   if(p)h+=`<button class="s" onclick="say(fsStory()[${n}])">🔊 Listen</button>`;
+  h+=`<div class="q"><b>✏️ Write it yourself</b> <span class="small">(new paragraph in your own words – Stormy checks, then shows the correct answer)</span><br><span class="vi">Con tự viết lại đoạn này, bấm Check để xem đúng/sai, nhận xét và đáp án.</span><textarea id="fsw_${st.k}">${esc(fs['w'+st.k]||'')}</textarea><button class="s go" onclick="fsCheck(${n})">✅ Check</button><div id="fsr_${st.k}"></div></div>`;
   h+='</div>'});
  const s=fsStory(),all=s.every(Boolean),full=s.join(' '),w=fsWc(full);
  h+=`<div class="card"><h3>🏆 Step 7 · Your finished story</h3>`;
@@ -459,6 +460,31 @@ function fixstory(){
  }
  h+='</div>';
  $('#view').innerHTML=h}
+const FSNEED={p1:[/\b(storm|stormy|rain|wind|thunder|night)\b/i,'Say the weather or time (storm, rain, night…) so the setting is clear.','Thêm thời tiết/thời gian để bối cảnh rõ.'],
+ p2:[/\b(heart|hands?|breath|knees|shiver|trembl|froze|goosebumps)/i,'Show a feeling with the body (heart thumped, hands trembled…).','Tả cảm xúc qua cơ thể.'],
+ p3:[/\blike\b|\bas \w+ as\b/i,'Add a simile with "like" or "as … as".','Cần 1 phép so sánh: like / as…as.'],
+ p4:[/\b(so|because|to)\b/i,'Give a reason: why did Peter do it? (so / because)','Nói lý do: vì sao Peter làm vậy.'],
+ p5:[/grandma|!/i,'Link back to Grandma, or end with a surprise!','Quay lại bà, hoặc kết bất ngờ.']};
+function fsCheck(n){const st=FS.steps[n],k=st.k,t=document.getElementById('fsw_'+k).value.trim();fs['w'+k]=t;fsSave();if(!t)return;
+ const good=[],fix=[];const sents=t.split(/(?<=[.!?])\s+/).filter(Boolean);
+ if(sents.every(s=>/^["']?[A-Z]/.test(s)))good.push(['Every sentence starts with a capital letter.','Đầu câu viết hoa đúng.']);else fix.push(['Start every sentence with a CAPITAL letter.','Đầu mỗi câu phải viết hoa.']);
+ if(/[.!?]["']?$/.test(t))good.push(['It ends with a full stop.','Có dấu chấm cuối.']);else fix.push(['Put a full stop (or !) at the end.','Thiếu dấu chấm cuối câu.']);
+ if(/\bi\b/.test(t))fix.push(['"I" is always a capital letter.','Chữ "I" luôn viết hoa.']);
+ if(/[a-z] (When|But|And|So|He|She|It|The)\b/.test(t))fix.push(['A capital letter in the middle of a sentence? Only names get capitals there.','Không viết hoa giữa câu (trừ tên riêng).']);
+ const w=(t.match(/\bwhen\b/gi)||[]).length;if(w>1)fix.push([`"when" is used ${w} times. Make new sentences: Suddenly / Slowly / Just then.`,'Lặp "when" → tách câu mới.']);
+ if(/,\s*(he|she|it|they|peter|when)\b/i.test(t))fix.push(['A comma cannot join two sentences – use a full stop.','Dấu phẩy không nối 2 câu → dùng dấu chấm.']);
+ const bad=t.match(/\b(he|she|peter|it|they|and)\s+(open|check|escape|come|explore|look|hurry|run|take|see|walk|push|hear|grab|climb|let go)\b/gi);
+ if(bad)fix.push([`Past tense! "${bad[0]}" → the story already happened (opened, checked, came, saw, took…).`,'Dùng thì quá khứ: thêm -ed hoặc từ đặc biệt.']);
+ if(/\btouch\b/i.test(t))fix.push(['"touch" → "torch" (the light 🔦).','Đèn pin là "torch".']);
+ if(sents.some(s=>s.split(/\s+/).length>25))fix.push(['One sentence is very long. Cut it into 2 shorter ones.','Câu quá dài → cắt đôi.']);
+ if(n==1){if(sents.some(s=>s.split(/\s+/).length<=3))good.push(['Short sentence for tension! ⚡','Có câu ngắn tạo hồi hộp.']);else fix.push(['Add a very short sentence for tension: "Nothing." "Locked."','Thêm câu thật ngắn để hồi hộp.'])}
+ const nd=FSNEED[k];if(nd[0].test(t))good.push([nd[1].replace(/^(Say|Show|Add|Give|Link)/,'✓ $1').split(/[.(]/)[0]+' – done!','Đạt yêu cầu đoạn này.']);else fix.push([nd[1],nd[2]]);
+ const model=fsPara(st)||(st.opts?st.opts[0][1]:st.text({sound:'scratching',feel:'His heart thumped.',sim:'like two tiny torches'}));
+ const ok=!fix.length;if(ok)star('fsw_'+k);
+ document.getElementById('fsr_'+k).innerHTML=`<div class="box ${ok?'ok':'no'}"><b>${ok?'✅ Correct! Great job!':'🔧 Almost! Fix '+fix.length+' thing'+(fix.length>1?'s':'')+':'}</b></div>`+
+  good.map(([e,v])=>`<div class="box ok">⭐ ${esc(e)} <span class="vi">· ${esc(v)}</span></div>`).join('')+
+  fix.map(([e,v])=>`<div class="box no">🔧 ${esc(e)}<br><span class="vi">${esc(v)}</span></div>`).join('')+
+  `<div class="box ex"><b>📗 Correct answer (model):</b><br>${esc(model)}</div><button class="s" onclick="say(${JSON.stringify(model).replace(/"/g,'&quot;')})">🔊 Listen to the model</button>`}
 function fsBug(i,j){fs['b'+i]=j;fsSave();const y=scrollY;fixstory();scrollTo(0,y);if(j===FS.bugs[i][2])star('fsb'+i)}
 function fsPick(k,v){fs[k]=v;if(k=='p4'&&v===1&&fs.p5===2)delete fs.p5;fsSave();const y=scrollY;fixstory();scrollTo(0,y)}
 
